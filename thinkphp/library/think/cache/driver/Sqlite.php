@@ -1,4 +1,5 @@
 <?php
+
 // +----------------------------------------------------------------------
 // | ThinkPHP [ WE CAN DO IT JUST THINK ]
 // +----------------------------------------------------------------------
@@ -95,6 +96,7 @@ class Sqlite extends Driver
 
         if (sqlite_num_rows($result)) {
             $content = sqlite_fetch_single($result);
+
             if (function_exists('gzcompress')) {
                 //启用数据压缩
                 $content = gzuncompress($content);
@@ -122,7 +124,7 @@ class Sqlite extends Driver
 
         $value = sqlite_escape_string($this->serialize($value));
 
-        if (is_null($expire)) {
+        if (null === $expire) {
             $expire = $this->options['expire'];
         }
 
@@ -219,6 +221,7 @@ class Sqlite extends Driver
             $name = sqlite_escape_string($this->getTagKey($tag));
             $sql  = 'DELETE FROM ' . $this->options['table'] . ' WHERE tag=\'' . $name . '\'';
             sqlite_query($this->handler, $sql);
+
             return true;
         }
 

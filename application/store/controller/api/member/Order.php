@@ -29,7 +29,6 @@ use think\exception\HttpResponseException;
  */
 class Order extends Member
 {
-
     /**
      * 创建商城订单
      * @throws \think\db\exception\DataNotFoundException
@@ -41,7 +40,10 @@ class Order extends Member
     {
         // 商品规则
         $rule = $this->request->post('rule', '');
-        if (empty($rule)) $this->error('下单商品规则不能为空！');
+
+        if (empty($rule)) {
+            $this->error('下单商品规则不能为空！');
+        }
         // 订单处理
         list($orderList, $order) = [[], [
             'status'   => '1', 'mid' => $this->mid,
@@ -56,13 +58,20 @@ class Order extends Member
                 $this->error('无效的推荐会员ID，稍候再试！');
             }
         }
+
         foreach (explode('||', $rule) as $item) {
             list($goods_id, $goods_spec, $number) = explode('@', $item);
             // 商品信息检查
             $goods = Db::name('StoreGoods')->where(['id' => $goods_id, 'status' => '1', 'is_deleted' => '0'])->find();
-            if (empty($goods)) $this->error('查询商品主体信息失败，请稍候再试！');
+
+            if (empty($goods)) {
+                $this->error('查询商品主体信息失败，请稍候再试！');
+            }
             $spec = Db::name('StoreGoodsList')->where(['goods_id' => $goods_id, 'goods_spec' => $goods_spec])->find();
-            if (empty($spec)) $this->error('查询商品规则信息失败，请稍候再试！');
+
+            if (empty($spec)) {
+                $this->error('查询商品规则信息失败，请稍候再试！');
+            }
             // 商品库存检查
             if ($spec['number_sales'] + $number > $spec['number_stock']) {
                 $this->error('商品库存不足，请购买其它商品！');
@@ -89,16 +98,19 @@ class Order extends Member
                 'price_rate_amount' => $spec['price_selling'] * $number * $goods['price_rate'] / 100,
             ]);
         }
-        $order['price_goods'] = array_sum(array_column($orderList, 'price_real')) + 0;
-        $order['price_express'] = max(array_column($orderList, 'price_express')) + 0;
-        $order['price_total'] = $order['price_goods'] + $order['price_express'];
+        $order['price_goods']       = array_sum(array_column($orderList, 'price_real'))        + 0;
+        $order['price_express']     = max(array_column($orderList, 'price_express'))           + 0;
+        $order['price_total']       = $order['price_goods']                                    + $order['price_express'];
         $order['price_rate_amount'] = array_sum(array_column($orderList, 'price_rate_amount')) + 0;
+
         try {
             // 订单数据写入
             Db::name('StoreOrder')->insert($order);
             Db::name('StoreOrderList')->insertAll($orderList);
             // 同步商品库存及销量
-            foreach (array_unique(array_column($orderList, 'goods_id')) as $goodsId) GoodsService::syncStock($goodsId);
+            foreach (array_unique(array_column($orderList, 'goods_id')) as $goodsId) {
+                GoodsService::syncStock($goodsId);
+            }
             $this->success('订单创建成功，请补全收货信息后支付！', ['order' => $order]);
         } catch (HttpResponseException $exception) {
             throw $exception;
@@ -127,20 +139,27 @@ class Order extends Member
             'order_no.require'   => '订单号不能为空！',
             'address_id.require' => '收货地址ID不能为空（0自提可以为空）',
         ]);
-        $map = ['order_no' => $data['order_no'], 'mid' => $this->member['id']];
+        $map   = ['order_no' => $data['order_no'], 'mid' => $this->member['id']];
         $order = Db::name('StoreOrder')->whereIn('status', ['1', '2'])->where($map)->find();
-        if (empty($order)) $this->error('订单异常，请返回商品重新下单！');
-        $update = ['status' => '2'];
-        $where = ['id' => $data['address_id'], 'mid' => $this->member['id']];
+
+        if (empty($order)) {
+            $this->error('订单异常，请返回商品重新下单！');
+        }
+        $update  = ['status' => '2'];
+        $where   = ['id' => $data['address_id'], 'mid' => $this->member['id']];
         $address = Db::name('StoreMemberAddress')->where($where)->find();
-        if (empty($address)) $this->error('会员收货地址异常，请刷新页面重试！');
+
+        if (empty($address)) {
+            $this->error('会员收货地址异常，请刷新页面重试！');
+        }
         $update['express_address_id'] = $data['address_id'];
-        $update['express_name'] = $address['name'];
-        $update['express_phone'] = $address['phone'];
-        $update['express_province'] = $address['province'];
-        $update['express_city'] = $address['city'];
-        $update['express_area'] = $address['area'];
-        $update['express_address'] = $address['address'];
+        $update['express_name']       = $address['name'];
+        $update['express_phone']      = $address['phone'];
+        $update['express_province']   = $address['province'];
+        $update['express_city']       = $address['city'];
+        $update['express_area']       = $address['area'];
+        $update['express_address']    = $address['address'];
+
         if (Db::name('StoreOrder')->where($map)->update($update) !== false) {
             $params = $this->getPayParams($order['order_no'], $order['price_total']);
             $this->success('更新订单会员信息成功！', $params);
@@ -158,10 +177,20 @@ class Order extends Member
     public function pay()
     {
         $order_no = $this->request->post('order_no');
-        $order = Db::name('StoreOrder')->where(['order_no' => $order_no])->find();
-        if (empty($order_no)) $this->error('获取订单信息异常，请稍候再试！');
-        if ($order['pay_state']) $this->error('订单已经完成支付，不需要再次支付！');
-        if ($order['status'] <> 2) $this->error('该订单不能发起支付哦！');
+        $order    = Db::name('StoreOrder')->where(['order_no' => $order_no])->find();
+
+        if (empty($order_no)) {
+            $this->error('获取订单信息异常，请稍候再试！');
+        }
+
+        if ($order['pay_state']) {
+            $this->error('订单已经完成支付，不需要再次支付！');
+        }
+
+        if ($order['status'] != 2) {
+            $this->error('该订单不能发起支付哦！');
+        }
+
         try {
             $param = $this->getPayParams($order['order_no'], $order['price_total']);
             $this->success('获取订单支付参数成功！', $param);
@@ -190,12 +219,15 @@ class Order extends Member
             'notify_url'       => url('@store/api.notify/wxpay', '', false, true),
             'spbill_create_ip' => $this->request->ip(),
         ];
+
         try {
-            $pay = \We::WePayOrder(config('wechat.miniapp'));
+            $pay  = \We::WePayOrder(config('wechat.miniapp'));
             $info = $pay->create($options);
+
             if ($info['return_code'] === 'SUCCESS' && $info['result_code'] === 'SUCCESS') {
                 return $pay->jsapiParams($info['prepay_id']);
             }
+
             if (isset($info['err_code_des'])) {
                 throw new \think\Exception($info['err_code_des']);
             }
@@ -215,21 +247,27 @@ class Order extends Member
     public function gets()
     {
         $where = [['mid', 'eq', $this->mid]];
+
         if ($this->request->has('order_no', 'post', true)) {
             $where[] = ['order_no', 'eq', $this->request->post('order_no')];
         } else {
             $where[] = ['status', 'in', ['0', '2', '3', '4', '5']];
         }
+
         if ($this->request->has('status', 'post', true)) {
             $where[] = ['status', 'eq', $this->request->post('status')];
         }
         $result = $this->_query('StoreOrder')->where($where)->order('id desc')->page(true, false, false, 20);
-        $glist = Db::name('StoreOrderList')->whereIn('order_no', array_unique(array_column($result['list'], 'order_no')))->select();
+        $glist  = Db::name('StoreOrderList')->whereIn('order_no', array_unique(array_column($result['list'], 'order_no')))->select();
+
         foreach ($result['list'] as &$vo) {
             list($vo['goods_count'], $vo['list']) = [0, []];
-            foreach ($glist as $goods) if ($vo['order_no'] === $goods['order_no']) {
-                $vo['list'][] = $goods;
-                $vo['goods_count'] += $goods['number_goods'];
+
+            foreach ($glist as $goods) {
+                if ($vo['order_no'] === $goods['order_no']) {
+                    $vo['list'][] = $goods;
+                    $vo['goods_count'] += $goods['number_goods'];
+                }
             }
         }
         $this->success('获取订单列表成功！', $result);
@@ -250,7 +288,11 @@ class Order extends Member
             'order_no' => $this->request->post('order_no'),
         ];
         $order = Db::name('StoreOrder')->where($where)->find();
-        if (empty($order)) $this->error('待取消的订单不存在，请稍候再试！');
+
+        if (empty($order)) {
+            $this->error('待取消的订单不存在，请稍候再试！');
+        }
+
         if (in_array($order['status'], ['1', '2'])) {
             $result = Db::name('StoreOrder')->where($where)->update([
                 'status'       => '0',
@@ -258,6 +300,7 @@ class Order extends Member
                 'cancel_at'    => date('Y-m-d H:i:s'),
                 'cancel_desc'  => '用户主动取消订单！',
             ]);
+
             if ($result !== false && OrderService::syncStock($order['order_no'])) {
                 $this->success('订单取消成功！');
             } else {
@@ -283,7 +326,11 @@ class Order extends Member
             'order_no' => $this->request->post('order_no'),
         ];
         $order = Db::name('StoreOrder')->where($where)->find();
-        if (empty($order)) $this->error('待确认的订单不存在，请稍候再试！');
+
+        if (empty($order)) {
+            $this->error('待确认的订单不存在，请稍候再试！');
+        }
+
         if (in_array($order['status'], ['4'])) {
             if (Db::name('StoreOrder')->where($where)->update(['status' => '5']) !== false) {
                 $this->success('订单确认成功！');

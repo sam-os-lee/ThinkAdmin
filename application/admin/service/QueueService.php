@@ -59,11 +59,18 @@ class QueueService
         if (empty($double) && self::exists($title)) {
             throw new \think\Exception('该任务已经创建，请耐心等待处理完成！');
         }
+
         $jobId = Db::name('SystemJobsLog')->insertGetId([
-            'title' => $title, 'later' => $later, 'uri' => $uri, 'double' => intval($double),
-            'data'  => json_encode($data, 256), 'desc' => $desc, 'status_at' => date('Y-m-d H:i:s'),
+            'title' => $title,
+            'later' => $later,
+            'uri' => $uri,
+            'double' => intval($double),
+            'data'  => json_encode($data, 256),
+            'desc' => $desc,
+            'status_at' => date('Y-m-d H:i:s'),
         ]);
-        $data['_job_id_'] = $jobId;
+
+        $data['_job_id_']    = $jobId;
         $data['_job_title_'] = $title;
         \think\Queue::later($later, $uri, $data);
     }
@@ -80,8 +87,11 @@ class QueueService
     public static function status($jobId, $status = self::STATUS_PEND, $statusDesc = '')
     {
         $result = Db::name('SystemJobsLog')->where(['id' => $jobId])->update([
-            'status' => $status, 'status_desc' => $statusDesc, 'status_at' => date('Y-m-d H:i:s'),
+            'status' => $status,
+            'status_desc' => $statusDesc,
+            'status_at' => date('Y-m-d H:i:s'),
         ]);
+
         return $result !== false;
     }
 
@@ -93,6 +103,7 @@ class QueueService
     public static function exists($title)
     {
         $where = [['title', 'eq', $title], ['status', 'in', [1, 2]]];
+
         return Db::name('SystemJobsLog')->where($where)->count() > 0;
     }
 
@@ -119,12 +130,13 @@ class QueueService
     public static function del($jobId)
     {
         $where = [['id', 'eq', $jobId], ['status', 'in', [1, 3, 4]]];
+
         if (Db::name('SystemJobsLog')->where($where)->delete() > 0) {
             Db::name('SystemJobs')->whereLike('payload', '%"_job_id_":"' . $jobId . '"%')->delete();
-            return true;
-        } else {
-            return false;
-        }
-    }
 
+            return true;
+        }
+
+        return false;
+    }
 }

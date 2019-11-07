@@ -1,4 +1,5 @@
 <?php
+
 // +----------------------------------------------------------------------
 // | ThinkPHP [ WE CAN DO IT JUST THINK ]
 // +----------------------------------------------------------------------
@@ -27,12 +28,11 @@ abstract class Make extends Command
 
     protected function configure()
     {
-        $this->addArgument('name', Argument::REQUIRED, "The name of the class");
+        $this->addArgument('name', Argument::REQUIRED, 'The name of the class');
     }
 
     protected function execute(Input $input, Output $output)
     {
-
         $name = trim($input->getArgument('name'));
 
         $classname = $this->getClassName($name);
@@ -41,6 +41,7 @@ abstract class Make extends Command
 
         if (is_file($pathname)) {
             $output->writeln('<error>' . $this->type . ' already exists!</error>');
+
             return false;
         }
 
@@ -51,7 +52,6 @@ abstract class Make extends Command
         file_put_contents($pathname, $this->buildClass($classname));
 
         $output->writeln('<info>' . $this->type . ' created successfully.</info>');
-
     }
 
     protected function buildClass($name)
@@ -106,5 +106,4 @@ abstract class Make extends Command
     {
         return $module ? ($appNamespace . '\\' . $module) : $appNamespace;
     }
-
 }

@@ -45,7 +45,8 @@ class Auth extends Controller
     public function index()
     {
         $this->title = '系统权限管理';
-        $query = $this->_query($this->table)->dateBetween('create_at');
+        $query       = $this->_query($this->table)->dateBetween('create_at');
+        // 注意:分页管理器
         $query->like('title,desc')->equal('status')->order('sort desc,id desc')->page();
     }
 
@@ -59,19 +60,24 @@ class Auth extends Controller
     public function apply()
     {
         $this->title = '权限配置节点';
-        $auth = $this->request->post('id', '0');
+        $auth        = $this->request->post('id', '0');
+
         switch (strtolower($this->request->post('action'))) {
-            case 'get': // 获取权限配置
+            case 'get':  // 获取权限配置
                 $checks = Db::name('SystemAuthNode')->where(['auth' => $auth])->column('node');
+
                 return $this->success('获取权限节点成功！', NodeService::getAuthTree($checks));
-            case 'save': // 保存权限配置
+            case 'save':  // 保存权限配置
                 list($post, $data) = [$this->request->post(), []];
+
                 foreach (isset($post['nodes']) ? $post['nodes'] : [] as $node) {
                     $data[] = ['auth' => $auth, 'node' => $node];
                 }
+
                 Db::name('SystemAuthNode')->where(['auth' => $auth])->delete();
                 Db::name('SystemAuthNode')->insertAll($data);
                 NodeService::applyUserAuth();
+
                 return $this->success('权限授权更新成功！');
             default:
                 return $this->_form($this->table, 'apply');
@@ -90,6 +96,7 @@ class Auth extends Controller
     public function add()
     {
         $this->applyCsrfToken();
+        // 注意:form逻辑器
         $this->_form($this->table, 'form');
     }
 
@@ -105,6 +112,7 @@ class Auth extends Controller
     public function edit()
     {
         $this->applyCsrfToken();
+        // 注意:form逻辑器
         $this->_form($this->table, 'form');
     }
 
@@ -133,6 +141,7 @@ class Auth extends Controller
     public function forbid()
     {
         $this->applyCsrfToken();
+        // 注意:更新逻辑器
         $this->_save($this->table, ['status' => '0']);
     }
 
@@ -145,6 +154,7 @@ class Auth extends Controller
     public function resume()
     {
         $this->applyCsrfToken();
+        // 注意:更新逻辑器
         $this->_save($this->table, ['status' => '1']);
     }
 
@@ -157,6 +167,7 @@ class Auth extends Controller
     public function remove()
     {
         $this->applyCsrfToken();
+        // 注意:删除逻辑器
         $this->_delete($this->table);
     }
 
@@ -171,10 +182,9 @@ class Auth extends Controller
         if ($result) {
             $map = ['auth' => $this->request->post('id')];
             Db::name('SystemAuthNode')->where($map)->delete();
-            $this->success("权限删除成功！", '');
+            $this->success('权限删除成功！', '');
         } else {
-            $this->error("权限删除失败，请稍候再试！");
+            $this->error('权限删除失败，请稍候再试！');
         }
     }
-
 }

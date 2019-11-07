@@ -1,4 +1,5 @@
 <?php
+
 // +----------------------------------------------------------------------
 // | ThinkPHP [ WE CAN DO IT JUST THINK ]
 // +----------------------------------------------------------------------
@@ -159,7 +160,7 @@ class RuleItem extends Rule
 
         $url = $this->urlSuffixCheck($request, $url, $option);
 
-        if (is_null($match)) {
+        if (null === $match) {
             $match = $this->match($url, $option, $completeMatch);
         }
 
@@ -256,6 +257,7 @@ class RuleItem extends Rule
             if (0 === strcasecmp($rule, $url) || (!$completeMatch && 0 === strncasecmp($rule . $depr, $url . $depr, strlen($rule . $depr)))) {
                 return $var;
             }
+
             return false;
         }
 
@@ -288,5 +290,4 @@ class RuleItem extends Rule
         // 成功匹配后返回URL中的动态变量数组
         return $var;
     }
-
 }

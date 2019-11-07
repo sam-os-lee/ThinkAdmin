@@ -1,4 +1,5 @@
 <?php
+
 // +----------------------------------------------------------------------
 // | ThinkPHP [ WE CAN DO IT JUST THINK ]
 // +----------------------------------------------------------------------
@@ -29,6 +30,7 @@ class Xml
         }
 
         $result = (array) $content;
+
         foreach ($result as $key => $val) {
             if (is_object($val)) {
                 $result[$key] = (array) $val;

@@ -1,4 +1,5 @@
 <?php
+
 // +----------------------------------------------------------------------
 // | ThinkPHP [ WE CAN DO IT JUST THINK ]
 // +----------------------------------------------------------------------
@@ -18,7 +19,6 @@ use think\exception\DbException;
  */
 class BindParamException extends DbException
 {
-
     /**
      * BindParamException constructor.
      * @access public

@@ -1,4 +1,5 @@
 <?php
+
 // +----------------------------------------------------------------------
 // | ThinkPHP [ WE CAN DO IT JUST THINK ]
 // +----------------------------------------------------------------------
@@ -41,7 +42,7 @@ class MorphMany extends Relation
         $this->type      = $type;
         $this->morphKey  = $morphKey;
         $this->morphType = $morphType;
-        $this->query     = (new $model)->db();
+        $this->query     = (new $model())->db();
     }
 
     /**
@@ -262,6 +263,7 @@ class MorphMany extends Relation
 
         // 组装模型数据
         $data = [];
+
         foreach ($list as $set) {
             $data[$set->$morphKey][] = $set;
         }
@@ -337,5 +339,4 @@ class MorphMany extends Relation
             $this->baseQuery = true;
         }
     }
-
 }

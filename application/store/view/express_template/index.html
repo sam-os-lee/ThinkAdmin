@@ -6,9 +6,11 @@
     <div class="layui-card-body think-box-shadow padding-bottom-20 padding-left-40">
 
         <div data-item-container>
+            <!--太优雅了!!!-->
             {foreach $list as $index=>$item}
             {assign name='is_default' value='0'}
             {assign name='index' value='$index+1'}
+            <!--区域性邮费规则-->
             {assign name='group_title' value='邮费规则分组'}
             {include file='express_template/index_item'}
             {/foreach}
@@ -16,8 +18,10 @@
 
         <div class="margin-bottom-20"><a onclick="addRuleItem()" class="layui-btn layui-btn-warm">添加邮费规则分组</a></div>
 
+        <!--太优雅了!!!-->
         {assign name='index' value='0'}
         {assign name='is_default' value='1'}
+        <!--默认邮费规则-->
         {assign name='group_title' value='默认邮费规则'}
         {assign name="item" value="$default"}
         {include file='express_template/index_item'}
@@ -55,6 +59,7 @@
         }
     }
 
+    // 全选/反选
     (function (opt) {
         opt.selecter = 'input[type=checkbox][data-province-input]';
         $('body').off('change', opt.selecter).on('change', opt.selecter, function () {
@@ -66,6 +71,7 @@
 
 </script>
 
+<!--邮费规则模板-->
 {assign name='is_default' value='0'}
 {assign name='index' value='[index]'}
 {assign name='group_title' value='邮费规则分组'}

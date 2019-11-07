@@ -36,6 +36,7 @@ class Notify
     {
         $wechat = \We::WePayOrder(config('wechat.miniapp'));
         $notify = $wechat->getNotify();
+
         if ($notify['result_code'] == 'SUCCESS' && $notify['return_code'] == 'SUCCESS') {
             if ($this->update($notify['out_trade_no'], $notify['transaction_id'], $notify['cash_fee'] / 100, 'wechat')) {
                 return $wechat->getNotifySuccessReply();
@@ -60,7 +61,10 @@ class Notify
         // 检查订单支付状态
         $where = ['order_no' => $order_no, 'pay_state' => '0', 'status' => '2'];
         $order = Db::name('StoreOrder')->where($where)->find();
-        if (empty($order)) return false;
+
+        if (empty($order)) {
+            return false;
+        }
         // 更新订单支付状态
         $result = Db::name('StoreOrder')->where($where)->update([
             'pay_type'  => $type, 'pay_no' => $pay_no, 'status' => '3',
@@ -68,7 +72,7 @@ class Notify
         ]);
         // 调用会员升级机制
         OrderService::update($order['order_no']);
+
         return $result !== false;
     }
-
 }

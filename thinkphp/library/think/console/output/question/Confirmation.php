@@ -1,4 +1,5 @@
 <?php
+
 // +----------------------------------------------------------------------
 // | ThinkPHP [ WE CAN DO IT JUST THINK ]
 // +----------------------------------------------------------------------
@@ -15,7 +16,6 @@ use think\console\output\Question;
 
 class Confirmation extends Question
 {
-
     private $trueAnswerRegex;
 
     /**
@@ -47,6 +47,7 @@ class Confirmation extends Question
             }
 
             $answerIsTrue = (bool) preg_match($regex, $answer);
+
             if (false === $default) {
                 return $answer && $answerIsTrue;
             }

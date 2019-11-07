@@ -22,8 +22,10 @@
 {block name="script"}
 <script>
     window.RoleAction = new function () {
+
         this.data = {};
         this.ztree = null;
+
         this.setting = {
             view: {showLine: false, showIcon: false, dblClickExpand: false},
             check: {enable: true, nocheck: false, chkboxType: {"Y": "ps", "N": "ps"}},
@@ -34,22 +36,29 @@
                 }
             }
         };
+
         this.renderChildren = function (list, level) {
+
             var childrens = [];
             for (var i in list) childrens.push({
                 open: true, node: list[i].node, name: list[i].title || list[i].node,
                 checked: list[i].checked || false, children: this.renderChildren(list[i]._sub_, level + 1)
             });
+
             return childrens;
         };
+
         this.getData = function (that) {
+
             var index = $.msg.loading();
             $.form.load('{:url()}', {id: '{$vo.id}', action: 'get'}, 'post', function (ret) {
                 that.data = that.renderChildren(ret.data, 1);
                 return $.msg.close(index), that.showTree(), false;
             });
         };
+
         this.showTree = function () {
+
             this.ztree = $.fn.zTree.init($("#zTree"), this.setting, this.data);
             while (true) {
                 var nodes = this.ztree.getNodesByFilter(function (node) {
@@ -59,13 +68,16 @@
                 for (var i in nodes) this.ztree.removeNode(nodes[i]);
             }
         };
+
         this.submit = function () {
             var nodes = [], data = this.ztree.getCheckedNodes(true);
             for (var i in data) if (data[i].node) nodes.push(data[i].node);
             $.form.load('{:url()}', {id: '{$vo.id}', action: 'save', nodes: nodes}, 'post');
         };
+
         // 刷新数据
         this.getData(this);
+
         // 提交表单
         $('[data-submit-role]').on('click', function () {
             RoleAction.submit();

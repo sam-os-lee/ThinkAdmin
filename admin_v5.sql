@@ -408,10 +408,10 @@ CREATE TABLE `system_config`  (
 -- ----------------------------
 -- Records of system_config
 -- ----------------------------
-INSERT INTO `system_config` VALUES (1, 'app_name', 'ThinkAdmin');
-INSERT INTO `system_config` VALUES (2, 'site_name', 'ThinkAdmin');
-INSERT INTO `system_config` VALUES (3, 'app_version', 'v5');
-INSERT INTO `system_config` VALUES (4, 'site_copy', '©版权所有 2014-2018 楚才科技');
+INSERT INTO `system_config` VALUES (1, 'app_name', '韩代免税狗');
+INSERT INTO `system_config` VALUES (2, 'site_name', '免税狗管理系统');
+INSERT INTO `system_config` VALUES (3, 'app_version', 'v1.0');
+INSERT INTO `system_config` VALUES (4, 'site_copy', '©版权所有 2019-2020 亚马逊科技');
 INSERT INTO `system_config` VALUES (5, 'site_icon', '/upload/decb0fe26fa3f486/b3f6521bf29403c8.png');
 INSERT INTO `system_config` VALUES (7, 'miitbeian', '粤ICP备16006642号-2');
 INSERT INTO `system_config` VALUES (8, 'storage_type', 'local');

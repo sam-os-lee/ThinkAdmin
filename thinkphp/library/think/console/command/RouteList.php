@@ -1,4 +1,5 @@
 <?php
+
 // +----------------------------------------------------------------------
 // | ThinkPHP [ WE CAN DO IT JUST THINK IT ]
 // +----------------------------------------------------------------------
@@ -31,7 +32,7 @@ class RouteList extends Command
     protected function configure()
     {
         $this->setName('route:list')
-            ->addArgument('style', Argument::OPTIONAL, "the style of the table.", 'default')
+            ->addArgument('style', Argument::OPTIONAL, 'the style of the table.', 'default')
             ->addOption('sort', 's', Option::VALUE_OPTIONAL, 'order by rule name.', 0)
             ->addOption('more', 'm', Option::VALUE_NONE, 'show route options.')
             ->setDescription('show route list.');
@@ -126,5 +127,4 @@ class RouteList extends Command
 
         return $this->table($table);
     }
-
 }

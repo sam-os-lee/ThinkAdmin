@@ -1,4 +1,5 @@
 <?php
+
 // +----------------------------------------------------------------------
 // | ThinkPHP [ WE CAN DO IT JUST THINK ]
 // +----------------------------------------------------------------------
@@ -85,6 +86,7 @@ class Domain extends RuleGroup
     public function bind($bind)
     {
         $this->router->bind($bind, $this->domain);
+
         return $this;
     }
 
@@ -232,5 +234,4 @@ class Domain extends RuleGroup
 
         return new ModuleDispatch($request, $this, $controller . '/' . $action, $param);
     }
-
 }

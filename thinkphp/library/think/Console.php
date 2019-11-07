@@ -1,4 +1,5 @@
 <?php
+
 // +----------------------------------------------------------------------
 // | TopThink [ WE CAN DO IT JUST THINK IT ]
 // +----------------------------------------------------------------------
@@ -20,7 +21,6 @@ use think\console\output\driver\Buffer;
 
 class Console
 {
-
     private $name;
     private $version;
 
@@ -35,22 +35,22 @@ class Console
     private $defaultCommand;
 
     private static $defaultCommands = [
-        'help'              => "think\\console\\command\\Help",
-        'list'              => "think\\console\\command\\Lists",
-        'build'             => "think\\console\\command\\Build",
-        'clear'             => "think\\console\\command\\Clear",
-        'make:command'      => "think\\console\\command\\make\\Command",
-        'make:controller'   => "think\\console\\command\\make\\Controller",
-        'make:model'        => "think\\console\\command\\make\\Model",
-        'make:middleware'   => "think\\console\\command\\make\\Middleware",
-        'make:validate'     => "think\\console\\command\\make\\Validate",
-        'optimize:autoload' => "think\\console\\command\\optimize\\Autoload",
-        'optimize:config'   => "think\\console\\command\\optimize\\Config",
-        'optimize:schema'   => "think\\console\\command\\optimize\\Schema",
-        'optimize:route'    => "think\\console\\command\\optimize\\Route",
-        'run'               => "think\\console\\command\\RunServer",
-        'version'           => "think\\console\\command\\Version",
-        'route:list'        => "think\\console\\command\\RouteList",
+        'help'              => 'think\\console\\command\\Help',
+        'list'              => 'think\\console\\command\\Lists',
+        'build'             => 'think\\console\\command\\Build',
+        'clear'             => 'think\\console\\command\\Clear',
+        'make:command'      => 'think\\console\\command\\make\\Command',
+        'make:controller'   => 'think\\console\\command\\make\\Controller',
+        'make:model'        => 'think\\console\\command\\make\\Model',
+        'make:middleware'   => 'think\\console\\command\\make\\Middleware',
+        'make:validate'     => 'think\\console\\command\\make\\Validate',
+        'optimize:autoload' => 'think\\console\\command\\optimize\\Autoload',
+        'optimize:config'   => 'think\\console\\command\\optimize\\Config',
+        'optimize:schema'   => 'think\\console\\command\\optimize\\Schema',
+        'optimize:route'    => 'think\\console\\command\\optimize\\Route',
+        'run'               => 'think\\console\\command\\RunServer',
+        'version'           => 'think\\console\\command\\Version',
+        'route:list'        => 'think\\console\\command\\RouteList',
     ];
 
     /**
@@ -84,6 +84,7 @@ class Console
         }
 
         $user = posix_getpwnam($user);
+
         if ($user) {
             posix_setuid($user['uid']);
             posix_setgid($user['gid']);
@@ -113,9 +114,9 @@ class Console
         if ($run) {
             // 运行
             return $console->run();
-        } else {
-            return $console;
         }
+
+        return $console;
     }
 
     /**
@@ -204,8 +205,10 @@ class Console
             $output->renderException($e);
 
             $exitCode = $e->getCode();
+
             if (is_numeric($exitCode)) {
                 $exitCode = (int) $exitCode;
+
                 if (0 === $exitCode) {
                     $exitCode = 1;
                 }
@@ -389,7 +392,7 @@ class Console
     public function addCommands(array $commands)
     {
         foreach ($commands as $key => $command) {
-            if (is_subclass_of($command, "\\think\\console\\Command")) {
+            if (is_subclass_of($command, '\\think\\console\\Command')) {
                 // 注册指令
                 $this->add($command, is_numeric($key) ? '' : $key);
             }
@@ -407,6 +410,7 @@ class Console
     {
         if ($name) {
             $this->commands[$name] = $command;
+
             return;
         }
 
@@ -418,6 +422,7 @@ class Console
 
         if (!$command->isEnabled()) {
             $command->setConsole(null);
+
             return;
         }
 
@@ -487,6 +492,7 @@ class Console
     public function getNamespaces()
     {
         $namespaces = [];
+
         foreach ($this->commands as $name => $command) {
             if (is_string($command)) {
                 $namespaces = array_merge($namespaces, $this->extractAllNamespaces($name));
@@ -497,7 +503,6 @@ class Console
                     $namespaces = array_merge($namespaces, $this->extractAllNamespaces($alias));
                 }
             }
-
         }
 
         return array_values(array_unique(array_filter($namespaces)));
@@ -535,6 +540,7 @@ class Console
         }
 
         $exact = in_array($namespace, $namespaces, true);
+
         if (count($namespaces) > 1 && !$exact) {
             throw new \InvalidArgumentException(sprintf('The namespace "%s" is ambiguous (%s).', $namespace, $this->getAbbreviationSuggestions(array_values($namespaces))));
         }
@@ -579,6 +585,7 @@ class Console
         }
 
         $exact = in_array($name, $commands, true);
+
         if (count($commands) > 1 && !$exact) {
             $suggestions = $this->getAbbreviationSuggestions(array_values($commands));
 
@@ -602,6 +609,7 @@ class Console
         }
 
         $commands = [];
+
         foreach ($this->commands as $name => $command) {
             if ($this->extractNamespace($name, substr_count($namespace, ':') + 1) === $namespace) {
                 $commands[$name] = $command;
@@ -620,6 +628,7 @@ class Console
     public static function getAbbreviations($names)
     {
         $abbrevs = [];
+
         foreach ($names as $name) {
             for ($len = strlen($name); $len > 0; --$len) {
                 $abbrev             = substr($name, 0, $len);
@@ -749,6 +758,7 @@ class Console
         $alternatives = [];
 
         $collectionParts = [];
+
         foreach ($collection as $item) {
             $collectionParts[$item] = explode(':', $item);
         }
@@ -756,14 +766,17 @@ class Console
         foreach (explode(':', $name) as $i => $subname) {
             foreach ($collectionParts as $collectionName => $parts) {
                 $exists = isset($alternatives[$collectionName]);
+
                 if (!isset($parts[$i]) && $exists) {
                     $alternatives[$collectionName] += $threshold;
+
                     continue;
                 } elseif (!isset($parts[$i])) {
                     continue;
                 }
 
                 $lev = levenshtein($subname, $parts[$i]);
+
                 if ($lev <= strlen($subname) / 3 || '' !== $subname && false !== strpos($parts[$i], $subname)) {
                     $alternatives[$collectionName] = $exists ? $alternatives[$collectionName] + $lev : $lev;
                 } elseif ($exists) {
@@ -774,6 +787,7 @@ class Console
 
         foreach ($collection as $item) {
             $lev = levenshtein($name, $item);
+
             if ($lev <= strlen($name) / 3 || false !== strpos($item, $name)) {
                 $alternatives[$item] = isset($alternatives[$item]) ? $alternatives[$item] - $lev : $lev;
             }

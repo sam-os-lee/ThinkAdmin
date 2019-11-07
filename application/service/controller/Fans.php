@@ -29,7 +29,6 @@ use think\exception\HttpResponseException;
  */
 class Fans extends Controller
 {
-
     protected $appid = '';
 
     /**
@@ -46,17 +45,20 @@ class Fans extends Controller
     {
         parent::__construct();
         $this->appid = input('appid', session('current_appid'));
+
         if (empty($this->appid)) {
             $this->where = ['status' => '1', 'service_type' => '2', 'is_deleted' => '0', 'verify_type' => '0'];
             $this->appid = Db::name('WechatServiceConfig')->where($this->where)->value('authorizer_appid');
         }
+
         if (empty($this->appid)) {
             $this->fetch('/not-auth');
         } else {
             session('current_appid', $this->appid);
         }
+
         if ($this->request->isGet()) {
-            $this->where = ['status' => '1', 'service_type' => '2', 'is_deleted' => '0', 'verify_type' => '0'];
+            $this->where   = ['status' => '1', 'service_type' => '2', 'is_deleted' => '0', 'verify_type' => '0'];
             $this->wechats = Db::name('WechatServiceConfig')->where($this->where)->order('id desc')->column('authorizer_appid,nick_name');
         }
     }
@@ -74,7 +76,7 @@ class Fans extends Controller
     public function index()
     {
         $this->title = '微信粉丝管理';
-        $query = $this->_query($this->table)->like('nickname')->equal('subscribe,is_black');
+        $query       = $this->_query($this->table)->like('nickname')->equal('subscribe,is_black');
         $query->dateBetween('subscribe_at')->where(['appid' => $this->appid])->order('subscribe_time desc')->page();
     }
 
@@ -85,10 +87,14 @@ class Fans extends Controller
     protected function _index_page_filter(array &$data)
     {
         $tags = Db::name('WechatFansTags')->column('id,name');
+
         foreach ($data as &$user) {
             $user['tags'] = [];
+
             foreach (explode(',', $user['tagid_list']) as $tagid) {
-                if (isset($tags[$tagid])) $user['tags'][] = $tags[$tagid];
+                if (isset($tags[$tagid])) {
+                    $user['tags'][] = $tags[$tagid];
+                }
             }
         }
     }
@@ -100,6 +106,7 @@ class Fans extends Controller
     public function setBlack()
     {
         $this->applyCsrfToken();
+
         try {
             foreach (array_chunk(explode(',', $this->request->post('openid')), 20) as $openids) {
                 WechatService::WeChatUser($this->appid)->batchBlackList($openids);
@@ -121,6 +128,7 @@ class Fans extends Controller
     {
         try {
             $this->applyCsrfToken();
+
             foreach (array_chunk(explode(',', $this->request->post('openid')), 20) as $openids) {
                 WechatService::WeChatUser($this->appid)->batchUnblackList($openids);
                 Db::name('WechatFans')->where(['appid' => $this->appid])->whereIn('openid', $openids)->update(['is_black' => '0']);
@@ -161,5 +169,4 @@ class Fans extends Controller
         $this->applyCsrfToken();
         $this->_delete($this->table);
     }
-
 }

@@ -1,0 +1,139 @@
+<?php
+
+$header = <<<'EOF'
+This file is part of PHP CS Fixer.
+
+(c) Fabien Potencier <fabien@symfony.com>
+    Dariusz Rumiński <dariusz.ruminski@gmail.com>
+
+This source file is subject to the MIT license that is bundled
+with this source code in the file LICENSE.
+EOF;
+
+$finder = PhpCsFixer\Finder::create()
+    ->files()
+    ->name('*.php')
+    ->exclude('vendor')
+    ->in(__DIR__)
+    ->ignoreDotFiles(true)
+    ->ignoreVCS(true);
+$fixers = array(
+    '@PSR2'                                      => true,
+	'braces'									 => true,
+    'single_quote'                               => true, //简单字符串应该使用单引号代替双引号；
+	'blank_line_after_opening_tag'               => true, //确保<?php所在行没有代码且后面跟随空行
+	'linebreak_after_opening_tag'				 => true, //确保<?php所在行没有代码
+	'blank_line_before_statement' 				 => array(
+		'statements' => ['break', 'continue', 'declare', 'die', 'do', 'exit', 'for', 'foreach', 'goto', 'if', 'include', 'include_once', 'require', 'require_once', 'return', 'switch', 'throw', 'try', 'while', 'yield']
+	), // 换行符必须位于已配置语句之前。
+	'array_indentation'							 => true, //数组的每个元素必须缩进一次
+	'array_syntax'							 	 => ['syntax' => 'short'],  //PHP数组显示格式 syntax ('long', 'short')
+	//'no_trailing_comma_in_singleline_array'		 => true, //PHP 单行数组不应该有逗号。
+	'no_whitespace_before_comma_in_array'		 => true, //在数组声明中,每个逗号前不得有空格。
+	'normalize_index_brace'						 => true, //数组索引始终使用方括号形式。
+	'trim_array_spaces'							 => true, //数组应该像函数/方法参数一样格式化，不带前导或尾随单行空格。
+	'whitespace_after_comma_in_array'			 => true, //在数组声明中，每个逗号后必须有一个空格。
+	'cast_spaces'								 => true, //强制变量转换时需要有一个空格
+	'class_attributes_separation'				 => false, //Class,trait,interface的elements使用换行符分隔
+	'combine_consecutive_issets'				 => true, //多次isset判断变量时,仅使用一次isset判断变量
+	'combine_consecutive_unsets'				 => true, //多次unset判断变量时,仅使用一次unset判断变量
+	'concat_space'					 			 => ['spacing' => 'one'], //.连接字符时空格数目 spacing ('none', 'one')
+	'date_time_immutable'						 => false, //使用Class DateTimeImmutable替代DateTime.
+	//'declare_equal_normalize' 					 => ['space'=>'single'], //声明declare(ticks=1);语句时=空格 space ('none', 'single')
+    'dir_constant'								 => true, //使用__DIR__表达式替换dirname(__FILE__)表达式
+	'ereg_to_preg'								 => true, //使用preg替换ereg表达式
+	//'escape_implicit_backslashes'				 => ['double_quoted' => true, 'heredoc_syntax' => true, 'single_quoted' => false], //自动转义斜杠
+	'explicit_string_variable'					 => true, //使用花括号将隐式变量转换到变量
+	'fopen_flag_order'							 => true, //使用fopen时,bt模式必须在模式的最后
+	'fopen_flags'								 => ['b_mode' => false],//使用fopen时,bt模式必须省略或一致包含
+	'function_to_constant'						 => array(
+		'functions' => ['get_called_class','get_class', 'php_sapi_name', 'phpversion', 'pi']
+	), //使用常量值替换执行核心函数
+	'function_typehint_space'					 => true, //确保函数的行为参数和类型之间只有单个空格
+	//'implode_call'								 => true, //implode函数参数必须按照函数参数定义顺序
+	'is_null'							 		 => ['use_yoda_style' => true], //替换is_null($var)为null===$var
+	'logical_operators'							 => true, //使用&&,||运算符替换and,or
+	'lowercase_cast'							 => true, //数据类型转换必须小写
+	'lowercase_constants'						 => true, //true,false,null这几个php常量必须为小写
+	'lowercase_keywords'						 => true, //PHP关键字必须小写
+	'lowercase_static_reference'				 => true, //静态调用必须小写,例如：self, static, parent
+	'method_argument_space'						 => array(
+		'after_heredoc' => false, //(是否应删除 heredoc end 和逗号之间的空格)
+		'keep_multiple_spaces_after_comma' => false, //（逗号后是否保留多个空格）
+		'on_multiline' => 'ensure_fully_multiline' //（定义如何处理包含换行符函数的参数列表）
+	), //在方法参数和方法调用中,每个逗号之前不能有空格,每个逗号后必须有一个空格。参数列表可以分为多行,每行后续行缩进一次。这样做时,列表中的第一项必须在下一行,并且每行必须只有一个参数。
+	'method_chaining_indentation'				 => true, //方法链方法必须适当缩进对齐
+	'modernize_types_casting'					 => false, //使用转换符替换intval,floatval,doubleval,strval,boolval
+	'multiline_whitespace_before_semicolons'	 => ['strategy'=>'no_multi_line'], //在结束分号之前禁止多行空格或将分号移动到链接调用的新行。strategy ('new_line_for_chained_calls', 'no_multi_line')
+	//'native_constant_invocation'                 => array(
+	//	'fix_built_in' => true, // 是否修复get_defined_constants()函数返回的常量
+	//	'scope' => 'all' // 仅修复namespace或all常量,默认all
+	//), //在常量之前添加\以加快解析.常量名称匹配区分大小写,但null、false和true除外。
+	//'native_function_invocation'                 => array(
+	//	'include' => ['@internal'], // @internal 所有本地方法,@all 所有全部方法, @compiler_optimized Zend优化方法
+	//	'scope' => 'all', // 仅修复namespace或all常量,默认all
+	//	'strict' => false // 是否删除不需要的函数前\；默认为false
+	//), //在执行函数之前添加\以加快解析.
+	'new_with_braces'                          	 => true, //使用new关键字创建的所有实例必须后跟括号。
+	'no_alternative_syntax'                      => true, //使用花括号方式替换语法
+	//'no_blank_lines_before_namespace'            => true, //命名空间之前不应该有空行
+	//'no_homoglyph_names'						 => true, //替换名称中的非ascii字符
+	//'no_leading_import_slash'					 => true, //在use语句中,取消前置斜杠
+	//'no_mixed_echo_print'						 => ['use' => 'echo'], //不允许混合使用echo和print语句use ('echo', 'print')
+	'no_multiline_whitespace_around_double_arrow'=> true, //运算符 => 不应被多行空格包围。
+	//'no_null_property_initialization'			 => true, //属性不能用显式初始化 null
+	//'no_short_bool_cast'						 => true, //不能使用双感叹号来进行bool类型转换
+	//'no_short_echo_tag'							 => true, //用 <?php echo 来代替 <?=
+	//'no_superfluous_elseif'				     => true, //用if替换多余的elseif。
+	//'no_trailing_comma_in_list_call'			 => true, //删除执行函数中参数尾随的逗号
+	'no_unneeded_control_parentheses'			 => array(
+		'statements' => ['break', 'clone', 'continue', 'echo_print', 'return', 'switch_case', 'yield']
+	), //删除控制语句周围不需要的括号。
+	'no_unneeded_curly_braces'					 => true, //删除不需要的花括号,这些花括号是多余的,不属于控制结构的主体。
+	//'no_unneeded_final_method'					 => true, //终态类一定不能有终态方法
+	//'no_unreachable_default_argument_value'		 => true, //在函数参数中,非默认值之前不能有默认值的参数。
+	//'no_unset_cast'								 => true, //必须设置变量 null 而不是使用(unset)强制转换。
+	//'no_unset_on_property'						 => true, //必须设置属性 null 而不是使用(unset)强制转换。
+	'no_useless_else'							 => true, //不需要没有用的 else 分支
+	'no_useless_return'							 => true, //函数结尾不需要return
+	'no_whitespace_in_blank_line'				 => true, //删除空行中的空格
+	'not_operator_with_space'					 => false, //逻辑非!运算符,前置后置含有空格
+	'not_operator_with_successor_space'			 => false, //逻辑非!运算符,后置含有空格
+	'object_operator_without_whitespace'		 => true, //对象运算符->前后不应有空格
+	//'ordered_class_elements'					 => array(
+	//	'order' => ['use_trait', 'constant_public', 'constant_protected', 'constant_private', 'property_public', 'property_protected', 'property_private', 'construct', 'destruct', 'magic', 'phpunit', 'method_public', 'method_protected', 'method_private']
+	//), //classes/interfaces/traits元素排序.
+	//'ordered_imports'							 => array(
+	//	'imports_order' => 'null'
+	//), //use语句排序
+	//'ordered_interfaces'						 => array(
+	//	'direction' => 'ascend',
+	//	'order' => 'alpha'
+	//), //实现接口排序
+	'single_line_comment_style'				 	 => true, //只有一行实际内容的单行注释和多行注释应使用//语法。
+	'space_after_semicolon'					 	 => array(
+		'remove_in_empty_for_expressions' => true
+	), //分号后修复空格
+	'standardize_increment'						 => true, //如果可能，应使用递增和递减运算符。
+	'ternary_operator_spaces'			 		 => true, //三元操作符周围有标准空格
+	//'trailing_comma_in_multiline_array'			 => ['after_heredoc' => false], //PHP 多行数组应该有一个尾随逗号。
+	'unary_operator_spaces'						 => true, //一元运算符应放在其操作数旁边。
+	'no_unused_imports'                          => true, //删除没用到的use
+    'no_singleline_whitespace_before_semicolons' => true, //禁止只有单行空格和分号的写法；
+    'self_accessor'                              => true, //在当前类中使用 self 代替类名；
+    'no_empty_statement'                         => true, //多余的分号
+    'no_extra_consecutive_blank_lines'           => true, //多余空白行
+	'no_extra_blank_lines'                       => array(
+		'tokens' => ['extra']
+	), //移除额外的空行，在[‘break’, ‘case’, ‘continue’, ‘curly_brace_block’, ‘default’, ‘extra’, ‘parenthesis_brace_block’, ‘return’, ‘square_brace_block’, ‘switch’, ‘throw’, ‘use’, ‘useTrait’, ‘use_trait’中
+    'no_blank_lines_after_class_opening'         => true, //class 开始标签后不应该有空白行；
+    'include'                                    => true, //include 和文件路径之间需要有一个空格，文件路径不需要用括号括起来；
+    'no_trailing_comma_in_list_call'             => true, //删除 list 语句中多余的逗号；
+    'no_leading_namespace_whitespace'            => true, //命名空间前面不应该有空格；
+    'standardize_not_equals'                     => true, //使用 <> 代替 !=；
+    'binary_operator_spaces'                     => ['default' => 'align_single_space'] //等号对齐、数字箭头符号对齐
+);
+return PhpCsFixer\Config::create()
+    ->setRules($fixers)
+    ->setFinder($finder)
+    ->setUsingCache(false);

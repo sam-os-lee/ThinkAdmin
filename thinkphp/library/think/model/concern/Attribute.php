@@ -1,4 +1,5 @@
 <?php
+
 // +----------------------------------------------------------------------
 // | ThinkPHP [ WE CAN DO IT JUST THINK ]
 // +----------------------------------------------------------------------
@@ -110,6 +111,7 @@ trait Attribute
     protected function isPk($key)
     {
         $pk = $this->getPk();
+
         if (is_string($pk) && $pk == $key) {
             return true;
         } elseif (is_array($pk) && in_array($key, $pk)) {
@@ -127,11 +129,10 @@ trait Attribute
     public function getKey()
     {
         $pk = $this->getPk();
+
         if (is_string($pk) && array_key_exists($pk, $this->data)) {
             return $this->data[$pk];
         }
-
-        return;
     }
 
     /**
@@ -179,6 +180,7 @@ trait Attribute
     {
         if (is_string($data)) {
             $this->data[$data] = $value;
+
             return $this;
         }
 
@@ -249,9 +251,10 @@ trait Attribute
      */
     public function getOrigin($name = null)
     {
-        if (is_null($name)) {
+        if (null === $name) {
             return $this->origin;
         }
+
         return array_key_exists($name, $this->origin) ? $this->origin[$name] : null;
     }
 
@@ -264,13 +267,14 @@ trait Attribute
      */
     public function getData($name = null)
     {
-        if (is_null($name)) {
+        if (null === $name) {
             return $this->data;
         } elseif (array_key_exists($name, $this->data)) {
             return $this->data[$name];
         } elseif (array_key_exists($name, $this->relation)) {
             return $this->relation[$name];
         }
+
         throw new InvalidArgumentException('property not exists:' . static::class . '->' . $name);
     }
 
@@ -319,7 +323,7 @@ trait Attribute
             return;
         }
 
-        if (is_null($value) && $this->autoWriteTimestamp && in_array($name, [$this->createTime, $this->updateTime])) {
+        if (null === $value && $this->autoWriteTimestamp && in_array($name, [$this->createTime, $this->updateTime])) {
             // 自动写入的时间戳字段
             $value = $this->autoWriteTimestamp($name);
         } else {
@@ -331,7 +335,8 @@ trait Attribute
                 $value  = $this->$method($value, array_merge($this->data, $data));
 
                 $this->set[$name] = true;
-                if (is_null($value) && $origin !== $this->data) {
+
+                if (null === $value && $origin !== $this->data) {
                     return;
                 }
             } elseif (isset($this->type[$name])) {
@@ -376,11 +381,13 @@ trait Attribute
                 case 'datetime':
                 case 'date':
                     $value = $this->formatDateTime('Y-m-d H:i:s.u');
+
                     break;
                 case 'timestamp':
                 case 'integer':
                 default:
                     $value = time();
+
                     break;
             }
         } elseif (is_string($this->autoWriteTimestamp) && in_array(strtolower($this->autoWriteTimestamp), [
@@ -405,7 +412,7 @@ trait Attribute
      */
     protected function writeTransform($value, $type)
     {
-        if (is_null($value)) {
+        if (null === $value) {
             return;
         }
 
@@ -422,6 +429,7 @@ trait Attribute
         switch ($type) {
             case 'integer':
                 $value = (int) $value;
+
                 break;
             case 'float':
                 if (empty($param)) {
@@ -429,32 +437,40 @@ trait Attribute
                 } else {
                     $value = (float) number_format($value, $param, '.', '');
                 }
+
                 break;
             case 'boolean':
                 $value = (bool) $value;
+
                 break;
             case 'timestamp':
                 if (!is_numeric($value)) {
                     $value = strtotime($value);
                 }
+
                 break;
             case 'datetime':
                 $value = is_numeric($value) ? $value : strtotime($value);
                 $value = $this->formatDateTime('Y-m-d H:i:s.u', $value);
+
                 break;
             case 'object':
                 if (is_object($value)) {
                     $value = json_encode($value, JSON_FORCE_OBJECT);
                 }
+
                 break;
             case 'array':
                 $value = (array) $value;
+                // no break
             case 'json':
                 $option = !empty($param) ? (int) $param : JSON_UNESCAPED_UNICODE;
                 $value  = json_encode($value, $option);
+
                 break;
             case 'serialize':
                 $value = serialize($value);
+
                 break;
         }
 
@@ -531,19 +547,18 @@ trait Attribute
 
         if ($relation) {
             $modelRelation = $this->$relation();
+
             if ($modelRelation instanceof Relation) {
                 $value = $this->getRelationData($modelRelation);
 
                 if ($item && method_exists($modelRelation, 'getBindAttr') && $bindAttr = $modelRelation->getBindAttr()) {
-
                     foreach ($bindAttr as $key => $attr) {
                         $key = is_numeric($key) ? $attr : $key;
 
                         if (isset($item[$key])) {
                             throw new Exception('bind attr has exists:' . $key);
-                        } else {
-                            $item[$key] = $value ? $value->getAttr($attr) : null;
                         }
+                        $item[$key] = $value ? $value->getAttr($attr) : null;
                     }
 
                     return false;
@@ -568,7 +583,7 @@ trait Attribute
      */
     protected function readTransform($value, $type)
     {
-        if (is_null($value)) {
+        if (null === $value) {
             return;
         }
 
@@ -581,6 +596,7 @@ trait Attribute
         switch ($type) {
             case 'integer':
                 $value = (int) $value;
+
                 break;
             case 'float':
                 if (empty($param)) {
@@ -588,30 +604,37 @@ trait Attribute
                 } else {
                     $value = (float) number_format($value, $param, '.', '');
                 }
+
                 break;
             case 'boolean':
                 $value = (bool) $value;
+
                 break;
             case 'timestamp':
-                if (!is_null($value)) {
+                if (null !== $value) {
                     $format = !empty($param) ? $param : $this->dateFormat;
                     $value  = $this->formatDateTime($format, $value, true);
                 }
+
                 break;
             case 'datetime':
-                if (!is_null($value)) {
+                if (null !== $value) {
                     $format = !empty($param) ? $param : $this->dateFormat;
                     $value  = $this->formatDateTime($format, $value);
                 }
+
                 break;
             case 'json':
                 $value = json_decode($value, true);
+
                 break;
             case 'array':
                 $value = empty($value) ? [] : json_decode($value, true);
+
                 break;
             case 'object':
                 $value = empty($value) ? new \stdClass() : json_decode($value);
+
                 break;
             case 'serialize':
                 try {
@@ -619,6 +642,7 @@ trait Attribute
                 } catch (\Exception $e) {
                     $value = null;
                 }
+
                 break;
             default:
                 if (false !== strpos($type, '\\')) {

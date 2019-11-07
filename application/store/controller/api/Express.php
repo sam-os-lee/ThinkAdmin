@@ -29,10 +29,9 @@ class Express extends Controller
      */
     public function query()
     {
-        $express_no = $this->request->post('express_no', '');
+        $express_no   = $this->request->post('express_no', '');
         $express_code = $this->request->post('express_code', '');
-        $result = \library\tools\Express::query($express_code, $express_no);
+        $result       = \library\tools\Express::query($express_code, $express_no);
         $this->success('获取物流查询结果！', $result);
     }
-
 }

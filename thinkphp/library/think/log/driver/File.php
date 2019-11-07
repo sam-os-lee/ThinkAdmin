@@ -1,4 +1,5 @@
 <?php
+
 // +----------------------------------------------------------------------
 // | ThinkPHP [ WE CAN DO IT JUST THINK IT ]
 // +----------------------------------------------------------------------
@@ -63,7 +64,6 @@ class File
         $info = [];
 
         foreach ($log as $type => $val) {
-
             foreach ($val as $msg) {
                 if (!is_string($msg)) {
                     $msg = var_export($msg, true);
@@ -108,6 +108,7 @@ class File
 
         foreach ($message as $type => $msg) {
             $msg = is_array($msg) ? implode("\r\n", $msg) : $msg;
+
             if (PHP_SAPI == 'cli') {
                 $info['msg']  = $msg;
                 $info['type'] = $type;
@@ -242,6 +243,7 @@ class File
 
         if ($this->config['json']) {
             $info = $requestInfo + $info;
+
             return json_encode($info, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) . "\r\n";
         }
 
@@ -254,7 +256,6 @@ class File
     protected function getDebugLog(&$info, $append, $apart)
     {
         if ($this->app->isDebug() && $append) {
-
             if ($this->config['json']) {
                 // 获取基本信息
                 $runtime = round(microtime(true) - $this->app->getBeginTime(), 10);
@@ -268,7 +269,6 @@ class File
                     'memory'  => $memory_use . 'kb',
                     'file'    => count(get_included_files()),
                 ] + $info;
-
             } elseif (!$apart) {
                 // 增加额外的调试信息
                 $runtime = round(microtime(true) - $this->app->getBeginTime(), 10);

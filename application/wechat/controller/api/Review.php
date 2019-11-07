@@ -25,7 +25,6 @@ use think\Db;
  */
 class Review extends Controller
 {
-
     /**
      * 图文展示
      * @param integer $id 图文ID
@@ -79,7 +78,7 @@ class Review extends Controller
      */
     public function video()
     {
-        $this->url = strip_tags(input('url', ''), '<a><img>');
+        $this->url   = strip_tags(input('url', ''), '<a><img>');
         $this->title = strip_tags(input('title', ''), '<a><img>');
         $this->fetch();
     }
@@ -98,10 +97,9 @@ class Review extends Controller
      */
     public function music()
     {
-        $this->url = strip_tags(input('url', ''), '<a><img>');
-        $this->desc = strip_tags(input('desc', ''), '<a><img>');
+        $this->url   = strip_tags(input('url', ''), '<a><img>');
+        $this->desc  = strip_tags(input('desc', ''), '<a><img>');
         $this->title = strip_tags(input('title', ''), '<a><img>');
         $this->fetch();
     }
-
 }

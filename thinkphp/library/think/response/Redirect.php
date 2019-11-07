@@ -1,4 +1,5 @@
 <?php
+
 // +----------------------------------------------------------------------
 // | ThinkPHP [ WE CAN DO IT JUST THINK ]
 // +----------------------------------------------------------------------
@@ -15,7 +16,6 @@ use think\Response;
 
 class Redirect extends Response
 {
-
     protected $options = [];
 
     // URL参数
@@ -37,8 +37,6 @@ class Redirect extends Response
     protected function output($data)
     {
         $this->header['Location'] = $this->getTargetUrl();
-
-        return;
     }
 
     /**
@@ -72,9 +70,9 @@ class Redirect extends Response
     {
         if (strpos($this->data, '://') || (0 === strpos($this->data, '/') && empty($this->params))) {
             return $this->data;
-        } else {
-            return $this->app['url']->build($this->data, $this->params);
         }
+
+        return $this->app['url']->build($this->data, $this->params);
     }
 
     public function params($params = [])

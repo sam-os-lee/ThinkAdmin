@@ -1,4 +1,5 @@
 <?php
+
 // +----------------------------------------------------------------------
 // | ThinkPHP [ WE CAN DO IT JUST THINK ]
 // +----------------------------------------------------------------------
@@ -172,7 +173,7 @@ class Think
         if (is_array($name)) {
             $this->template->config($name);
             $this->config = array_merge($this->config, $name);
-        } elseif (is_null($value)) {
+        } elseif (null === $value) {
             return $this->template->config($name);
         } else {
             $this->template->$name = $value;

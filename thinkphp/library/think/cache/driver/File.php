@@ -1,4 +1,5 @@
 <?php
+
 // +----------------------------------------------------------------------
 // | ThinkPHP [ WE CAN DO IT JUST THINK ]
 // +----------------------------------------------------------------------
@@ -135,9 +136,11 @@ class File extends Driver
 
         if (false !== $content) {
             $expire = (int) substr($content, 8, 12);
+
             if (0 != $expire && time() > filemtime($filename) + $expire) {
                 //缓存过期删除缓存文件
                 $this->unlink($filename);
+
                 return $default;
             }
 
@@ -148,10 +151,11 @@ class File extends Driver
                 //启用数据压缩
                 $content = gzuncompress($content);
             }
+
             return $this->unserialize($content);
-        } else {
-            return $default;
         }
+
+        return $default;
     }
 
     /**
@@ -166,7 +170,7 @@ class File extends Driver
     {
         $this->writeTimes++;
 
-        if (is_null($expire)) {
+        if (null === $expire) {
             $expire = $this->options['expire'];
         }
 
@@ -190,10 +194,11 @@ class File extends Driver
         if ($result) {
             isset($first) && $this->setTagItem($filename);
             clearstatcache();
+
             return true;
-        } else {
-            return false;
         }
+
+        return false;
     }
 
     /**
@@ -263,10 +268,12 @@ class File extends Driver
         if ($tag) {
             // 指定标签清除
             $keys = $this->getTagItem($tag);
+
             foreach ($keys as $key) {
                 $this->unlink($key);
             }
             $this->rm($this->getTagKey($tag));
+
             return true;
         }
 
@@ -277,6 +284,7 @@ class File extends Driver
         foreach ($files as $path) {
             if (is_dir($path)) {
                 $matches = glob($path . DIRECTORY_SEPARATOR . '*.php');
+
                 if (is_array($matches)) {
                     array_map('unlink', $matches);
                 }
@@ -301,5 +309,4 @@ class File extends Driver
     {
         return is_file($path) && unlink($path);
     }
-
 }

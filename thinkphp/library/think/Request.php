@@ -1,4 +1,5 @@
 <?php
+
 // +----------------------------------------------------------------------
 // | ThinkPHP [ WE CAN DO IT JUST THINK ]
 // +----------------------------------------------------------------------
@@ -301,16 +302,17 @@ class Request
     {
         $this->config = array_merge($this->config, $options);
 
-        if (is_null($this->filter) && !empty($this->config['default_filter'])) {
+        if (null === $this->filter && !empty($this->config['default_filter'])) {
             $this->filter = $this->config['default_filter'];
         }
     }
 
     public function config($name = null)
     {
-        if (is_null($name)) {
+        if (null === $name) {
             return $this->config;
         }
+
         return isset($this->config[$name]) ? $this->config[$name] : null;
     }
 
@@ -328,6 +330,7 @@ class Request
     {
         if (array_key_exists($method, $this->hook)) {
             array_unshift($args, $this);
+
             return call_user_func_array($this->hook[$method], $args);
         }
 
@@ -407,6 +410,7 @@ class Request
 
         if (isset($info['query'])) {
             parse_str(html_entity_decode($info['query']), $query);
+
             if (!empty($params)) {
                 $params      = array_replace($query, $params);
                 $queryString = http_build_query($params, '', '&');
@@ -437,6 +441,7 @@ class Request
         $options['content']     = $content;
 
         $request = new static();
+
         foreach ($options as $name => $item) {
             if (property_exists($request, $name)) {
                 $request->$name = $item;
@@ -482,7 +487,7 @@ class Request
      */
     public function subDomain()
     {
-        if (is_null($this->subDomain)) {
+        if (null === $this->subDomain) {
             // 获取当前主域名
             $rootDomain = $this->config['url_domain_root'];
 
@@ -508,6 +513,7 @@ class Request
     public function setPanDomain($domain)
     {
         $this->panDomain = $domain;
+
         return $this;
     }
 
@@ -530,6 +536,7 @@ class Request
     public function setUrl($url)
     {
         $this->url = $url;
+
         return $this;
     }
 
@@ -567,6 +574,7 @@ class Request
     public function setBaseUrl($url)
     {
         $this->baseUrl = $url;
+
         return $this;
     }
 
@@ -596,8 +604,10 @@ class Request
     {
         if (!$this->baseFile) {
             $url = '';
+
             if (!$this->isCli()) {
                 $script_name = basename($this->server('SCRIPT_FILENAME'));
+
                 if (basename($this->server('SCRIPT_NAME')) === $script_name) {
                     $url = $this->server('SCRIPT_NAME');
                 } elseif (basename($this->server('PHP_SELF')) === $script_name) {
@@ -625,6 +635,7 @@ class Request
     public function setRoot($url = null)
     {
         $this->root = $url;
+
         return $this;
     }
 
@@ -638,6 +649,7 @@ class Request
     {
         if (!$this->root) {
             $file = $this->baseFile();
+
             if ($file && 0 !== strpos($this->url(), $file)) {
                 $file = str_replace('\\', '/', dirname($file));
             }
@@ -667,6 +679,7 @@ class Request
     public function setPathinfo($pathinfo)
     {
         $this->pathinfo = $pathinfo;
+
         return $this;
     }
 
@@ -677,7 +690,7 @@ class Request
      */
     public function pathinfo()
     {
-        if (is_null($this->pathinfo)) {
+        if (null === $this->pathinfo) {
             if (isset($_GET[$this->config['var_pathinfo']])) {
                 // 判断URL里面是否有兼容模式参数
                 $pathinfo = $_GET[$this->config['var_pathinfo']];
@@ -697,6 +710,7 @@ class Request
                     if ($this->server($type)) {
                         $pathinfo = (0 === strpos($this->server($type), $this->server('SCRIPT_NAME'))) ?
                         substr($this->server($type), strlen($this->server('SCRIPT_NAME'))) : $this->server($type);
+
                         break;
                     }
                 }
@@ -715,7 +729,7 @@ class Request
      */
     public function path()
     {
-        if (is_null($this->path)) {
+        if (null === $this->path) {
             $suffix   = $this->config['url_html_suffix'];
             $pathinfo = $this->pathinfo();
 
@@ -770,6 +784,7 @@ class Request
 
         foreach ($this->mimeType as $key => $val) {
             $array = explode(',', $val);
+
             foreach ($array as $k => $v) {
                 if (stristr($accept, $v)) {
                     return $key;
@@ -810,6 +825,7 @@ class Request
         } elseif (!$this->method) {
             if (isset($_POST[$this->config['var_method']])) {
                 $method = strtolower($_POST[$this->config['var_method']]);
+
                 if (in_array($method, ['get', 'post', 'put', 'patch', 'delete'])) {
                     $this->method    = strtoupper($method);
                     $this->{$method} = $_POST;
@@ -934,11 +950,13 @@ class Request
             switch ($method) {
                 case 'POST':
                     $vars = $this->post(false);
+
                     break;
                 case 'PUT':
                 case 'DELETE':
                 case 'PATCH':
                     $vars = $this->put(false);
+
                     break;
                 default:
                     $vars = [];
@@ -970,6 +988,7 @@ class Request
     public function setRouteVars(array $route)
     {
         $this->route = array_merge($this->route, $route);
+
         return $this;
     }
 
@@ -1030,7 +1049,7 @@ class Request
      */
     public function put($name = '', $default = null, $filter = '')
     {
-        if (is_null($this->put)) {
+        if (null === $this->put) {
             $this->put = $this->getInputData($this->input);
         }
 
@@ -1043,6 +1062,7 @@ class Request
             return (array) json_decode($content, true);
         } elseif (strpos($content, '=')) {
             parse_str($content, $data);
+
             return $data;
         }
 
@@ -1111,7 +1131,7 @@ class Request
 
         $data = $this->getData($this->session, $name);
 
-        return is_null($data) ? $default : $data;
+        return null === $data ? $default : $data;
     }
 
     /**
@@ -1158,9 +1178,8 @@ class Request
     {
         if (empty($name)) {
             return $this->server;
-        } else {
-            $name = strtoupper($name);
         }
+        $name = strtoupper($name);
 
         return isset($this->server[$name]) ? $this->server[$name] : $default;
     }
@@ -1178,6 +1197,7 @@ class Request
         }
 
         $files = $this->file;
+
         if (!empty($files)) {
             if (strpos($name, '.')) {
                 list($name, $sub) = explode('.', $name);
@@ -1189,19 +1209,18 @@ class Request
             if ('' === $name) {
                 // 获取全部文件
                 return $array;
-            } elseif (isset($sub) && isset($array[$name][$sub])) {
+            } elseif (isset($sub, $array[$name][$sub])) {
                 return $array[$name][$sub];
             } elseif (isset($array[$name])) {
                 return $array[$name];
             }
         }
-
-        return;
     }
 
     protected function dealUploadFile($files, $name)
     {
         $array = [];
+
         foreach ($files as $key => $file) {
             if ($file instanceof File) {
                 $array[$key] = $file;
@@ -1272,9 +1291,8 @@ class Request
     {
         if (empty($name)) {
             return $this->env;
-        } else {
-            $name = strtoupper($name);
         }
+        $name = strtoupper($name);
 
         return isset($this->env[$name]) ? $this->env[$name] : $default;
     }
@@ -1290,19 +1308,23 @@ class Request
     {
         if (empty($this->header)) {
             $header = [];
+
             if (function_exists('apache_request_headers') && $result = apache_request_headers()) {
                 $header = $result;
             } else {
                 $server = $this->server;
+
                 foreach ($server as $key => $val) {
                     if (0 === strpos($key, 'HTTP_')) {
                         $key          = str_replace('_', '-', strtolower(substr($key, 5)));
                         $header[$key] = $val;
                     }
                 }
+
                 if (isset($server['CONTENT_TYPE'])) {
                     $header['content-type'] = $server['CONTENT_TYPE'];
                 }
+
                 if (isset($server['CONTENT_LENGTH'])) {
                     $header['content-length'] = $server['CONTENT_LENGTH'];
                 }
@@ -1352,6 +1374,7 @@ class Request
         }
 
         $name = (string) $name;
+
         if ('' != $name) {
             // 解析name
             if (strpos($name, '/')) {
@@ -1360,7 +1383,7 @@ class Request
 
             $data = $this->getData($data, $name);
 
-            if (is_null($data)) {
+            if (null === $data) {
                 return $default;
             }
 
@@ -1374,6 +1397,7 @@ class Request
 
         if (is_array($data)) {
             array_walk_recursive($data, [$this, 'filterValue'], $filter);
+
             if (version_compare(PHP_VERSION, '7.1.0', '<')) {
                 // 恢复PHP版本低于 7.1 时 array_walk_recursive 中消耗的内部指针
                 $this->arrayReset($data);
@@ -1418,7 +1442,7 @@ class Request
      */
     public function filter($filter = null)
     {
-        if (is_null($filter)) {
+        if (null === $filter) {
             return $this->filter;
         }
 
@@ -1427,10 +1451,11 @@ class Request
 
     protected function getFilter($filter, $default)
     {
-        if (is_null($filter)) {
+        if (null === $filter) {
             $filter = [];
         } else {
             $filter = $filter ?: $this->filter;
+
             if (is_string($filter) && false === strpos($filter, '/')) {
                 $filter = explode(',', $filter);
             } else {
@@ -1465,14 +1490,17 @@ class Request
                     if (!preg_match($filter, $value)) {
                         // 匹配不成功返回默认值
                         $value = $default;
+
                         break;
                     }
                 } elseif (!empty($filter)) {
                     // filter函数不存在时, 则使用filter_var进行过滤
                     // filter为非整形值时, 调用filter_id取得过滤id
                     $value = filter_var($value, is_int($filter) ? $filter : filter_id($filter));
+
                     if (false === $value) {
                         $value = $default;
+
                         break;
                     }
                 }
@@ -1495,18 +1523,22 @@ class Request
             // 数组
             case 'a':
                 $data = (array) $data;
+
                 break;
             // 数字
             case 'd':
                 $data = (int) $data;
+
                 break;
             // 浮点
             case 'f':
                 $data = (float) $data;
+
                 break;
             // 布尔
             case 'b':
                 $data = (boolean) $data;
+
                 break;
             // 字符串
             case 's':
@@ -1515,6 +1547,7 @@ class Request
                 } else {
                     throw new \InvalidArgumentException('variable type error：' . gettype($data));
                 }
+
                 break;
         }
     }
@@ -1567,8 +1600,8 @@ class Request
         }
 
         $item = [];
-        foreach ($name as $key => $val) {
 
+        foreach ($name as $key => $val) {
             if (is_int($key)) {
                 $default = null;
                 $key     = $val;
@@ -1596,6 +1629,7 @@ class Request
     public function except($name, $type = 'param')
     {
         $param = $this->$type();
+
         if (is_string($name)) {
             $name = explode(',', $name);
         }
@@ -1648,6 +1682,7 @@ class Request
 
         $result           = $this->param($this->config['var_ajax']) ? true : $result;
         $this->mergeParam = false;
+
         return $result;
     }
 
@@ -1659,7 +1694,7 @@ class Request
      */
     public function isPjax($pjax = false)
     {
-        $result = !is_null($this->server('HTTP_X_PJAX')) ? true : false;
+        $result = null !== $this->server('HTTP_X_PJAX') ? true : false;
 
         if (true === $pjax) {
             return $result;
@@ -1667,6 +1702,7 @@ class Request
 
         $result           = $this->param($this->config['var_pjax']) ? true : $result;
         $this->mergeParam = false;
+
         return $result;
     }
 
@@ -1694,6 +1730,7 @@ class Request
             if ($this->server('HTTP_X_FORWARDED_FOR')) {
                 $arr = explode(',', $this->server('HTTP_X_FORWARDED_FOR'));
                 $pos = array_search('unknown', $arr);
+
                 if (false !== $pos) {
                     unset($arr[$pos]);
                 }
@@ -1716,7 +1753,7 @@ class Request
         }
 
         // 如果是ipv4地址，则直接使用ip2long返回int类型ip；如果是ipv6地址，暂时不支持，直接返回0
-        $long_ip = ('ipv4' === $ip_mode) ? sprintf("%u", ip2long($ip)) : 0;
+        $long_ip = ('ipv4' === $ip_mode) ? sprintf('%u', ip2long($ip)) : 0;
 
         $ip = [$ip, $long_ip];
 
@@ -1730,9 +1767,9 @@ class Request
      */
     public function isMobile()
     {
-        if ($this->server('HTTP_VIA') && stristr($this->server('HTTP_VIA'), "wap")) {
+        if ($this->server('HTTP_VIA') && stristr($this->server('HTTP_VIA'), 'wap')) {
             return true;
-        } elseif ($this->server('HTTP_ACCEPT') && strpos(strtoupper($this->server('HTTP_ACCEPT')), "VND.WAP.WML")) {
+        } elseif ($this->server('HTTP_ACCEPT') && strpos(strtoupper($this->server('HTTP_ACCEPT')), 'VND.WAP.WML')) {
             return true;
         } elseif ($this->server('HTTP_X_WAP_PROFILE') || $this->server('HTTP_PROFILE')) {
             return true;
@@ -1836,6 +1873,7 @@ class Request
             } else {
                 $type = $contentType;
             }
+
             return trim($type);
         }
 
@@ -1865,7 +1903,7 @@ class Request
      */
     public function dispatch($dispatch = null)
     {
-        if (!is_null($dispatch)) {
+        if (null !== $dispatch) {
             $this->dispatch = $dispatch;
         }
 
@@ -1879,7 +1917,7 @@ class Request
      */
     public function secureKey()
     {
-        if (is_null($this->secureKey)) {
+        if (null === $this->secureKey) {
             $this->secureKey = uniqid('', true);
         }
 
@@ -1895,6 +1933,7 @@ class Request
     public function setModule($module)
     {
         $this->module = $module;
+
         return $this;
     }
 
@@ -1907,6 +1946,7 @@ class Request
     public function setController($controller)
     {
         $this->controller = $controller;
+
         return $this;
     }
 
@@ -1919,6 +1959,7 @@ class Request
     public function setAction($action)
     {
         $this->action = $action;
+
         return $this;
     }
 
@@ -1941,6 +1982,7 @@ class Request
     public function controller($convert = false)
     {
         $name = $this->controller ?: '';
+
         return $convert ? strtolower($name) : $name;
     }
 
@@ -1953,6 +1995,7 @@ class Request
     public function action($convert = false)
     {
         $name = $this->action ?: '';
+
         return $convert ? $name : strtolower($name);
     }
 
@@ -1965,6 +2008,7 @@ class Request
     public function setLangset($lang)
     {
         $this->langset = $lang;
+
         return $this;
     }
 
@@ -1985,7 +2029,7 @@ class Request
      */
     public function getContent()
     {
-        if (is_null($this->content)) {
+        if (null === $this->content) {
             $this->content = $this->input;
         }
 
@@ -2069,6 +2113,7 @@ class Request
 
         if (false !== strpos($key, ':')) {
             $param = $this->param();
+
             foreach ($param as $item => $val) {
                 if (is_string($val) && false !== strpos($key, ':' . $item)) {
                     $key = str_replace(':' . $item, $val, $key);
@@ -2088,6 +2133,7 @@ class Request
         }
 
         $this->cache = [$key, $expire, $tag];
+
         return $this->cache;
     }
 
@@ -2110,6 +2156,7 @@ class Request
     public function withGet(array $get)
     {
         $this->get = $get;
+
         return $this;
     }
 
@@ -2122,6 +2169,7 @@ class Request
     public function withPost(array $post)
     {
         $this->post = $post;
+
         return $this;
     }
 
@@ -2134,6 +2182,7 @@ class Request
     public function withInput($input)
     {
         $this->input = $input;
+
         return $this;
     }
 
@@ -2146,6 +2195,7 @@ class Request
     public function withFiles(array $files)
     {
         $this->file = $files;
+
         return $this;
     }
 
@@ -2158,6 +2208,7 @@ class Request
     public function withCookie(array $cookie)
     {
         $this->cookie = $cookie;
+
         return $this;
     }
 
@@ -2170,6 +2221,7 @@ class Request
     public function withServer(array $server)
     {
         $this->server = array_change_key_case($server, CASE_UPPER);
+
         return $this;
     }
 
@@ -2182,6 +2234,7 @@ class Request
     public function withHeader(array $header)
     {
         $this->header = array_change_key_case($header);
+
         return $this;
     }
 
@@ -2194,6 +2247,7 @@ class Request
     public function withEnv(array $env)
     {
         $this->env = $env;
+
         return $this;
     }
 
@@ -2206,6 +2260,7 @@ class Request
     public function withRoute(array $route)
     {
         $this->route = $route;
+
         return $this;
     }
 

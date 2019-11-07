@@ -45,6 +45,7 @@ class Order extends Controller
     public function index()
     {
         $this->title = '订单记录管理';
+        // 注意:分页管理器
         $this->_query($this->table)->order('id desc')->page();
     }
 
@@ -57,16 +58,23 @@ class Order extends Controller
      */
     protected function _index_page_filter(array &$data)
     {
-        $goodsList = Db::name('StoreOrderList')->whereIn('order_no', array_unique(array_column($data, 'order_no')))->select();
-        $mids = array_unique(array_merge(array_column($data, 'mid'), array_column($data, 'from_mid')));
+        $goodsList  = Db::name('StoreOrderList')->whereIn('order_no', array_unique(array_column($data, 'order_no')))->select();
+        $mids       = array_unique(array_merge(array_column($data, 'mid'), array_column($data, 'from_mid')));
         $memberList = Db::name('StoreMember')->whereIn('id', $mids)->select();
+
         foreach ($data as &$vo) {
             list($vo['member'], $vo['from_member'], $vo['list']) = [[], [], []];
-            foreach ($goodsList as $goods) if ($goods['order_no'] === $vo['order_no']) {
-                $vo['list'][] = $goods;
+
+            foreach ($goodsList as $goods) {
+                if ($goods['order_no'] === $vo['order_no']) {
+                    $vo['list'][] = $goods;
+                }
             }
-            foreach ($memberList as $member) if ($member['id'] === $vo['mid']) {
-                $vo['member'] = $member;
+
+            foreach ($memberList as $member) {
+                if ($member['id'] === $vo['mid']) {
+                    $vo['member'] = $member;
+                }
             }
         }
     }
@@ -83,9 +91,12 @@ class Order extends Controller
     public function express()
     {
         if ($this->request->isGet()) {
-            $where = ['is_deleted' => '0', 'status' => '1'];
-            $this->expressList = Db::name('StoreExpress')->where($where)->order('sort desc,id desc')->select();
+            $where             = ['is_deleted' => '0', 'status' => '1'];
+            $this->expressList = Db::name('StoreExpress')->where($where)
+                ->order('sort desc,id desc')->select();
         }
+
+        // 注意:form逻辑器
         $this->_form($this->table);
     }
 
@@ -96,8 +107,15 @@ class Order extends Controller
     public function expressQuery()
     {
         list($code, $no) = [input('code', ''), input('no', '')];
-        if (empty($no)) $this->error('快递编号不能为空！');
-        if (empty($code)) $this->error('快递公司编码不能为空！');
+
+        if (empty($no)) {
+            $this->error('快递编号不能为空！');
+        }
+
+        if (empty($code)) {
+            $this->error('快递公司编码不能为空！');
+        }
+
         $this->result = Express::query($code, $no);
         $this->fetch();
     }
@@ -113,14 +131,23 @@ class Order extends Controller
     {
         if ($this->request->isPost()) {
             $order = Db::name($this->table)->where(['id' => $vo['id']])->find();
-            if (empty($order)) $this->error('订单查询异常，请稍候再试！');
-            $express = Db::name('StoreExpress')->where(['express_code' => $vo['express_company_code']])->find();
-            if (empty($express)) $this->error('发货快递公司异常，请重新选择快递公司！');
+
+            if (empty($order)) {
+                $this->error('订单查询异常，请稍候再试！');
+            }
+
+            $express = Db::name('StoreExpress')->where([
+                'express_code' => $vo['express_company_code']
+            ])->find();
+
+            if (empty($express)) {
+                $this->error('发货快递公司异常，请重新选择快递公司！');
+            }
+
             $vo['express_company_title'] = $express['express_title'];
-            $vo['express_send_at'] = empty($order['express_send_at']) ? date('Y-m-d H:i:s') : $order['express_send_at'];
-            $vo['express_state'] = '1';
-            $vo['status'] = '4';
+            $vo['express_send_at']       = empty($order['express_send_at']) ? date('Y-m-d H:i:s') : $order['express_send_at'];
+            $vo['express_state']         = '1';
+            $vo['status']                = '4';
         }
     }
-
 }

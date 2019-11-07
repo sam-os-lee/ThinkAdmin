@@ -15,7 +15,6 @@
 
 namespace app\store\controller;
 
-use app\store\service\Extend;
 use app\store\service\ExtendService;
 use library\Controller;
 
@@ -26,7 +25,6 @@ use library\Controller;
  */
 class Config extends Controller
 {
-
     /**
      * 商城参数配置
      * @auth true
@@ -38,8 +36,10 @@ class Config extends Controller
     {
         $this->title = '商城参数配置';
         $this->applyCsrfToken('save');
-        $this->query = ExtendService::querySmsBalance();
+
+        $this->query  = ExtendService::querySmsBalance();
         $this->query2 = ExtendService::querySmsBalance2();
+
         $this->fetch();
     }
 
@@ -53,9 +53,12 @@ class Config extends Controller
     {
         if ($this->request->isPost()) {
             $this->applyCsrfToken('save');
-            foreach ($this->request->post() as $k => $v) sysconf($k, $v);
+
+            foreach ($this->request->post() as $k => $v) {
+                sysconf($k, $v);
+            }
+
             $this->success('商城短信配置保存成功！');
         }
     }
-
 }

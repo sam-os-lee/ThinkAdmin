@@ -1,4 +1,5 @@
 <?php
+
 // +----------------------------------------------------------------------
 // | ThinkPHP [ WE CAN DO IT JUST THINK ]
 // +----------------------------------------------------------------------
@@ -51,7 +52,7 @@ class Error
         self::getExceptionHandler()->report($e);
 
         if (PHP_SAPI == 'cli') {
-            self::getExceptionHandler()->renderForConsole(new ConsoleOutput, $e);
+            self::getExceptionHandler()->renderForConsole(new ConsoleOutput(), $e);
         } else {
             self::getExceptionHandler()->render($e)->send();
         }
@@ -69,6 +70,7 @@ class Error
     public static function appError($errno, $errstr, $errfile = '', $errline = 0)
     {
         $exception = new ErrorException($errno, $errstr, $errfile, $errline);
+
         if (error_reporting() & $errno) {
             // 将错误信息托管至 think\exception\ErrorException
             throw $exception;
@@ -83,7 +85,7 @@ class Error
      */
     public static function appShutdown()
     {
-        if (!is_null($error = error_get_last()) && self::isFatal($error['type'])) {
+        if (null !== ($error = error_get_last()) && self::isFatal($error['type'])) {
             // 将错误信息托管至think\ErrorException
             $exception = new ErrorException($error['type'], $error['message'], $error['file'], $error['line']);
 
@@ -132,10 +134,11 @@ class Error
             // 异常处理handle
             $class = self::$exceptionHandler;
 
-            if ($class && is_string($class) && class_exists($class) && is_subclass_of($class, "\\think\\exception\\Handle")) {
-                $handle = new $class;
+            if ($class && is_string($class) && class_exists($class) && is_subclass_of($class, '\\think\\exception\\Handle')) {
+                $handle = new $class();
             } else {
-                $handle = new Handle;
+                $handle = new Handle();
+
                 if ($class instanceof \Closure) {
                     $handle->setRender($class);
                 }

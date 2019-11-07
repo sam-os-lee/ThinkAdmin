@@ -1,4 +1,5 @@
 <?php
+
 // +----------------------------------------------------------------------
 // | ThinkPHP [ WE CAN DO IT JUST THINK ]
 // +----------------------------------------------------------------------
@@ -27,8 +28,8 @@ class Build extends Command
     {
         $this->setName('build')
             ->setDefinition([
-                new Option('config', null, Option::VALUE_OPTIONAL, "build.php path"),
-                new Option('module', null, Option::VALUE_OPTIONAL, "module name"),
+                new Option('config', null, Option::VALUE_OPTIONAL, 'build.php path'),
+                new Option('module', null, Option::VALUE_OPTIONAL, 'module name'),
             ])
             ->setDescription('Build Application Dirs');
     }
@@ -37,7 +38,8 @@ class Build extends Command
     {
         if ($input->hasOption('module')) {
             AppBuild::module($input->getOption('module'));
-            $output->writeln("Successed");
+            $output->writeln('Successed');
+
             return;
         }
 
@@ -48,12 +50,12 @@ class Build extends Command
         }
 
         if (empty($build)) {
-            $output->writeln("Build Config Is Empty");
+            $output->writeln('Build Config Is Empty');
+
             return;
         }
 
         AppBuild::run($build);
-        $output->writeln("Successed");
-
+        $output->writeln('Successed');
     }
 }

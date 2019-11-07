@@ -1,4 +1,5 @@
 <?php
+
 // +----------------------------------------------------------------------
 // | ThinkPHP [ WE CAN DO IT JUST THINK ]
 // +----------------------------------------------------------------------
@@ -83,7 +84,7 @@ class Xcache extends Driver
     {
         $this->writeTimes++;
 
-        if (is_null($expire)) {
+        if (null === $expire) {
             $expire = $this->options['expire'];
         }
 
@@ -97,6 +98,7 @@ class Xcache extends Driver
 
         if (xcache_set($key, $value, $expire)) {
             isset($first) && $this->setTagItem($key);
+
             return true;
         }
 
@@ -165,6 +167,7 @@ class Xcache extends Driver
             }
 
             $this->rm($this->getTagKey($tag));
+
             return true;
         }
 
@@ -172,8 +175,8 @@ class Xcache extends Driver
 
         if (function_exists('xcache_unset_by_prefix')) {
             return xcache_unset_by_prefix($this->options['prefix']);
-        } else {
-            return false;
         }
+
+        return false;
     }
 }

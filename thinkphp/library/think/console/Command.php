@@ -1,4 +1,5 @@
 <?php
+
 // +----------------------------------------------------------------------
 // | ThinkPHP [ WE CAN DO IT JUST THINK ]
 // +----------------------------------------------------------------------
@@ -18,7 +19,6 @@ use think\console\input\Option;
 
 class Command
 {
-
     /** @var  Console */
     private $console;
     private $name;
@@ -193,6 +193,7 @@ class Command
 
         if (PHP_VERSION_ID >= 50400 && $code instanceof \Closure) {
             $r = new \ReflectionFunction($code);
+
             if (null === $r->getClosureThis()) {
                 $code = \Closure::bind($code, $this);
             }
@@ -225,6 +226,7 @@ class Command
         $this->definition->addOptions($this->console->getDefinition()->getOptions());
 
         $this->consoleDefinitionMerged = true;
+
         if ($mergeArgs) {
             $this->consoleDefinitionMergedWithArgs = true;
         }
@@ -477,6 +479,7 @@ class Command
     {
         $content = $table->render();
         $this->output->writeln($content);
+
         return $content;
     }
 }

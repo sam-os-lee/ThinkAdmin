@@ -1,4 +1,5 @@
 <?php
+
 // +----------------------------------------------------------------------
 // | ThinkPHP [ WE CAN DO IT JUST THINK ]
 // +----------------------------------------------------------------------
@@ -42,6 +43,7 @@ abstract class OneToOne extends Relation
     public function joinType($type)
     {
         $this->joinType = $type;
+
         return $this;
     }
 
@@ -180,7 +182,7 @@ abstract class OneToOne extends Relation
             $data = $data->getData();
         }
 
-        $model = new $this->model;
+        $model = new $this->model();
         // 保存关联表数据
         $data[$this->foreignKey] = $this->parent->{$this->localKey};
 
@@ -250,6 +252,7 @@ abstract class OneToOne extends Relation
         foreach ($result->getData() as $key => $val) {
             if (strpos($key, '__')) {
                 list($name, $attr) = explode('__', $key, 2);
+
                 if ($name == $relation) {
                     $list[$name][$attr] = $val;
                     unset($result->$key);
@@ -290,11 +293,11 @@ abstract class OneToOne extends Relation
     {
         foreach ($this->bindAttr as $key => $attr) {
             $key = is_numeric($key) ? $attr : $key;
+
             if (isset($result->$key)) {
                 throw new Exception('bind attr has exists:' . $key);
-            } else {
-                $result->setAttr($key, $model ? $model->$attr : null);
             }
+            $result->setAttr($key, $model ? $model->$attr : null);
         }
     }
 
@@ -330,5 +333,4 @@ abstract class OneToOne extends Relation
 
         return $data;
     }
-
 }

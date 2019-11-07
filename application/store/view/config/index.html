@@ -22,9 +22,11 @@
             $checked = $('.layui-tab ul.layui-tab-title li[data-type="' + type + '"]');
             ($checked.length > 0 ? $checked : $default).trigger('click');
         })(layui.data(storage)['type'] || '');
+
         $('.layui-tab ul.layui-tab-title li[data-type]').on('click', function () {
             layui.data(storage, {key: 'type', value: this.getAttribute('data-type')});
         });
+
     })('store-config-type');
 </script>
 {/block}

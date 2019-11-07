@@ -15,7 +15,7 @@
 
 use think\facade\Route;
 
-/*  演示环境禁止操作路由绑定 */
+// 演示环境禁止操作路由绑定
 if (in_array(request()->rootDomain(), ['ctolog.com', 'thinkadmin.top'])) {
     Route::post('admin/user/pass', function () {
         return json(['code' => 0, 'info' => '演示环境禁止修改用户密码！']);

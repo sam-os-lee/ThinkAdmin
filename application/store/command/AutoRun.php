@@ -24,7 +24,6 @@ use think\Db;
  */
 class AutoRun extends \think\console\Command
 {
-
     /**
      * 配置指令信息
      */
@@ -63,13 +62,14 @@ class AutoRun extends \think\console\Command
     private function autoCancelOrder()
     {
         $datetime = $this->getDatetime('store_order_wait_time');
-        $where = [['status', 'in', ['1', '2']], ['pay_state', 'eq', '0'], ['create_at', '<', $datetime]];
-        $count = Db::name('StoreOrder')->where($where)->update([
+        $where    = [['status', 'in', ['1', '2']], ['pay_state', 'eq', '0'], ['create_at', '<', $datetime]];
+        $count    = Db::name('StoreOrder')->where($where)->update([
             'status'       => '0',
             'cancel_state' => '1',
             'cancel_at'    => date('Y-m-d H:i:s'),
             'cancel_desc'  => '30分钟未完成支付自动取消订单',
         ]);
+
         if ($count > 0) {
             $this->output->info("共计自动取消了30分钟未支付的{$count}笔订单！");
         } else {
@@ -88,10 +88,11 @@ class AutoRun extends \think\console\Command
     private function autoRemoveOrder()
     {
         $datetime = $this->getDatetime('store_order_clear_time');
-        $where = [['status', 'eq', '0'], ['pay_state', 'eq', '0'], ['create_at', '<', $datetime]];
-        $list = Db::name('StoreOrder')->where($where)->limit(20)->select();
+        $where    = [['status', 'eq', '0'], ['pay_state', 'eq', '0'], ['create_at', '<', $datetime]];
+        $list     = Db::name('StoreOrder')->where($where)->limit(20)->select();
+
         if (count($orderNos = array_unique(array_column($list, 'order_no'))) > 0) {
-            $this->output->info("自动删除前一天已经取消的订单：" . PHP_EOL . join(',' . PHP_EOL, $orderNos));
+            $this->output->info('自动删除前一天已经取消的订单：' . PHP_EOL . join(',' . PHP_EOL, $orderNos));
             Db::name('StoreOrder')->whereIn('order_no', $orderNos)->delete();
             Db::name('StoreOrderList')->whereIn('order_no', $orderNos)->delete();
         } else {
@@ -120,6 +121,7 @@ class AutoRun extends \think\console\Command
                     'refund_fee'     => $order['pay_price'] * 100,
                     'refund_account' => 'REFUND_SOURCE_UNSETTLED_FUNDS',
                 ]);
+
                 if ($result['return_code'] === 'SUCCESS' && $result['result_code'] === 'SUCCESS') {
                     Db::name('StoreOrder')->where(['order_no' => $order['order_no']])->update([
                         'refund_state' => '2', 'refund_desc' => '自动退款成功！',
@@ -147,7 +149,7 @@ class AutoRun extends \think\console\Command
      */
     private function autoTransfer()
     {
-        # 批量企业打款
+        // 批量企业打款
         foreach (Db::name('StoreProfitUsed')->where(['status' => '1'])->select() as $vo) {
             try {
                 $wechat = \We::WePayTransfers(config('wechat.wxpay'));
@@ -159,6 +161,7 @@ class AutoRun extends \think\console\Command
                     'desc'             => '营销活动拥金提现',
                     'spbill_create_ip' => '127.0.0.1',
                 ]);
+
                 if ($result['return_code'] === 'SUCCESS' && $result['result_code'] === 'SUCCESS') {
                     Db::name('StoreProfitUsed')->where(['trs_no' => $vo['trs_no']])->update([
                         'status' => '2', 'pay_desc' => '拥金提现成功！', 'pay_no' => $result['payment_no'], 'pay_at' => date('Y-m-d H:i:s'),
@@ -185,7 +188,7 @@ class AutoRun extends \think\console\Command
     private function getDatetime($code)
     {
         $minutes = intval(sysconf($code) * 60);
+
         return date('Y-m-d H:i:s', strtotime("-{$minutes} minutes"));
     }
-
 }

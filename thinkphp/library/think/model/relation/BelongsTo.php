@@ -1,4 +1,5 @@
 <?php
+
 // +----------------------------------------------------------------------
 // | ThinkPHP [ WE CAN DO IT JUST THINK ]
 // +----------------------------------------------------------------------
@@ -32,7 +33,7 @@ class BelongsTo extends OneToOne
         $this->foreignKey = $foreignKey;
         $this->localKey   = $localKey;
         $this->joinType   = 'INNER';
-        $this->query      = (new $model)->db();
+        $this->query      = (new $model())->db();
         $this->relation   = $relation;
 
         if (get_class($parent) == $model) {
@@ -191,6 +192,7 @@ class BelongsTo extends OneToOne
         $foreignKey = $this->foreignKey;
 
         $range = [];
+
         foreach ($resultSet as $result) {
             // 获取关联外键列表
             if (isset($result->$foreignKey)) {

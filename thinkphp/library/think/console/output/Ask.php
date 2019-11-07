@@ -1,4 +1,5 @@
 <?php
+
 // +----------------------------------------------------------------------
 // | ThinkPHP [ WE CAN DO IT JUST THINK IT ]
 // +----------------------------------------------------------------------
@@ -66,6 +67,7 @@ class Ask
 
         if (null === $autocomplete || !$this->hasSttyAvailable()) {
             $ret = false;
+
             if ($this->question->isHidden()) {
                 try {
                     $ret = trim($this->getHiddenResponse($inputStream));
@@ -78,6 +80,7 @@ class Ask
 
             if (false === $ret) {
                 $ret = fgets($inputStream, 4096);
+
                 if (false === $ret) {
                     throw new \RuntimeException('Aborted');
                 }
@@ -153,6 +156,7 @@ class Ask
 
                     if ("\n" === $c) {
                         $this->output->write($c);
+
                         break;
                     }
 
@@ -238,6 +242,7 @@ class Ask
         /** @var \Exception $error */
         $error    = null;
         $attempts = $this->question->getMaxAttempts();
+
         while (null === $attempts || $attempts--) {
             if (null !== $error) {
                 $this->output->error($error->getMessage());
@@ -316,9 +321,11 @@ class Ask
 
         if (file_exists('/usr/bin/env')) {
             $test = "/usr/bin/env %s -c 'echo OK' 2> /dev/null";
+
             foreach (['bash', 'zsh', 'ksh', 'csh'] as $sh) {
                 if ('OK' === rtrim(shell_exec(sprintf($test, $sh)))) {
                     self::$shell = $sh;
+
                     break;
                 }
             }

@@ -27,7 +27,6 @@ use think\Db;
  */
 class User extends Controller
 {
-
     /**
      * 指定当前数据表
      * @var string
@@ -47,7 +46,8 @@ class User extends Controller
     public function index()
     {
         $this->title = '系统用户管理';
-        $query = $this->_query($this->table)->like('username,phone,mail')->equal('status');
+        $query       = $this->_query($this->table)->like('username,phone,mail')->equal('status');
+        // 注意:分页管理器
         $query->dateBetween('login_at,create_at')->where(['is_deleted' => '0'])->order('id desc')->page();
     }
 
@@ -63,6 +63,7 @@ class User extends Controller
     public function add()
     {
         $this->applyCsrfToken();
+        // 注意:form逻辑器
         $this->_form($this->table, 'form');
     }
 
@@ -78,6 +79,7 @@ class User extends Controller
     public function edit()
     {
         $this->applyCsrfToken();
+        // 注意:form逻辑器
         $this->_form($this->table, 'form');
     }
 
@@ -90,16 +92,23 @@ class User extends Controller
     public function pass()
     {
         $this->applyCsrfToken();
+
         if ($this->request->isGet()) {
             $this->verify = false;
             $this->_form($this->table, 'pass');
         } else {
             $post = $this->request->post();
+
             if ($post['password'] !== $post['repassword']) {
                 $this->error('两次输入的密码不一致！');
             }
+
             $result = NodeService::checkpwd($post['password']);
-            if (empty($result['code'])) $this->error($result['msg']);
+
+            if (empty($result['code'])) {
+                $this->error($result['msg']);
+            }
+
             if (Data::save($this->table, ['id' => $post['id'], 'password' => md5($post['password'])], 'id')) {
                 $this->success('密码修改成功，下次请使用新密码登录！', '');
             } else {
@@ -118,8 +127,10 @@ class User extends Controller
     public function _form_filter(&$data)
     {
         if ($this->request->isPost()) {
+
             NodeService::applyUserAuth();
             $data['authorize'] = (isset($data['authorize']) && is_array($data['authorize'])) ? join(',', $data['authorize']) : '';
+
             if (isset($data['id'])) {
                 unset($data['username']);
             } elseif (Db::name($this->table)->where(['username' => $data['username']])->count() > 0) {
@@ -127,7 +138,7 @@ class User extends Controller
             }
         } else {
             $data['authorize'] = explode(',', isset($data['authorize']) ? $data['authorize'] : '');
-            $this->authorizes = Db::name('SystemAuth')->where(['status' => '1'])->order('sort desc,id desc')->select();
+            $this->authorizes  = Db::name('SystemAuth')->where(['status' => '1'])->order('sort desc,id desc')->select();
         }
     }
 
@@ -142,7 +153,9 @@ class User extends Controller
         if (in_array('10000', explode(',', $this->request->post('id')))) {
             $this->error('系统超级账号禁止操作！');
         }
+
         $this->applyCsrfToken();
+        // 注意:更新逻辑器
         $this->_save($this->table, ['status' => '0']);
     }
 
@@ -155,6 +168,7 @@ class User extends Controller
     public function resume()
     {
         $this->applyCsrfToken();
+        // 注意:更新逻辑器
         $this->_save($this->table, ['status' => '1']);
     }
 
@@ -169,8 +183,9 @@ class User extends Controller
         if (in_array('10000', explode(',', $this->request->post('id')))) {
             $this->error('系统超级账号禁止删除！');
         }
+
         $this->applyCsrfToken();
+        // 注意:删除逻辑器
         $this->_delete($this->table);
     }
-
 }

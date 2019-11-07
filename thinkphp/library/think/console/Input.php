@@ -1,4 +1,5 @@
 <?php
+
 // +----------------------------------------------------------------------
 // | ThinkPHP [ WE CAN DO IT JUST THINK ]
 // +----------------------------------------------------------------------
@@ -17,7 +18,6 @@ use think\console\input\Option;
 
 class Input
 {
-
     /**
      * @var Definition
      */
@@ -76,6 +76,7 @@ class Input
     {
         $parseOptions = true;
         $this->parsed = $this->tokens;
+
         while (null !== $token = array_shift($this->parsed)) {
             if ($parseOptions && '' == $token) {
                 $this->parseArgument($token);
@@ -120,19 +121,20 @@ class Input
     private function parseShortOptionSet($name)
     {
         $len = strlen($name);
+
         for ($i = 0; $i < $len; ++$i) {
             if (!$this->definition->hasShortcut($name[$i])) {
                 throw new \RuntimeException(sprintf('The "-%s" option does not exist.', $name[$i]));
             }
 
             $option = $this->definition->getOptionForShortcut($name[$i]);
+
             if ($option->acceptValue()) {
                 $this->addLongOption($option->getName(), $i === $len - 1 ? null : substr($name, $i + 1));
 
                 break;
-            } else {
-                $this->addLongOption($option->getName(), null);
             }
+            $this->addLongOption($option->getName(), null);
         }
     }
 
@@ -164,7 +166,6 @@ class Input
             $arg = $this->definition->getArgument($c);
 
             $this->arguments[$arg->getName()] = $arg->isArray() ? [$token] : $token;
-
         } elseif ($this->definition->hasArgument($c - 1) && $this->definition->getArgument($c - 1)->isArray()) {
             $arg = $this->definition->getArgument($c - 1);
 
@@ -213,6 +214,7 @@ class Input
 
         if (null === $value && $option->acceptValue() && count($this->parsed)) {
             $next = array_shift($this->parsed);
+
             if (isset($next[0]) && '-' !== $next[0]) {
                 $value = $next;
             } elseif (empty($next)) {
@@ -252,7 +254,6 @@ class Input
 
             return $token;
         }
-        return;
     }
 
     /**

@@ -1,4 +1,5 @@
 <?php
+
 // +----------------------------------------------------------------------
 // | ThinkPHP [ WE CAN DO IT JUST THINK ]
 // +----------------------------------------------------------------------
@@ -46,7 +47,7 @@ class Redis extends Driver
         }
 
         if (extension_loaded('redis')) {
-            $this->handler = new \Redis;
+            $this->handler = new \Redis();
 
             if ($this->options['persistent']) {
                 $this->handler->pconnect($this->options['host'], $this->options['port'], $this->options['timeout'], 'persistent_id_' . $this->options['select']);
@@ -63,6 +64,7 @@ class Redis extends Driver
             }
         } elseif (class_exists('\Predis\Client')) {
             $params = [];
+
             foreach ($this->options as $key => $val) {
                 if (in_array($key, ['aggregate', 'cluster', 'connections', 'exceptions', 'prefix', 'profile', 'replication', 'parameters'])) {
                     $params[$key] = $val;
@@ -106,7 +108,7 @@ class Redis extends Driver
 
         $value = $this->handler->get($this->getCacheKey($name));
 
-        if (is_null($value) || false === $value) {
+        if (null === $value || false === $value) {
             return $default;
         }
 
@@ -125,7 +127,7 @@ class Redis extends Driver
     {
         $this->writeTimes++;
 
-        if (is_null($expire)) {
+        if (null === $expire) {
             $expire = $this->options['expire'];
         }
 
@@ -210,6 +212,7 @@ class Redis extends Driver
 
             $tagName = $this->getTagKey($tag);
             $this->handler->del($tagName);
+
             return true;
         }
 
@@ -228,10 +231,11 @@ class Redis extends Driver
      */
     public function tag($name, $keys = null, $overlay = false)
     {
-        if (is_null($keys)) {
+        if (null === $keys) {
             $this->tag = $name;
         } else {
             $tagName = $this->getTagKey($name);
+
             if ($overlay) {
                 $this->handler->del($tagName);
             }
@@ -267,6 +271,7 @@ class Redis extends Driver
     protected function getTagItem($tag)
     {
         $tagName = $this->getTagKey($tag);
+
         return $this->handler->sMembers($tagName);
     }
 }

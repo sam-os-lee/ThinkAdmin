@@ -1,4 +1,5 @@
 <?php
+
 // +----------------------------------------------------------------------
 // | ThinkPHP [ WE CAN DO IT JUST THINK ]
 // +----------------------------------------------------------------------
@@ -15,7 +16,7 @@ use think\console\command\Make;
 
 class Middleware extends Make
 {
-    protected $type = "Middleware";
+    protected $type = 'Middleware';
 
     protected function configure()
     {

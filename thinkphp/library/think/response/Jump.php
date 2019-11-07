@@ -1,4 +1,5 @@
 <?php
+
 // +----------------------------------------------------------------------
 // | ThinkPHP [ WE CAN DO IT JUST THINK ]
 // +----------------------------------------------------------------------
@@ -27,6 +28,7 @@ class Jump extends Response
     protected function output($data)
     {
         $data = $this->app['view']->fetch($this->options['jump_template'], $data);
+
         return $data;
     }
 }

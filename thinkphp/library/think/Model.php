@@ -1,4 +1,5 @@
 <?php
+
 // +----------------------------------------------------------------------
 // | ThinkPHP [ WE CAN DO IT JUST THINK ]
 // +----------------------------------------------------------------------
@@ -188,23 +189,24 @@ abstract class Model implements \JsonSerializable, \ArrayAccess
             // 当前模型名
             $name       = str_replace('\\', '/', static::class);
             $this->name = basename($name);
+
             if (Container::get('config')->get('class_suffix')) {
                 $suffix     = basename(dirname($name));
                 $this->name = substr($this->name, 0, -strlen($suffix));
             }
         }
 
-        if (is_null($this->autoWriteTimestamp)) {
+        if (null === $this->autoWriteTimestamp) {
             // 自动写入时间戳
             $this->autoWriteTimestamp = $config['auto_timestamp'];
         }
 
-        if (is_null($this->dateFormat)) {
+        if (null === $this->dateFormat) {
             // 设置时间戳格式
             $this->dateFormat = $config['datetime_format'];
         }
 
-        if (is_null($this->resultSetType)) {
+        if (null === $this->resultSetType) {
             $this->resultSetType = $config['resultset_type'];
         }
 
@@ -299,6 +301,7 @@ abstract class Model implements \JsonSerializable, \ArrayAccess
     public function setQuery($query)
     {
         $this->queryInstance = $query;
+
         return $this;
     }
 
@@ -323,7 +326,7 @@ abstract class Model implements \JsonSerializable, \ArrayAccess
 
         // 全局作用域
         if (true === $useBaseQuery && method_exists($this, 'base')) {
-            call_user_func_array([$this, 'base'], [ & $query]);
+            call_user_func_array([$this, 'base'], [&$query]);
         }
 
         $globalScope = is_array($useBaseQuery) && $useBaseQuery ? $useBaseQuery : $this->globalScope;
@@ -355,7 +358,8 @@ abstract class Model implements \JsonSerializable, \ArrayAccess
      * @return void
      */
     protected static function init()
-    {}
+    {
+    }
 
     /**
      * 数据自动完成
@@ -377,7 +381,7 @@ abstract class Model implements \JsonSerializable, \ArrayAccess
                 $default = $this->data[$field];
             }
 
-            $this->setAttr($field, !is_null($value) ? $value : $default);
+            $this->setAttr($field, null !== $value ? $value : $default);
         }
     }
 
@@ -390,6 +394,7 @@ abstract class Model implements \JsonSerializable, \ArrayAccess
     public function force($force = true)
     {
         $this->force = $force;
+
         return $this;
     }
 
@@ -412,6 +417,7 @@ abstract class Model implements \JsonSerializable, \ArrayAccess
     public function replace($replace = true)
     {
         $this->replace = $replace;
+
         return $this;
     }
 
@@ -424,6 +430,7 @@ abstract class Model implements \JsonSerializable, \ArrayAccess
     public function exists($exists)
     {
         $this->exists = $exists;
+
         return $this;
     }
 
@@ -640,6 +647,7 @@ abstract class Model implements \JsonSerializable, \ArrayAccess
             return true;
         } catch (\Exception $e) {
             $db->rollback();
+
             throw $e;
         }
     }
@@ -700,6 +708,7 @@ abstract class Model implements \JsonSerializable, \ArrayAccess
             return true;
         } catch (\Exception $e) {
             $db->rollback();
+
             throw $e;
         }
     }
@@ -826,6 +835,7 @@ abstract class Model implements \JsonSerializable, \ArrayAccess
             return $this->toCollection($result);
         } catch (\Exception $e) {
             $db->rollback();
+
             throw $e;
         }
     }
@@ -888,6 +898,7 @@ abstract class Model implements \JsonSerializable, \ArrayAccess
             return true;
         } catch (\Exception $e) {
             $db->rollback();
+
             throw $e;
         }
     }
@@ -1040,7 +1051,7 @@ abstract class Model implements \JsonSerializable, \ArrayAccess
     public function __isset($name)
     {
         try {
-            return !is_null($this->getAttr($name));
+            return null !== $this->getAttr($name);
         } catch (InvalidArgumentException $e) {
             return false;
         }

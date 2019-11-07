@@ -1,4 +1,5 @@
 <?php
+
 // +----------------------------------------------------------------------
 // | ThinkPHP [ WE CAN DO IT JUST THINK IT ]
 // +----------------------------------------------------------------------
@@ -49,7 +50,7 @@ class Clear extends Command
             $this->clear(rtrim($path, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR, $rmdir);
         }
 
-        $output->writeln("<info>Clear Successed</info>");
+        $output->writeln('<info>Clear Successed</info>');
     }
 
     protected function clear($path, $rmdir)
@@ -59,6 +60,7 @@ class Clear extends Command
         foreach ($files as $file) {
             if ('.' != $file && '..' != $file && is_dir($path . $file)) {
                 array_map('unlink', glob($path . $file . DIRECTORY_SEPARATOR . '*.*'));
+
                 if ($rmdir) {
                     rmdir($path . $file);
                 }

@@ -1,4 +1,5 @@
 <?php
+
 // +----------------------------------------------------------------------
 // | ThinkPHP [ WE CAN DO IT JUST THINK ]
 // +----------------------------------------------------------------------
@@ -42,7 +43,7 @@ class Memcached extends Driver
             $this->options = array_merge($this->options, $options);
         }
 
-        $this->handler = new \Memcached;
+        $this->handler = new \Memcached();
 
         if (!empty($this->options['option'])) {
             $this->handler->setOptions($this->options['option']);
@@ -56,12 +57,14 @@ class Memcached extends Driver
         // 支持集群
         $hosts = explode(',', $this->options['host']);
         $ports = explode(',', $this->options['port']);
+
         if (empty($ports[0])) {
             $ports[0] = 11211;
         }
 
         // 建立连接
         $servers = [];
+
         foreach ((array) $hosts as $i => $host) {
             $servers[] = [$host, (isset($ports[$i]) ? $ports[$i] : $ports[0]), 1];
         }
@@ -115,7 +118,7 @@ class Memcached extends Driver
     {
         $this->writeTimes++;
 
-        if (is_null($expire)) {
+        if (null === $expire) {
             $expire = $this->options['expire'];
         }
 
@@ -129,6 +132,7 @@ class Memcached extends Driver
 
         if ($this->handler->set($key, $value, $expire)) {
             isset($first) && $this->setTagItem($key);
+
             return true;
         }
 
@@ -224,10 +228,11 @@ class Memcached extends Driver
      */
     public function tag($name, $keys = null, $overlay = false)
     {
-        if (is_null($keys)) {
+        if (null === $keys) {
             $this->tag = $name;
         } else {
             $tagName = $this->getTagKey($name);
+
             if ($overlay) {
                 $this->handler->delete($tagName);
             }
@@ -274,6 +279,7 @@ class Memcached extends Driver
     public function getTagItem($tag)
     {
         $tagName = $this->getTagKey($tag);
+
         return explode(',', trim($this->handler->get($tagName), ','));
     }
 }

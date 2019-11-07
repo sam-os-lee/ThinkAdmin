@@ -1,4 +1,5 @@
 <?php
+
 // +----------------------------------------------------------------------
 // | ThinkPHP [ WE CAN DO IT JUST THINK ]
 // +----------------------------------------------------------------------
@@ -40,7 +41,6 @@ class Lite extends Driver
         if (substr($this->options['path'], -1) != DIRECTORY_SEPARATOR) {
             $this->options['path'] .= DIRECTORY_SEPARATOR;
         }
-
     }
 
     /**
@@ -85,13 +85,14 @@ class Lite extends Driver
             if ($mtime < time()) {
                 // 清除已经过期的文件
                 unlink($filename);
+
                 return $default;
             }
 
             return include $filename;
-        } else {
-            return $default;
         }
+
+        return $default;
     }
 
     /**
@@ -106,7 +107,7 @@ class Lite extends Driver
     {
         $this->writeTimes++;
 
-        if (is_null($expire)) {
+        if (null === $expire) {
             $expire = $this->options['expire'];
         }
 
@@ -123,7 +124,7 @@ class Lite extends Driver
             $first = true;
         }
 
-        $ret = file_put_contents($filename, ("<?php return " . var_export($value, true) . ";"));
+        $ret = file_put_contents($filename, ('<?php return ' . var_export($value, true) . ';'));
 
         // 通过设置修改时间实现有效期
         if ($ret) {
@@ -194,16 +195,18 @@ class Lite extends Driver
         if ($tag) {
             // 指定标签清除
             $keys = $this->getTagItem($tag);
+
             foreach ($keys as $key) {
                 unlink($key);
             }
 
             $this->rm($this->getTagKey($tag));
+
             return true;
         }
 
         $this->writeTimes++;
 
-        array_map("unlink", glob($this->options['path'] . ($this->options['prefix'] ? $this->options['prefix'] . DIRECTORY_SEPARATOR : '') . '*.php'));
+        array_map('unlink', glob($this->options['path'] . ($this->options['prefix'] ? $this->options['prefix'] . DIRECTORY_SEPARATOR : '') . '*.php'));
     }
 }

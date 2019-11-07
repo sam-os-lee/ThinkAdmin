@@ -27,13 +27,13 @@ class MichatService
 {
     const URI = 'https://mimc.chat.xiaomi.net';
 
-    const BIZ_TYPE_PING = 'PING';
-    const BIZ_TYPE_POND = 'PONG';
-    const BIZ_TYPE_TEXT = 'TEXT';
-    const BIZ_TYPE_PIC_FILE = 'PIC_FILE';
-    const BIZ_TYPE_BIN_FILE = 'BIN_FILE';
+    const BIZ_TYPE_PING       = 'PING';
+    const BIZ_TYPE_POND       = 'PONG';
+    const BIZ_TYPE_TEXT       = 'TEXT';
+    const BIZ_TYPE_PIC_FILE   = 'PIC_FILE';
+    const BIZ_TYPE_BIN_FILE   = 'BIN_FILE';
     const BIZ_TYPE_AUDIO_FILE = 'AUDIO_FILE';
-    const MSG_TYPE_BASE64 = 'base64';
+    const MSG_TYPE_BASE64     = 'base64';
 
     /**
      * 给指定账号推送消息内容
@@ -73,11 +73,11 @@ class MichatService
             'data'    => json_encode($data, JSON_UNESCAPED_UNICODE),
             'headers' => ['Content-Type: application/json'],
         ]), true);
+
         if (isset($result['code']) && intval($result['code']) === 200) {
             return $result['data'];
-        } else {
-            throw new Exception($result['message'], $result['code']);
         }
-    }
 
+        throw new Exception($result['message'], $result['code']);
+    }
 }

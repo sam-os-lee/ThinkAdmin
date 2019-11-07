@@ -1,4 +1,5 @@
 <?php
+
 // +----------------------------------------------------------------------
 // | ThinkPHP [ WE CAN DO IT JUST THINK ]
 // +----------------------------------------------------------------------
@@ -21,12 +22,27 @@ class RunServer extends Command
     public function configure()
     {
         $this->setName('run')
-            ->addOption('host', 'H', Option::VALUE_OPTIONAL,
-                'The host to server the application on', '127.0.0.1')
-            ->addOption('port', 'p', Option::VALUE_OPTIONAL,
-                'The port to server the application on', 8000)
-            ->addOption('root', 'r', Option::VALUE_OPTIONAL,
-                'The document root of the application', App::getRootPath() . 'public')
+            ->addOption(
+                'host',
+                'H',
+                Option::VALUE_OPTIONAL,
+                'The host to server the application on',
+                '127.0.0.1'
+            )
+            ->addOption(
+                'port',
+                'p',
+                Option::VALUE_OPTIONAL,
+                'The port to server the application on',
+                8000
+            )
+            ->addOption(
+                'root',
+                'r',
+                Option::VALUE_OPTIONAL,
+                'The document root of the application',
+                App::getRootPath() . 'public'
+            )
             ->setDescription('PHP Built-in Server for ThinkPHP');
     }
 
@@ -49,5 +65,4 @@ class RunServer extends Command
         $output->writeln(sprintf('Document root is: %s', $root));
         passthru($command);
     }
-
 }

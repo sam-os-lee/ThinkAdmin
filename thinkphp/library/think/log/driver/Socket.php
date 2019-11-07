@@ -1,4 +1,5 @@
 <?php
+
 // +----------------------------------------------------------------------
 // | ThinkPHP [ WE CAN DO IT JUST THINK IT ]
 // +----------------------------------------------------------------------
@@ -204,11 +205,13 @@ class Socket
         if (!empty($allow_client_ids)) {
             //通过数组交集得出授权强制推送的client_id
             $this->allowForceClientIds = array_intersect($allow_client_ids, $this->config['force_client_ids']);
+
             if (!$tabid && count($this->allowForceClientIds)) {
                 return true;
             }
 
             $client_id = $this->getClientArg('client_id');
+
             if (!in_array($client_id, $allow_client_ids)) {
                 return false;
             }
@@ -236,6 +239,7 @@ class Socket
         if (empty($args)) {
             if (!preg_match('/SocketLog\((.*?)\)/', $_SERVER[$key], $match)) {
                 $args = ['tabid' => null];
+
                 return;
             }
             parse_str($match[1], $args);
@@ -244,8 +248,6 @@ class Socket
         if (isset($args[$name])) {
             return $args[$name];
         }
-
-        return;
     }
 
     /**
@@ -268,12 +270,11 @@ class Socket
         curl_setopt($ch, CURLOPT_TIMEOUT, 10);
 
         $headers = [
-            "Content-Type: application/json;charset=UTF-8",
+            'Content-Type: application/json;charset=UTF-8',
         ];
 
         curl_setopt($ch, CURLOPT_HTTPHEADER, $headers); //设置header
 
         return curl_exec($ch);
     }
-
 }

@@ -1,4 +1,5 @@
 <?php
+
 // +----------------------------------------------------------------------
 // | ThinkPHP [ WE CAN DO IT JUST THINK ]
 // +----------------------------------------------------------------------
@@ -19,7 +20,7 @@ class Download extends Response
     protected $expire = 360;
     protected $name;
     protected $mimeType;
-    protected $isContent = false;
+    protected $isContent     = false;
     protected $openinBrowser = false;
     /**
      * 处理数据
@@ -56,11 +57,12 @@ class Download extends Response
         $this->header['Content-Disposition']       = $this->openinBrowser ? 'inline' : 'attachment; filename="' . $name . '"';
         $this->header['Content-Length']            = $size;
         $this->header['Content-Transfer-Encoding'] = 'binary';
-        $this->header['Expires']                   = gmdate("D, d M Y H:i:s", time() + $this->expire) . ' GMT';
+        $this->header['Expires']                   = gmdate('D, d M Y H:i:s', time() + $this->expire) . ' GMT';
 
         $this->lastModified(gmdate('D, d M Y H:i:s', time()) . ' GMT');
 
         $data = $this->isContent ? $data : file_get_contents($data);
+
         return $data;
     }
 
@@ -73,6 +75,7 @@ class Download extends Response
     public function isContent($content = true)
     {
         $this->isContent = $content;
+
         return $this;
     }
 
@@ -85,6 +88,7 @@ class Download extends Response
     public function expire($expire)
     {
         $this->expire = $expire;
+
         return $this;
     }
 
@@ -97,6 +101,7 @@ class Download extends Response
     public function mimeType($mimeType)
     {
         $this->mimeType = $mimeType;
+
         return $this;
     }
 
@@ -141,8 +146,10 @@ class Download extends Response
      * @param  bool  $openinBrowser 是否在浏览器中显示文件
      * @return $this
      */
-    public function openinBrowser($openinBrowser) {
+    public function openinBrowser($openinBrowser)
+    {
         $this->openinBrowser = $openinBrowser;
+
         return $this;
     }
 }

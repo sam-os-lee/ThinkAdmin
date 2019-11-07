@@ -1,4 +1,5 @@
 <?php
+
 // +----------------------------------------------------------------------
 // | ThinkPHP [ WE CAN DO IT JUST THINK ]
 // +----------------------------------------------------------------------
@@ -161,6 +162,7 @@ class View
     public function filter($filter)
     {
         $this->filter = $filter;
+
         return $this;
     }
 
@@ -189,6 +191,7 @@ class View
             $this->engine->$method($template, $vars, $config);
         } catch (\Exception $e) {
             ob_end_clean();
+
             throw $e;
         }
 

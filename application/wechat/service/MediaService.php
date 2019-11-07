@@ -38,12 +38,21 @@ class MediaService
     public static function news($id, $where = [])
     {
         $data = Db::name('WechatNews')->where(['id' => $id])->where($where)->find();
+
         list($data['articles'], $articleIds) = [[], explode(',', $data['article_id'])];
+
         $articles = Db::name('WechatNewsArticle')->whereIn('id', $articleIds)->select();
-        foreach ($articleIds as $article_id) foreach ($articles as $article) {
-            if (intval($article['id']) === intval($article_id)) array_push($data['articles'], $article);
-            unset($article['create_by'], $article['create_at']);
+
+        foreach ($articleIds as $article_id) {
+            foreach ($articles as $article) {
+                if (intval($article['id']) === intval($article_id)) {
+                    array_push($data['articles'], $article);
+                }
+
+                unset($article['create_by'], $article['create_at']);
+            }
         }
+
         return $data;
     }
 
@@ -61,12 +70,21 @@ class MediaService
     public static function upload($url, $type = 'image', $videoInfo = [])
     {
         $where = ['md5' => md5($url), 'appid' => WechatService::getAppid()];
-        if (($mediaId = Db::name('WechatMedia')->where($where)->value('media_id'))) return $mediaId;
+
+        if (($mediaId = Db::name('WechatMedia')->where($where)->value('media_id'))) {
+            return $mediaId;
+        }
+
         $result = WechatService::WeChatMedia()->addMaterial(self::getServerPath($url), $type, $videoInfo);
         data_save('WechatMedia', [
-            'local_url' => $url, 'md5' => $where['md5'], 'appid' => WechatService::getAppid(), 'type' => $type,
-            'media_url' => isset($result['url']) ? $result['url'] : '', 'media_id' => $result['media_id'],
+            'local_url' => $url,
+            'md5' => $where['md5'],
+            'appid' => WechatService::getAppid(),
+            'type' => $type,
+            'media_url' => isset($result['url']) ? $result['url'] : '',
+            'media_id' => $result['media_id'],
         ], 'type', $where);
+
         return $result['media_id'];
     }
 
@@ -80,8 +98,8 @@ class MediaService
     {
         if (file_exists($local)) {
             return new MyCurlFile($local);
-        } else {
-            return new MyCurlFile(File::down($local)['file']);
         }
+
+        return new MyCurlFile(File::down($local)['file']);
     }
 }

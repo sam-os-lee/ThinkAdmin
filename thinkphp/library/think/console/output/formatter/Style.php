@@ -1,4 +1,5 @@
 <?php
+
 // +----------------------------------------------------------------------
 // | ThinkPHP [ WE CAN DO IT JUST THINK ]
 // +----------------------------------------------------------------------
@@ -13,7 +14,6 @@ namespace think\console\output\formatter;
 
 class Style
 {
-
     private static $availableForegroundColors = [
         'black'   => ['set' => 30, 'unset' => 39],
         'red'     => ['set' => 31, 'unset' => 39],
@@ -58,9 +58,11 @@ class Style
         if (null !== $foreground) {
             $this->setForeground($foreground);
         }
+
         if (null !== $background) {
             $this->setBackground($background);
         }
+
         if (count($options)) {
             $this->setOptions($options);
         }
@@ -137,6 +139,7 @@ class Style
         }
 
         $pos = array_search(static::$availableOptions[$option], $this->options);
+
         if (false !== $pos) {
             unset($this->options[$pos]);
         }
@@ -169,10 +172,12 @@ class Style
             $setCodes[]   = $this->foreground['set'];
             $unsetCodes[] = $this->foreground['unset'];
         }
+
         if (null !== $this->background) {
             $setCodes[]   = $this->background['set'];
             $unsetCodes[] = $this->background['unset'];
         }
+
         if (count($this->options)) {
             foreach ($this->options as $option) {
                 $setCodes[]   = $option['set'];

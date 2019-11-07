@@ -36,7 +36,6 @@ use think\Db;
  */
 class ExtendService
 {
-
     /**
      * 发送短信验证码
      * @param string $mid 会员ID
@@ -49,7 +48,8 @@ class ExtendService
      */
     public static function sendSms($mid, $phone, $content, $productid = '676767')
     {
-        $tkey = date("YmdHis");
+        $tkey = date('YmdHis');
+
         $data = [
             'tkey'      => $tkey,
             'mobile'    => $phone,
@@ -58,10 +58,19 @@ class ExtendService
             'productid' => $productid,
             'password'  => md5(md5(sysconf('sms_zt_password')) . $tkey),
         ];
-        $result = Http::post('http://www.ztsms.cn/sendNSms.do', $data);
+
+        $result           = Http::post('http://www.ztsms.cn/sendNSms.do', $data);
         list($code, $msg) = explode(',', $result . ',');
-        $insert = ['mid' => $mid, 'phone' => $phone, 'content' => $content, 'result' => $result];
+
+        $insert = [
+            'mid' => $mid,
+            'phone' => $phone,
+            'content' => $content,
+            'result' => $result
+        ];
+
         Db::name('StoreMemberSmsHistory')->insert($insert);
+
         return intval($code) === 1;
     }
 
@@ -73,13 +82,16 @@ class ExtendService
      */
     public static function querySmsBalance()
     {
-        $tkey = date("YmdHis");
+        $tkey = date('YmdHis');
+
         $data = [
             'tkey'     => $tkey,
             'username' => sysconf('sms_zt_username'),
             'password' => md5(md5(sysconf('sms_zt_password')) . $tkey),
         ];
+
         $result = Http::post('http://www.ztsms.cn/balanceN.do', $data);
+
         if ($result > -1) {
             return ['code' => 1, 'num' => $result, 'msg' => '获取短信剩余条数成功！'];
         } elseif ($result > -2) {
@@ -89,6 +101,7 @@ class ExtendService
         } elseif ($result > -4) {
             return ['code' => 0, 'num' => '0', 'msg' => '用户不存在或用户停用！'];
         }
+
     }
 
     /**
@@ -96,8 +109,14 @@ class ExtendService
      * @var array
      */
     private static $messageMap2 = [
-        2  => '用户账号为空', 3 => '用户账号错误', 4 => '授权密码为空', 5 => '授权密码错误',
-        6  => '当前时间为空', 7 => '当前时间错误', 8 => '用户类型错误', 9 => '用户鉴权错误',
+        2  => '用户账号为空',
+        3 => '用户账号错误',
+        4 => '授权密码为空',
+        5 => '授权密码错误',
+        6  => '当前时间为空',
+        7 => '当前时间错误',
+        8 => '用户类型错误',
+        9 => '用户鉴权错误',
         10 => '请求IP已被列入黑名单',
     ];
 
@@ -113,7 +132,8 @@ class ExtendService
      */
     public static function sendSms2($mid, $code, $mobile, $content)
     {
-        $tkey = date("YmdHis");
+        $tkey = date('YmdHis');
+
         $data = [
             'tkey'     => $tkey,
             'code'     => $code,
@@ -122,10 +142,16 @@ class ExtendService
             'username' => sysconf('sms_zt_username2'),
             'password' => md5(md5(sysconf('sms_zt_password2')) . $tkey),
         ];
+
         $result = Http::post('http://intl.zthysms.com/intSendSms.do', $data);
         Db::name('StoreMemberSmsHistory')->insert([
-            'mid' => $mid, 'region' => $code, 'phone' => $mobile, 'content' => $content, 'result' => $result,
+            'mid' => $mid,
+            'region' => $code,
+            'phone' => $mobile,
+            'content' => $content,
+            'result' => $result,
         ]);
+
         return intval($result) === 1;
     }
 
@@ -137,18 +163,20 @@ class ExtendService
      */
     public static function querySmsBalance2()
     {
-        $tkey = date("YmdHis");
+        $tkey = date('YmdHis');
+
         $data = [
             'username' => sysconf('sms_zt_username2'), 'tkey' => $tkey,
             'password' => md5(md5(sysconf('sms_zt_password2')) . $tkey),
         ];
+
         $result = Http::post('http://intl.zthysms.com/intBalance.do', $data);
 
         if (!is_numeric($result) && ($state = intval($result)) && isset(self::$messageMap2[$state])) {
             return ['code' => 0, 'num' => 0, 'msg' => self::$messageMap2[$state]];
-        } else {
-            return ['code' => 1, 'num' => $result, 'msg' => '查询成功'];
         }
+
+        return ['code' => 1, 'num' => $result, 'msg' => '查询成功'];
     }
 
     /**
@@ -378,5 +406,4 @@ class ExtendService
             ['title' => '黑山共和国', 'english' => 'The Republic of Montenegro', 'code' => 382],
         ];
     }
-
 }

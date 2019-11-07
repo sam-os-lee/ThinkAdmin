@@ -1,4 +1,5 @@
 <?php
+
 // +----------------------------------------------------------------------
 // | ThinkPHP [ WE CAN DO IT JUST THINK ]
 // +----------------------------------------------------------------------
@@ -388,7 +389,7 @@ abstract class Rule
             $this->option['model'][] = $var;
         } elseif (is_array($var)) {
             $this->option['model'] = $var;
-        } elseif (is_null($model)) {
+        } elseif (null === $model) {
             $this->option['model']['id'] = [$var, true];
         } else {
             $this->option['model'][$var] = [$model, $exception];
@@ -439,6 +440,7 @@ abstract class Rule
     public function response($response)
     {
         $this->option['response'][] = $response;
+
         return $this;
     }
 
@@ -469,7 +471,7 @@ abstract class Rule
      */
     public function middleware($middleware, $param = null)
     {
-        if (is_null($param) && is_array($middleware)) {
+        if (null === $param && is_array($middleware)) {
             $this->option['middleware'] = $middleware;
         } else {
             foreach ((array) $middleware as $item) {
@@ -522,6 +524,7 @@ abstract class Rule
     public function mergeOptions($option = [])
     {
         $this->mergeOptions = array_merge($this->mergeOptions, $option);
+
         return $this;
     }
 
@@ -699,7 +702,7 @@ abstract class Rule
             $parentOption = $this->parent->getOption();
             // 合并分组参数
             foreach ($this->mergeOptions as $item) {
-                if (isset($parentOption[$item]) && isset($this->option[$item])) {
+                if (isset($parentOption[$item], $this->option[$item])) {
                     $this->option[$item] = array_merge($parentOption[$item], $this->option[$item]);
                 }
             }
@@ -896,6 +899,7 @@ abstract class Rule
         foreach (['ajax', 'pjax', 'mobile'] as $item) {
             if (isset($option[$item])) {
                 $call = 'is' . $item;
+
                 if ($option[$item] && !$request->$call() || !$option[$item] && $request->$call()) {
                     return false;
                 }
@@ -927,6 +931,7 @@ abstract class Rule
                 }
             }
         }
+
         return true;
     }
 
@@ -1054,6 +1059,7 @@ abstract class Rule
 
         if (isset($pattern[$name])) {
             $nameRule = $pattern[$name];
+
             if (0 === strpos($nameRule, '/') && '/' == substr($nameRule, -1)) {
                 $nameRule = substr($nameRule, 1, -1);
             }

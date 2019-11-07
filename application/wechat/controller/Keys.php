@@ -66,9 +66,11 @@ class Keys extends Controller
                 $this->error("生成二维码失败，请稍候再试！<br> {$e->getMessage()}");
             }
         }
+
         // 关键字列表显示
         $this->title = '回复规则管理';
         $query = $this->_query($this->table)->like('keys,type')->equal('status')->dateBetween('create_at');
+        // 注意:分页管理器
         $query->whereNotIn('keys', ['subscribe', 'default'])->order('sort desc,id desc')->page();
     }
 
@@ -79,7 +81,7 @@ class Keys extends Controller
     protected function _index_page_filter(&$data)
     {
         foreach ($data as &$vo) {
-            $vo['qrc'] = url('@wechat/keys/index') . "?action=qrc&keys={$vo['keys']}";
+            $vo['qrc']  = url('@wechat/keys/index') . "?action=qrc&keys={$vo['keys']}";
             $vo['type'] = isset($this->types[$vo['type']]) ? $this->types[$vo['type']] : $vo['type'];
         }
     }
@@ -92,6 +94,7 @@ class Keys extends Controller
     {
         $this->applyCsrfToken();
         $this->title = '添加关键字规则';
+        // 注意:form逻辑器
         $this->_form($this->table, 'form');
     }
 
@@ -103,6 +106,7 @@ class Keys extends Controller
     {
         $this->applyCsrfToken();
         $this->title = '编辑关键字规则';
+        // 注意:form逻辑器
         $this->_form($this->table, 'form');
     }
 
@@ -113,6 +117,7 @@ class Keys extends Controller
     public function remove()
     {
         $this->applyCsrfToken();
+        // 注意:删除逻辑器
         $this->_delete($this->table);
     }
 
@@ -123,6 +128,7 @@ class Keys extends Controller
     public function forbid()
     {
         $this->applyCsrfToken();
+        // 注意:更新逻辑器
         $this->_save($this->table, ['status' => '0']);
     }
 
@@ -133,6 +139,7 @@ class Keys extends Controller
     public function resume()
     {
         $this->applyCsrfToken();
+        // 注意:更新逻辑器
         $this->_save($this->table, ['status' => '1']);
     }
 
@@ -144,6 +151,7 @@ class Keys extends Controller
     {
         $this->applyCsrfToken();
         $this->title = '编辑关注回复规则';
+        // 注意:form逻辑器
         $this->_form($this->table, 'form', 'keys', [], ['keys' => 'subscribe']);
     }
 
@@ -155,6 +163,7 @@ class Keys extends Controller
     {
         $this->applyCsrfToken();
         $this->title = '编辑默认回复规则';
+        // 注意:form逻辑器
         $this->_form($this->table, 'form', 'keys', [], ['keys' => 'default']);
     }
 
@@ -167,13 +176,15 @@ class Keys extends Controller
         if ($this->request->isPost() && isset($data['keys'])) {
             $db = Db::name($this->table)->where('keys', $data['keys']);
             empty($data['id']) || $db->where('id', 'neq', $data['id']);
+
             if ($db->count() > 0) {
                 $this->error('关键字已经存在，请使用其它关键字！');
             }
         }
+
         if ($this->request->isGet()) {
-            $this->msgTypes = $this->types;
-            $root = rtrim(dirname(request()->basefile(true)), '\\/');
+            $this->msgTypes     = $this->types;
+            $root               = rtrim(dirname(request()->basefile(true)), '\\/');
             $this->defaultImage = "{$root}/static/theme/img/image.png";
         }
     }
@@ -186,13 +197,14 @@ class Keys extends Controller
     {
         if ($result !== false) {
             list($url, $keys) = ['', $this->request->post('keys')];
+
             if (!in_array($keys, ['subscribe', 'default'])) {
                 $url = url('@admin') . '#' . url('wechat/keys/index') . '?spm=' . $this->request->get('spm');
             }
+
             $this->success('恭喜, 关键字保存成功!', $url);
         } else {
             $this->error('关键字保存失败, 请稍候再试!');
         }
     }
-
 }

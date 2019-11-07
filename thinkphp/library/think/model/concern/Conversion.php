@@ -1,4 +1,5 @@
 <?php
+
 // +----------------------------------------------------------------------
 // | ThinkPHP [ WE CAN DO IT JUST THINK ]
 // +----------------------------------------------------------------------
@@ -75,6 +76,7 @@ trait Conversion
         }
 
         $relation = Loader::parseName($attr, 1, false);
+
         if (isset($this->relation[$relation])) {
             $model = $this->relation[$relation];
         } else {
@@ -84,11 +86,11 @@ trait Conversion
         if ($model instanceof Model) {
             foreach ($append as $key => $attr) {
                 $key = is_numeric($key) ? $attr : $key;
+
                 if (isset($this->data[$key])) {
                     throw new Exception('bind attr has exists:' . $key);
-                } else {
-                    $this->data[$key] = $model->$attr;
                 }
+                $this->data[$key] = $model->$attr;
             }
         }
 
@@ -232,6 +234,7 @@ trait Conversion
     public function removeRelation()
     {
         $this->relation = [];
+
         return $this;
     }
 
@@ -265,5 +268,4 @@ trait Conversion
 
         return $collection;
     }
-
 }

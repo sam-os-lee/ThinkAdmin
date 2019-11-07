@@ -1,4 +1,5 @@
 <?php
+
 // +----------------------------------------------------------------------
 // | ThinkPHP [ WE CAN DO IT JUST THINK ]
 // +----------------------------------------------------------------------
@@ -174,7 +175,7 @@ abstract class Dispatch
     {
         if ($data instanceof Response) {
             $response = $data;
-        } elseif (!is_null($data)) {
+        } elseif (null !== $data) {
             // 默认自动识别响应输出类型
             $isAjax = $this->request->isAjax();
             $type   = $isAjax ? $this->rule->getConfig('default_ajax_return') : $this->rule->getConfig('default_return_type');
@@ -183,7 +184,7 @@ abstract class Dispatch
         } else {
             $data     = ob_get_clean();
             $content  = false === $data ? '' : $data;
-            $status   = '' === $content && $this->request->isAjax() ? 204 : 200;
+            $status   = ''    === $content && $this->request->isAjax() ? 204 : 200;
             $response = Response::create($content, '', $status);
         }
 
@@ -207,7 +208,7 @@ abstract class Dispatch
         foreach ((array) $after as $behavior) {
             $result = $hook->exec($behavior);
 
-            if (!is_null($result)) {
+            if (null !== $result) {
                 break;
             }
         }
@@ -238,6 +239,7 @@ abstract class Dispatch
         } else {
             // 调用验证器
             $v = $this->app->validate($validate);
+
             if (!empty($scene)) {
                 $v->scene($scene);
             }
@@ -306,10 +308,10 @@ abstract class Dispatch
                 foreach ($fields as $field) {
                     if (!isset($matches[$field])) {
                         $match = false;
+
                         break;
-                    } else {
-                        $where[] = [$field, '=', $matches[$field]];
                     }
+                    $where[] = [$field, '=', $matches[$field]];
                 }
 
                 if ($match) {

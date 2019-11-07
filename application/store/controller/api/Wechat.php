@@ -40,8 +40,9 @@ class Wechat extends Controller
     public function session()
     {
         try {
-            $code = $this->request->post('code');
+            $code   = $this->request->post('code');
             $result = \We::WeMiniCrypt($this->config())->session($code);
+
             if (isset($result['openid'])) {
                 data_save('StoreMember', ['openid' => $result['openid']], 'openid');
                 $result['member'] = Db::name('StoreMember')->where(['openid' => $result['openid']])->find();
@@ -62,15 +63,17 @@ class Wechat extends Controller
     public function decode()
     {
         try {
-            $iv = $this->request->post('iv');
+            $iv      = $this->request->post('iv');
             $session = $this->request->post('session');
             $content = $this->request->post('encrypted');
+
             if (empty($session)) {
-                $code = $this->request->post('code');
-                $result = \We::WeMiniCrypt($this->config())->session($code);
+                $code    = $this->request->post('code');
+                $result  = \We::WeMiniCrypt($this->config())->session($code);
                 $session = isset($result['session_key']) ? $result['session_key'] : '';
             }
             $result = \We::WeMiniCrypt($this->config())->decode($iv, $session, $content);
+
             if ($result !== false && isset($result['openId'])) {
                 data_save('StoreMember', [
                     'openid'   => $result['openId'],
@@ -88,5 +91,4 @@ class Wechat extends Controller
             $this->error("小程序加密数据解密失败，{$e->getMessage()}");
         }
     }
-
 }

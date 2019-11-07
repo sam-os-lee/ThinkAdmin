@@ -1,4 +1,5 @@
 <?php
+
 // +----------------------------------------------------------------------
 // | ThinkPHP [ WE CAN DO IT JUST THINK ]
 // +----------------------------------------------------------------------
@@ -16,7 +17,6 @@ use think\validate\ValidateRule;
 
 class Validate
 {
-
     /**
      * 自定义验证类型
      * @var array
@@ -222,6 +222,7 @@ class Validate
     {
         if (is_array($name)) {
             $this->rule = $name + $this->rule;
+
             if (is_array($rule)) {
                 $this->field = array_merge($this->field, $rule);
             }
@@ -449,6 +450,7 @@ class Validate
                     }
                 } else {
                     $this->error = $result;
+
                     return false;
                 }
             }
@@ -534,17 +536,17 @@ class Validate
                 list($type, $rule, $info) = $this->getValidateType($key, $rule);
 
                 if (isset($this->append[$field]) && in_array($info, $this->append[$field])) {
-
                 } elseif (array_key_exists($field, $this->remove) && (null === $this->remove[$field] || in_array($info, $this->remove[$field]))) {
                     // 规则已经移除
                     $i++;
+
                     continue;
                 }
 
                 // 验证类型
                 if (isset(self::$type[$type])) {
                     $result = call_user_func_array(self::$type[$type], [$value, $rule, $data, $field, $title]);
-                } elseif ('must' == $info || 0 === strpos($info, 'require') || (!is_null($value) && '' !== $value)) {
+                } elseif ('must' == $info || 0 === strpos($info, 'require') || (null !== $value && '' !== $value)) {
                     // 验证数据
                     $result = call_user_func_array([$this, $type], [$value, $rule, $data, $field, $title]);
                 } else {
@@ -556,6 +558,7 @@ class Validate
                 // 验证失败 返回错误信息
                 if (!empty($msg[$i])) {
                     $message = $msg[$i];
+
                     if (is_string($message) && strpos($message, '{%') === 0) {
                         $message = facade\Lang::get(substr($message, 2, -1));
                     }
@@ -598,6 +601,7 @@ class Validate
 
         if (strpos($rule, ':')) {
             list($type, $rule) = explode(':', $rule, 2);
+
             if (isset($this->alias[$type])) {
                 // 判断别名
                 $type = $this->alias[$type];
@@ -740,42 +744,53 @@ class Validate
             case 'require':
                 // 必须
                 $result = !empty($value) || '0' == $value;
+
                 break;
             case 'accepted':
                 // 接受
                 $result = in_array($value, ['1', 'on', 'yes']);
+
                 break;
             case 'date':
                 // 是否是一个有效日期
                 $result = false !== strtotime($value);
+
                 break;
             case 'activeUrl':
                 // 是否为有效的网址
                 $result = checkdnsrr($value);
+
                 break;
             case 'boolean':
             case 'bool':
                 // 是否为布尔值
                 $result = in_array($value, [true, false, 0, 1, '0', '1'], true);
+
                 break;
             case 'number':
                 $result = ctype_digit((string) $value);
+
                 break;
             case 'alphaNum':
                 $result = ctype_alnum($value);
+
                 break;
             case 'array':
                 // 是否为数组
                 $result = is_array($value);
+
                 break;
             case 'file':
                 $result = $value instanceof File;
+
                 break;
             case 'image':
                 $result = $value instanceof File && in_array($this->getImageType($value->getRealPath()), [1, 2, 3, 6]);
+
                 break;
             case 'token':
                 $result = $this->token($value, '__token__', $data);
+
                 break;
             default:
                 if (isset(self::$type[$rule])) {
@@ -806,6 +821,7 @@ class Validate
 
         try {
             $info = getimagesize($image);
+
             return $info ? $info[2] : false;
         } catch (\Exception $e) {
             return false;
@@ -859,6 +875,7 @@ class Validate
                     return false;
                 }
             }
+
             return true;
         } elseif ($file instanceof File) {
             return $file->checkExt($rule);
@@ -882,6 +899,7 @@ class Validate
                     return false;
                 }
             }
+
             return true;
         } elseif ($file instanceof File) {
             return $file->checkMime($rule);
@@ -905,6 +923,7 @@ class Validate
                     return false;
                 }
             }
+
             return true;
         } elseif ($file instanceof File) {
             return $file->checkSize($rule);
@@ -961,6 +980,7 @@ class Validate
     public function method($value, $rule)
     {
         $method = Container::get('request')->method();
+
         return strtoupper($rule) == $method;
     }
 
@@ -974,6 +994,7 @@ class Validate
     public function dateFormat($value, $rule)
     {
         $info = date_parse_from_format($rule, $value);
+
         return 0 == $info['warning_count'] && 0 == $info['error_count'];
     }
 
@@ -994,7 +1015,7 @@ class Validate
 
         if (false !== strpos($rule[0], '\\')) {
             // 指定模型类
-            $db = new $rule[0];
+            $db = new $rule[0]();
         } else {
             try {
                 $db = Container::get('app')->model($rule[0]);
@@ -1008,6 +1029,7 @@ class Validate
         if (strpos($key, '^')) {
             // 支持多个字段验证
             $fields = explode('^', $key);
+
             foreach ($fields as $key) {
                 if (isset($data[$key])) {
                     $map[] = [$key, '=', $data[$key]];
@@ -1207,6 +1229,7 @@ class Validate
         if (strpos($rule, ',')) {
             // 长度区间
             list($min, $max) = explode(',', $rule);
+
             return $length >= $min && $length <= $max;
         }
 
@@ -1291,7 +1314,8 @@ class Validate
     protected function afterWith($value, $rule, $data)
     {
         $rule = $this->getDataValue($data, $rule);
-        return !is_null($rule) && strtotime($value) >= strtotime($rule);
+
+        return null !== $rule && strtotime($value) >= strtotime($rule);
     }
 
     /**
@@ -1305,7 +1329,8 @@ class Validate
     protected function beforeWith($value, $rule, $data)
     {
         $rule = $this->getDataValue($data, $rule);
-        return !is_null($rule) && strtotime($value) <= strtotime($rule);
+
+        return null !== $rule && strtotime($value) <= strtotime($rule);
     }
 
     /**
@@ -1434,6 +1459,7 @@ class Validate
             foreach (explode('.', $key) as $key) {
                 if (!isset($data[$key])) {
                     $value = null;
+
                     break;
                 }
                 $value = $data = $data[$key];
@@ -1492,7 +1518,9 @@ class Validate
             $msg = str_replace(
                 [':attribute', ':1', ':2', ':3'],
                 [$title, $array[0], $array[1], $array[2]],
-                $msg);
+                $msg
+            );
+
             if (strpos($msg, ':rule')) {
                 $msg = str_replace(':rule', (string) $rule, $msg);
             }

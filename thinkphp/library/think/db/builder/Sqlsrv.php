@@ -1,4 +1,5 @@
 <?php
+
 // +----------------------------------------------------------------------
 // | ThinkPHP [ WE CAN DO IT JUST THINK IT ]
 // +----------------------------------------------------------------------
@@ -143,7 +144,7 @@ class Sqlsrv extends Builder
         if (count($limit) > 1) {
             $limitStr = '(T1.ROW_NUMBER BETWEEN ' . $limit[0] . ' + 1 AND ' . $limit[0] . ' + ' . $limit[1] . ')';
         } else {
-            $limitStr = '(T1.ROW_NUMBER BETWEEN 1 AND ' . $limit[0] . ")";
+            $limitStr = '(T1.ROW_NUMBER BETWEEN 1 AND ' . $limit[0] . ')';
         }
 
         return 'WHERE ' . $limitStr;
@@ -155,5 +156,4 @@ class Sqlsrv extends Builder
 
         return parent::selectInsert($query, $fields, $table);
     }
-
 }

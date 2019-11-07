@@ -1,4 +1,5 @@
 <?php
+
 // +----------------------------------------------------------------------
 // | ThinkPHP [ WE CAN DO IT JUST THINK ]
 // +----------------------------------------------------------------------
@@ -44,7 +45,7 @@ class Memcache implements SessionHandlerInterface
             throw new Exception('not support:memcache');
         }
 
-        $this->handler = new \Memcache;
+        $this->handler = new \Memcache();
 
         // 支持集群
         $hosts = explode(',', $this->config['host']);

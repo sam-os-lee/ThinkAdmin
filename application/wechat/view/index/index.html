@@ -76,8 +76,10 @@
 
 <script>
     require(['echarts'], function (echarts, chart) {
+
         chart = echarts.init(document.getElementById('main'));
         window.onresize = chart.resize;
+
         chart.setOption({
             tooltip: {trigger: 'axis'},
             grid: {top: '10%', left: '3%', right: '8%', bottom: '3%', containLabel: true},

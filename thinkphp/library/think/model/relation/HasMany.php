@@ -1,4 +1,5 @@
 <?php
+
 // +----------------------------------------------------------------------
 // | ThinkPHP [ WE CAN DO IT JUST THINK ]
 // +----------------------------------------------------------------------
@@ -32,7 +33,7 @@ class HasMany extends Relation
         $this->model      = $model;
         $this->foreignKey = $foreignKey;
         $this->localKey   = $localKey;
-        $this->query      = (new $model)->db();
+        $this->query      = (new $model())->db();
 
         if (get_class($parent) == $model) {
             $this->selfRelation = true;
@@ -99,6 +100,7 @@ class HasMany extends Relation
             // 关联数据封装
             foreach ($resultSet as $result) {
                 $pk = $result->$localKey;
+
                 if (!isset($data[$pk])) {
                     $data[$pk] = [];
                 }
@@ -165,6 +167,7 @@ class HasMany extends Relation
 
         if ($closure) {
             $return = $closure($this->query);
+
             if ($return && is_string($return)) {
                 $name = $return;
             }
@@ -347,5 +350,4 @@ class HasMany extends Relation
             $this->baseQuery = true;
         }
     }
-
 }

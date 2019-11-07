@@ -25,7 +25,6 @@ use think\Db;
  */
 class Oplog extends Controller
 {
-
     /**
      * 指定当前数据表
      * @var string
@@ -44,7 +43,8 @@ class Oplog extends Controller
     public function index()
     {
         $this->title = '系统操作日志';
-        $query = $this->_query($this->table)->like('action,node,content,username,geoip');
+        $query       = $this->_query($this->table)->like('action,node,content,username,geoip');
+        // 注意:分页管理器
         $query->dateBetween('create_at')->order('id desc')->page();
     }
 
@@ -57,8 +57,9 @@ class Oplog extends Controller
     protected function _index_page_filter(&$data)
     {
         $ip = new \Ip2Region();
+
         foreach ($data as &$vo) {
-            $result = $ip->btreeSearch($vo['geoip']);
+            $result    = $ip->btreeSearch($vo['geoip']);
             $vo['isp'] = isset($result['region']) ? $result['region'] : '';
             $vo['isp'] = str_replace(['内网IP', '0', '|'], '', $vo['isp']);
         }
@@ -88,7 +89,7 @@ class Oplog extends Controller
     public function remove()
     {
         $this->applyCsrfToken();
+        // 注意:删除逻辑器
         $this->_delete($this->table);
     }
-
 }

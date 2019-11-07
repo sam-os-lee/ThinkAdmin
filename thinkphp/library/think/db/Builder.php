@@ -1,4 +1,5 @@
 <?php
+
 // +----------------------------------------------------------------------
 // | ThinkPHP [ WE CAN DO IT JUST THINK ]
 // +----------------------------------------------------------------------
@@ -77,6 +78,7 @@ abstract class Builder
     public function bindParser($name, $parser)
     {
         $this->parser[$name] = $parser;
+
         return $this;
     }
 
@@ -121,6 +123,7 @@ abstract class Builder
 
             if ($val instanceof Expression) {
                 $result[$item] = $val->getValue();
+
                 continue;
             } elseif (!is_scalar($val) && (in_array($key, (array) $query->getOptions('json')) || 'json' == $this->connection->getFieldsType($options['table'], $key))) {
                 $val = json_encode($val, JSON_UNESCAPED_UNICODE);
@@ -137,15 +140,17 @@ abstract class Builder
                 if ($options['strict']) {
                     throw new Exception('fields not exists:[' . $key . ']');
                 }
-            } elseif (is_null($val)) {
+            } elseif (null === $val) {
                 $result[$item] = 'NULL';
             } elseif (is_array($val) && !empty($val)) {
                 switch (strtoupper($val[0])) {
                     case 'INC':
                         $result[$item] = $item . ' + ' . floatval($val[1]);
+
                         break;
                     case 'DEC':
                         $result[$item] = $item . ' - ' . floatval($val[1]);
+
                         break;
                     case 'EXP':
                         throw new Exception('not support data:[' . $val[0] . ']');
@@ -297,6 +302,7 @@ abstract class Builder
             foreach ($val as $value) {
                 if ($value instanceof Expression) {
                     $str[] = ' ' . $logic . ' ( ' . $value->getValue() . ' )';
+
                     continue;
                 }
 
@@ -321,6 +327,7 @@ abstract class Builder
                 } elseif (is_array($field)) {
                     array_unshift($value, $field);
                     $str2 = [];
+
                     foreach ($value as $item) {
                         $str2[] = $this->parseWhereItem($query, array_shift($item), $item, $logic, $binds);
                     }
@@ -367,7 +374,7 @@ abstract class Builder
 
         // 查询规则和条件
         if (!is_array($val)) {
-            $val = is_null($val) ? ['NULL', ''] : ['=', $val];
+            $val = null === $val ? ['NULL', ''] : ['=', $val];
         }
 
         list($exp, $value) = $val;
@@ -392,12 +399,12 @@ abstract class Builder
 
         // 检测操作符
         $exp = strtoupper($exp);
+
         if (isset($this->exp[$exp])) {
             $exp = $this->exp[$exp];
         }
 
         if ($value instanceof Expression) {
-
         } elseif (is_object($value) && method_exists($value, '__toString')) {
             // 对象数据写入
             $value = $value->__toString();
@@ -422,6 +429,7 @@ abstract class Builder
         foreach ($this->parser as $fun => $parse) {
             if (in_array($exp, $parse)) {
                 $whereStr = $this->$fun($query, $key, $exp, $value, $field, $bindType, isset($val[2]) ? $val[2] : 'AND');
+
                 break;
             }
         }
@@ -628,7 +636,6 @@ abstract class Builder
         . $this->parseDateTime($query, $value[0], $field, $bindType)
         . ' AND '
         . $this->parseDateTime($query, $value[1], $field, $bindType);
-
     }
 
     /**
@@ -952,7 +959,7 @@ abstract class Builder
             return '';
         }
 
-        return sprintf(" FORCE INDEX ( %s ) ", is_array($index) ? implode(',', $index) : $index);
+        return sprintf(' FORCE INDEX ( %s ) ', is_array($index) ? implode(',', $index) : $index);
     }
 
     /**
@@ -998,7 +1005,8 @@ abstract class Builder
                 $this->parseComment($query, $options['comment']),
                 $this->parseForce($query, $options['force']),
             ],
-            $this->selectSql);
+            $this->selectSql
+        );
     }
 
     /**
@@ -1014,6 +1022,7 @@ abstract class Builder
 
         // 分析并处理数据
         $data = $this->parseData($query, $options['data']);
+
         if (empty($data)) {
             return '';
         }
@@ -1030,7 +1039,8 @@ abstract class Builder
                 implode(' , ', $values),
                 $this->parseComment($query, $options['comment']),
             ],
-            $this->insertSql);
+            $this->insertSql
+        );
     }
 
     /**
@@ -1080,7 +1090,8 @@ abstract class Builder
                 implode(' UNION ALL ', $values),
                 $this->parseComment($query, $options['comment']),
             ],
-            $this->insertAllSql);
+            $this->insertAllSql
+        );
     }
 
     /**
@@ -1136,7 +1147,8 @@ abstract class Builder
                 $this->parseLock($query, $options['lock']),
                 $this->parseComment($query, $options['comment']),
             ],
-            $this->updateSql);
+            $this->updateSql
+        );
     }
 
     /**
@@ -1161,6 +1173,7 @@ abstract class Builder
                 $this->parseLock($query, $options['lock']),
                 $this->parseComment($query, $options['comment']),
             ],
-            $this->deleteSql);
+            $this->deleteSql
+        );
     }
 }

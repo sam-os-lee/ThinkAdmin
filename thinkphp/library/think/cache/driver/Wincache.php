@@ -1,4 +1,5 @@
 <?php
+
 // +----------------------------------------------------------------------
 // | ThinkPHP [ WE CAN DO IT JUST THINK ]
 // +----------------------------------------------------------------------
@@ -85,7 +86,7 @@ class Wincache extends Driver
     {
         $this->writeTimes++;
 
-        if (is_null($expire)) {
+        if (null === $expire) {
             $expire = $this->options['expire'];
         }
 
@@ -99,6 +100,7 @@ class Wincache extends Driver
 
         if (wincache_ucache_set($key, $value, $expire)) {
             isset($first) && $this->setTagItem($key);
+
             return true;
         }
 
@@ -165,11 +167,12 @@ class Wincache extends Driver
 
             $tagName = $this->getTagkey($tag);
             $this->rm($tagName);
+
             return true;
         }
 
         $this->writeTimes++;
+
         return wincache_ucache_clear();
     }
-
 }

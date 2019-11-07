@@ -51,7 +51,7 @@ class WechatHandler
     public function __construct($config = [])
     {
         $this->config = $config;
-        $this->appid = isset($config['authorizer_appid']) ? $config['authorizer_appid'] : '';
+        $this->appid  = isset($config['authorizer_appid']) ? $config['authorizer_appid'] : '';
     }
 
     /**
@@ -61,7 +61,10 @@ class WechatHandler
      */
     private function checkInit()
     {
-        if (!empty($this->config)) return true;
+        if (!empty($this->config)) {
+            return true;
+        }
+
         throw new \think\Exception('Wechat Please bind Wechat first');
     }
 
@@ -74,8 +77,15 @@ class WechatHandler
     {
         $this->checkInit();
         $info = Db::name('WechatServiceConfig')->where(['authorizer_appid' => $this->appid])->find();
-        if (empty($info)) return false;
-        if (isset($info['id'])) unset($info['id']);
+
+        if (empty($info)) {
+            return false;
+        }
+
+        if (isset($info['id'])) {
+            unset($info['id']);
+        }
+
         return $info;
     }
 
@@ -89,8 +99,13 @@ class WechatHandler
     public function setApiNotifyUri($notifyUri)
     {
         $this->checkInit();
-        if (empty($notifyUri)) throw new \think\Exception('请传入微信通知URL');
+
+        if (empty($notifyUri)) {
+            throw new \think\Exception('请传入微信通知URL');
+        }
+
         list($where, $data) = [['authorizer_appid' => $this->appid], ['appuri' => $notifyUri]];
+
         return Db::name('WechatServiceConfig')->where($where)->update($data) !== false;
     }
 
@@ -105,6 +120,7 @@ class WechatHandler
         $this->checkInit();
         $data = ['appkey' => md5(uniqid())];
         Db::name('WechatServiceConfig')->where(['authorizer_appid' => $this->appid])->update($data);
+
         return $data['appkey'];
     }
 
@@ -117,6 +133,7 @@ class WechatHandler
     public function config($name = null)
     {
         $this->checkInit();
+
         return WechatLogic::WeChatScript($this->appid)->config->get($name);
     }
 
@@ -131,16 +148,25 @@ class WechatHandler
     public function oauth($sessid, $selfUrl, $fullMode = 0)
     {
         $this->checkInit();
-        $fans = cache("{$this->appid}_{$sessid}_fans");
+
+        $fans   = cache("{$this->appid}_{$sessid}_fans");
         $openid = cache("{$this->appid}_{$sessid}_openid");
+
         if (!empty($openid) && (empty($fullMode) || !empty($fans))) {
             return ['openid' => $openid, 'fans' => $fans, 'url' => ''];
         }
+
         $service = WechatLogic::service();
-        $mode = empty($fullMode) ? 'snsapi_base' : 'snsapi_userinfo';
-        $url = url('@service/api.push/oauth', '', true, true);
-        $params = ['mode' => $fullMode, 'sessid' => $sessid, 'enurl' => encode($selfUrl)];
+        $mode    = empty($fullMode) ? 'snsapi_base' : 'snsapi_userinfo';
+        $url     = url('@service/api.push/oauth', '', true, true);
+        $params  = [
+            'mode' => $fullMode,
+            'sessid' => $sessid,
+            'enurl' => encode($selfUrl)
+        ];
+
         $authurl = $service->getOauthRedirect($this->appid, $url . '?' . http_build_query($params), $mode);
+
         return ['openid' => $openid, 'fans' => $fans, 'url' => $authurl];
     }
 
@@ -155,7 +181,7 @@ class WechatHandler
     public function jsSign($url)
     {
         $this->checkInit();
+
         return WechatLogic::WeChatScript($this->appid)->getJsSign($url);
     }
-
 }

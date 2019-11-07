@@ -1,4 +1,5 @@
 <?php
+
 // +----------------------------------------------------------------------
 // | ThinkPHP [ WE CAN DO IT JUST THINK ]
 // +----------------------------------------------------------------------
@@ -77,6 +78,7 @@ abstract class Relation
     public function selfRelation($self = true)
     {
         $this->selfRelation = $self;
+
         return $this;
     }
 
@@ -98,19 +100,19 @@ abstract class Relation
      */
     protected function resultSetBuild($resultSet)
     {
-        return (new $this->model)->toCollection($resultSet);
+        return (new $this->model())->toCollection($resultSet);
     }
 
     protected function getQueryFields($model)
     {
         $fields = $this->query->getOptions('field');
+
         return $this->getRelationQueryFields($fields, $model);
     }
 
     protected function getRelationQueryFields($fields, $model)
     {
         if ($fields) {
-
             if (is_string($fields)) {
                 $fields = explode(',', $fields);
             }
@@ -169,7 +171,8 @@ abstract class Relation
      * @return void
      */
     protected function baseQuery()
-    {}
+    {
+    }
 
     public function __call($method, $args)
     {
@@ -180,8 +183,8 @@ abstract class Relation
             $result = call_user_func_array([$this->query->getModel(), $method], $args);
 
             return $result === $this->query && !in_array(strtolower($method), ['fetchsql', 'fetchpdo']) ? $this : $result;
-        } else {
-            throw new Exception('method not exists:' . __CLASS__ . '->' . $method);
         }
+
+        throw new Exception('method not exists:' . __CLASS__ . '->' . $method);
     }
 }

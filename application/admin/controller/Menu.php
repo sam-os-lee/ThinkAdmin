@@ -27,7 +27,6 @@ use think\Db;
  */
 class Menu extends Controller
 {
-
     /**
      * 当前操作数据库
      * @var string
@@ -60,8 +59,10 @@ class Menu extends Controller
             if ($vo['url'] !== '#') {
                 $vo['url'] = url($vo['url']) . (empty($vo['params']) ? '' : "?{$vo['params']}");
             }
+
             $vo['ids'] = join(',', Data::getArrSubIds($data, $vo['id']));
         }
+
         $data = Data::arr2table($data);
     }
 
@@ -77,6 +78,7 @@ class Menu extends Controller
     public function add()
     {
         $this->applyCsrfToken();
+        // 注意:form逻辑器
         $this->_form($this->table, 'form');
     }
 
@@ -92,6 +94,7 @@ class Menu extends Controller
     public function edit()
     {
         $this->applyCsrfToken();
+        // 注意:form逻辑器
         $this->_form($this->table, 'form');
     }
 
@@ -106,18 +109,27 @@ class Menu extends Controller
     protected function _form_filter(&$vo)
     {
         if ($this->request->isGet()) {
-            $menus = Db::name($this->table)->where(['status' => '1'])->order('sort desc,id asc')->select();
+
+            $menus   = Db::name($this->table)->where(['status' => '1'])->order('sort desc,id asc')->select();
             $menus[] = ['title' => '顶级菜单', 'id' => '0', 'pid' => '-1'];
+
             foreach ($this->menus = Data::arr2table($menus) as $key => &$menu) {
-                if (substr_count($menu['path'], '-') > 3) unset($this->menus[$key]); # 移除三级以下的菜单
+
+                if (substr_count($menu['path'], '-') > 3) {
+                    unset($this->menus[$key]);
+                } // 移除三级以下的菜单
                 elseif (isset($vo['pid']) && $vo['pid'] !== '' && $cur = "-{$vo['pid']}-{$vo['id']}") {
-                    if (stripos("{$menu['path']}-", "{$cur}-") !== false || $menu['path'] === $cur) unset($this->menus[$key]); # 移除与自己相关联的菜单
+                    if (stripos("{$menu['path']}-", "{$cur}-") !== false || $menu['path'] === $cur) {
+                        unset($this->menus[$key]);
+                    } // 移除与自己相关联的菜单
                 }
             }
+
             // 选择自己的上级菜单
             if (empty($vo['pid']) && $this->request->get('pid', '0')) {
                 $vo['pid'] = $this->request->get('pid', '0');
             }
+
             // 读取系统功能节点
             $this->nodes = NodeService::getMenuNodeList();
         }
@@ -132,6 +144,7 @@ class Menu extends Controller
     public function resume()
     {
         $this->applyCsrfToken();
+        // 注意:更新逻辑器
         $this->_save($this->table, ['status' => '1']);
     }
 
@@ -144,6 +157,7 @@ class Menu extends Controller
     public function forbid()
     {
         $this->applyCsrfToken();
+        // 注意:更新逻辑器
         $this->_save($this->table, ['status' => '0']);
     }
 
@@ -156,7 +170,7 @@ class Menu extends Controller
     public function remove()
     {
         $this->applyCsrfToken();
+        // 注意:删除逻辑器
         $this->_delete($this->table);
     }
-
 }

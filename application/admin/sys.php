@@ -44,12 +44,13 @@ if (!function_exists('sysdata')) {
      */
     function sysdata($name, array $value = null)
     {
-        if (is_null($value)) {
+        if (null === $value) {
             $data = json_decode(Db::name('SystemData')->where(['name' => $name])->value('value'), true);
+
             return empty($data) ? [] : $data;
-        } else {
-            return data_save('SystemData', ['name' => $name, 'value' => json_encode($value, JSON_UNESCAPED_UNICODE)], 'name');
         }
+
+        return data_save('SystemData', ['name' => $name, 'value' => json_encode($value, JSON_UNESCAPED_UNICODE)], 'name');
     }
 }
 
@@ -75,11 +76,12 @@ if (!function_exists('local_image')) {
     function local_image($url)
     {
         $result = File::down($url);
+
         if (isset($result['url'])) {
             return $result['url'];
-        } else {
-            return $url;
         }
+
+        return $url;
     }
 }
 
@@ -95,11 +97,12 @@ if (!function_exists('base64_image')) {
         try {
             if (preg_match('|^data:image/(.*?);base64,|i', $content)) {
                 list($ext, $base) = explode('|||', preg_replace('|^data:image/(.*?);base64,|i', '$1|||', $content));
-                $info = File::save($predir . md5($base) . '.' . (empty($ext) ? 'tmp' : $ext), base64_decode($base));
+                $info             = File::save($predir . md5($base) . '.' . (empty($ext) ? 'tmp' : $ext), base64_decode($base));
+
                 return $info['url'];
-            } else {
-                return $content;
             }
+
+            return $content;
         } catch (\Exception $e) {
             return $content;
         }
@@ -113,7 +116,7 @@ Middleware::add(function (Request $request, \Closure $next) {
         return $next($request);
     } elseif (NodeService::islogin()) {
         return json(['code' => 0, 'msg' => '抱歉，没有访问该操作的权限！']);
-    } else {
-        return json(['code' => 0, 'msg' => '抱歉，需要登录获取访问权限！', 'url' => url('@admin/login')]);
     }
+
+    return json(['code' => 0, 'msg' => '抱歉，需要登录获取访问权限！', 'url' => url('@admin/login')]);
 });

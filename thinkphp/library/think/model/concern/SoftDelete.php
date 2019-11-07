@@ -9,7 +9,6 @@ use think\db\Query;
  */
 trait SoftDelete
 {
-
     /**
      * 是否包含软删除数据
      * @var bool
@@ -53,6 +52,7 @@ trait SoftDelete
     protected function withTrashedData($withTrashed)
     {
         $this->withTrashed = $withTrashed;
+
         return $this;
     }
 
@@ -82,7 +82,7 @@ trait SoftDelete
      */
     protected function getWithTrashedExp()
     {
-        return is_null($this->defaultSoftDelete) ?
+        return null === $this->defaultSoftDelete ?
         ['notnull', ''] : ['<>', $this->defaultSoftDelete];
     }
 
@@ -146,9 +146,9 @@ trait SoftDelete
             $query->where($data);
             $data = null;
         } elseif ($data instanceof \Closure) {
-            call_user_func_array($data, [ & $query]);
+            call_user_func_array($data, [&$query]);
             $data = null;
-        } elseif (is_null($data)) {
+        } elseif (null === $data) {
             return false;
         }
 
@@ -235,7 +235,7 @@ trait SoftDelete
         $field = $this->getDeleteTimeField(true);
 
         if ($field) {
-            $condition = is_null($this->defaultSoftDelete) ? ['null', ''] : ['=', $this->defaultSoftDelete];
+            $condition = null === $this->defaultSoftDelete ? ['null', ''] : ['=', $this->defaultSoftDelete];
             $query->useSoftDelete($field, $condition);
         }
     }

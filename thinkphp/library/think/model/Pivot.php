@@ -1,4 +1,5 @@
 <?php
+
 // +----------------------------------------------------------------------
 // | ThinkPHP [ WE CAN DO IT JUST THINK ]
 // +----------------------------------------------------------------------
@@ -15,7 +16,6 @@ use think\Model;
 
 class Pivot extends Model
 {
-
     /** @var Model */
     public $parent;
 
@@ -32,11 +32,10 @@ class Pivot extends Model
     {
         $this->parent = $parent;
 
-        if (is_null($this->name)) {
+        if (null === $this->name) {
             $this->name = $table;
         }
 
         parent::__construct($data);
     }
-
 }

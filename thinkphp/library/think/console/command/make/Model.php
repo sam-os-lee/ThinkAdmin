@@ -1,4 +1,5 @@
 <?php
+
 // +----------------------------------------------------------------------
 // | ThinkPHP [ WE CAN DO IT JUST THINK ]
 // +----------------------------------------------------------------------
@@ -15,7 +16,7 @@ use think\console\command\Make;
 
 class Model extends Make
 {
-    protected $type = "Model";
+    protected $type = 'Model';
 
     protected function configure()
     {

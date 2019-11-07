@@ -36,13 +36,13 @@ class Js extends Controller
      */
     public function index()
     {
-        $url = $this->request->server('http_referer', $this->request->url(true), null);
-        $wechat = WechatService::getWebOauthInfo($url, $this->request->get('mode', 1), false);
-        $openid = isset($wechat['openid']) ? $wechat['openid'] : '';
-        $unionid = empty($wechat['fansinfo']['unionid']) ? '' : $wechat['fansinfo']['unionid'];
-        $configJson = json_encode(WechatService::getWebJssdkSign($url), JSON_UNESCAPED_UNICODE);
+        $url          = $this->request->server('http_referer', $this->request->url(true), null);
+        $wechat       = WechatService::getWebOauthInfo($url, $this->request->get('mode', 1), false);
+        $openid       = isset($wechat['openid']) ? $wechat['openid'] : '';
+        $unionid      = empty($wechat['fansinfo']['unionid']) ? '' : $wechat['fansinfo']['unionid'];
+        $configJson   = json_encode(WechatService::getWebJssdkSign($url), JSON_UNESCAPED_UNICODE);
         $fansinfoJson = json_encode(isset($wechat['fansinfo']) ? $wechat['fansinfo'] : [], JSON_UNESCAPED_UNICODE);
-        $html = <<<EOF
+        $html         = <<<EOF
 if(typeof wx === 'object'){
     wx.openid="{$openid}";
     wx.unionid="{$unionid}";
@@ -54,7 +54,7 @@ if(typeof wx === 'object'){
     });
 }
 EOF;
+
         return Response::create($html)->contentType('application/x-javascript');
     }
-
 }

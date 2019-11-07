@@ -1,4 +1,5 @@
 <?php
+
 // +----------------------------------------------------------------------
 // | ThinkPHP [ WE CAN DO IT JUST THINK ]
 // +----------------------------------------------------------------------
@@ -21,10 +22,10 @@ class Controller extends Dispatch
         $vars = array_merge($this->request->param(), $this->param);
 
         return $this->app->action(
-            $this->dispatch, $vars,
+            $this->dispatch,
+            $vars,
             $this->rule->getConfig('url_controller_layer'),
             $this->rule->getConfig('controller_suffix')
         );
     }
-
 }

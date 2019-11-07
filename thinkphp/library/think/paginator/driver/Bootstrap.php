@@ -1,4 +1,5 @@
 <?php
+
 // +----------------------------------------------------------------------
 // | ThinkPHP [ WE CAN DO IT JUST THINK ]
 // +----------------------------------------------------------------------
@@ -15,15 +16,13 @@ use think\Paginator;
 
 class Bootstrap extends Paginator
 {
-
     /**
      * 上一页按钮
      * @param string $text
      * @return string
      */
-    protected function getPreviousButton($text = "&laquo;")
+    protected function getPreviousButton($text = '&laquo;')
     {
-
         if ($this->currentPage() <= 1) {
             return $this->getDisabledTextWrapper($text);
         }
@@ -116,14 +115,14 @@ class Bootstrap extends Paginator
                     $this->getPreviousButton(),
                     $this->getNextButton()
                 );
-            } else {
-                return sprintf(
+            }
+
+            return sprintf(
                     '<ul class="pagination">%s %s %s</ul>',
                     $this->getPreviousButton(),
                     $this->getLinks(),
                     $this->getNextButton()
                 );
-            }
         }
     }
 

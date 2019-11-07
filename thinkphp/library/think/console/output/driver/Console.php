@@ -1,4 +1,5 @@
 <?php
+
 // +----------------------------------------------------------------------
 // | ThinkPHP [ WE CAN DO IT JUST THINK IT ]
 // +----------------------------------------------------------------------
@@ -16,7 +17,6 @@ use think\console\output\Formatter;
 
 class Console
 {
-
     /** @var  Resource */
     private $stdout;
 
@@ -54,11 +54,13 @@ class Console
             switch ($type) {
                 case Output::OUTPUT_NORMAL:
                     $message = $this->formatter->format($message);
+
                     break;
                 case Output::OUTPUT_RAW:
                     break;
                 case Output::OUTPUT_PLAIN:
                     $message = strip_tags($this->formatter->format($message));
+
                     break;
                 default:
                     throw new \InvalidArgumentException(sprintf('Unknown output type given (%s)', $type));
@@ -85,9 +87,9 @@ class Console
                 $width = 1 << 31;
             }
             $lines = [];
+
             foreach (preg_split('/\r?\n/', $e->getMessage()) as $line) {
                 foreach ($this->splitStringByWidth($line, $width - 4) as $line) {
-
                     $lineLength = $this->stringWidth(preg_replace('/\[[^m]*m/', '', $line)) + 4;
                     $lines[]    = [$line, $lineLength];
 
@@ -98,6 +100,7 @@ class Console
             $messages   = ['', ''];
             $messages[] = $emptyLine = sprintf('<error>%s</error>', str_repeat(' ', $len));
             $messages[] = sprintf('<error>%s%s</error>', $title, str_repeat(' ', max(0, $len - $this->stringWidth($title))));
+
             foreach ($lines as $line) {
                 $messages[] = sprintf('<error>  %s  %s</error>', $line[0], str_repeat(' ', $len - $line[1]));
             }
@@ -133,7 +136,6 @@ class Console
                 $this->write('', true, Output::OUTPUT_NORMAL, $stderr);
             }
         } while ($e = $e->getPrevious());
-
     }
 
     /**
@@ -172,6 +174,7 @@ class Console
             if (preg_match('/^(\d+)x\d+ \(\d+x(\d+)\)$/', trim(getenv('ANSICON')), $matches)) {
                 return [(int) $matches[1], (int) $matches[2]];
             }
+
             if (preg_match('/^(\d+)x(\d+)$/', $this->getMode(), $matches)) {
                 return [(int) $matches[1], (int) $matches[2]];
             }
@@ -181,6 +184,7 @@ class Console
             if (preg_match('/rows.(\d+);.columns.(\d+);/i', $sttyString, $matches)) {
                 return [(int) $matches[2], (int) $matches[1]];
             }
+
             if (preg_match('/;.(\d+).rows;.(\d+).columns/i', $sttyString, $matches)) {
                 return [(int) $matches[2], (int) $matches[1]];
             }
@@ -201,6 +205,7 @@ class Console
 
         $descriptorspec = [1 => ['pipe', 'w'], 2 => ['pipe', 'w']];
         $process        = proc_open('stty -a | grep columns', $descriptorspec, $pipes, null, null, ['suppress_errors' => true]);
+
         if (is_resource($process)) {
             $info = stream_get_contents($pipes[1]);
             fclose($pipes[1]);
@@ -209,7 +214,6 @@ class Console
 
             return $info;
         }
-        return;
     }
 
     /**
@@ -224,6 +228,7 @@ class Console
 
         $descriptorspec = [1 => ['pipe', 'w'], 2 => ['pipe', 'w']];
         $process        = proc_open('mode CON', $descriptorspec, $pipes, null, null, ['suppress_errors' => true]);
+
         if (is_resource($process)) {
             $info = stream_get_contents($pipes[1]);
             fclose($pipes[1]);
@@ -234,7 +239,6 @@ class Console
                 return $matches[2] . 'x' . $matches[1];
             }
         }
-        return;
     }
 
     private function stringWidth($string)
@@ -263,14 +267,17 @@ class Console
         $utf8String = mb_convert_encoding($string, 'utf8', $encoding);
         $lines      = [];
         $line       = '';
+
         foreach (preg_split('//u', $utf8String) as $char) {
             if (mb_strwidth($line . $char, 'utf8') <= $width) {
                 $line .= $char;
+
                 continue;
             }
             $lines[] = str_pad($line, $width);
             $line    = $char;
         }
+
         if (strlen($line)) {
             $lines[] = count($lines) ? str_pad($line, $width) : $line;
         }
@@ -287,6 +294,7 @@ class Console
             getenv('OSTYPE'),
             PHP_OS,
         ];
+
         return false !== stripos(implode(';', $checks), 'OS400');
     }
 
@@ -318,6 +326,7 @@ class Console
         if (!$this->hasStdoutSupport()) {
             return fopen('php://output', 'w');
         }
+
         return @fopen('php://stdout', 'w') ?: fopen('php://output', 'w');
     }
 
@@ -340,6 +349,7 @@ class Console
         if (null === $stream) {
             $stream = $this->stdout;
         }
+
         if (false === @fwrite($stream, $message . ($newline ? PHP_EOL : ''))) {
             throw new \RuntimeException('Unable to write output.');
         }
@@ -358,11 +368,10 @@ class Console
             return
             '10.0.10586' === PHP_WINDOWS_VERSION_MAJOR . '.' . PHP_WINDOWS_VERSION_MINOR . '.' . PHP_WINDOWS_VERSION_BUILD
             || false !== getenv('ANSICON')
-            || 'ON' === getenv('ConEmuANSI')
+            || 'ON'    === getenv('ConEmuANSI')
             || 'xterm' === getenv('TERM');
         }
 
         return function_exists('posix_isatty') && @posix_isatty($stream);
     }
-
 }

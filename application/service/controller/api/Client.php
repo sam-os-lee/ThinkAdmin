@@ -26,7 +26,6 @@ use think\Db;
  */
 class Client extends Controller
 {
-
     /**
      * 当前配置
      * @var string
@@ -66,7 +65,7 @@ class Client extends Controller
     {
         try {
             $instance = $this->create($param);
-            $service = new \Yar_Server(empty($instance) ? $this : $instance);
+            $service  = new \Yar_Server(empty($instance) ? $this : $instance);
             $service->handle();
         } catch (\Exception $e) {
             return $e->getMessage();
@@ -82,7 +81,7 @@ class Client extends Controller
     {
         try {
             $instance = $this->create($param);
-            $service = new \SoapServer(null, ['uri' => strtolower($this->name)]);
+            $service  = new \SoapServer(null, ['uri' => strtolower($this->name)]);
             $service->setObject(empty($instance) ? $this : $instance);
             $service->handle();
         } catch (\Exception $e) {
@@ -104,6 +103,7 @@ class Client extends Controller
         if ($this->auth($token)) {
             $weminiClassName = 'Account,Basic,Code,Domain,Tester,User,Crypt,Plugs,Poi,Qrcode,Template,Total';
             $wechatClassName = 'Card,Custom,Limit,Media,Menu,Oauth,Pay,Product,Qrcode,Receive,Scan,Script,Shake,Tags,Template,User,Wifi';
+
             if ($this->type === 'wechat' && stripos($wechatClassName, $this->name) !== false) {
                 $instance = WechatService::instance($this->name, $this->appid, 'WeChat');
             } elseif ($this->type === 'wemini' && stripos($weminiClassName, $this->name) !== false) {
@@ -111,11 +111,15 @@ class Client extends Controller
             } elseif (stripos('Service,MiniApp', $this->name) !== false) {
                 $instance = WechatService::instance($this->name, $this->appid, 'WeOpen');
             } elseif (stripos('Wechat,Config,Handler', $this->name) !== false) {
-                $className = "\\app\\service\\handler\\WechatHandler";
-                $instance = new $className($this->config);
+                $className = '\\app\\service\\handler\\WechatHandler';
+                $instance  = new $className($this->config);
             }
-            if (!empty($instance)) return $instance;
+
+            if (!empty($instance)) {
+                return $instance;
+            }
         }
+
         throw new \think\Exception($this->message);
     }
 
@@ -131,25 +135,31 @@ class Client extends Controller
     private function auth($token = '')
     {
         list($this->name, $this->appid, $appkey, $this->type) = explode('-', $token . '---');
+
         if (empty($this->name) || empty($this->appid) || empty($appkey)) {
             $this->message = '缺少必要的参数AppId或AppKey';
+
             return false;
         }
-        $where = ['authorizer_appid' => $this->appid, 'status' => '1', 'is_deleted' => '0'];
+        $where        = ['authorizer_appid' => $this->appid, 'status' => '1', 'is_deleted' => '0'];
         $this->config = Db::name('WechatServiceConfig')->where($where)->find();
+
         if (empty($this->config)) {
             $this->message = '无效的微信绑定对象';
+
             return false;
         }
+
         if (strtolower($this->config['appkey']) !== strtolower($appkey)) {
             $this->message = '授权AppId与AppKey不匹配';
+
             return false;
         }
         $this->message = '';
-        $this->name = ucfirst(strtolower($this->name));
-        $this->type = strtolower(empty($this->type) ? 'WeChat' : $this->type);
+        $this->name    = ucfirst(strtolower($this->name));
+        $this->type    = strtolower(empty($this->type) ? 'WeChat' : $this->type);
         Db::name('WechatServiceConfig')->where($where)->setInc('total', 1);
+
         return true;
     }
-
 }

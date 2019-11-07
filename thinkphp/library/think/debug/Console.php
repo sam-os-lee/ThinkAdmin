@@ -1,4 +1,5 @@
 <?php
+
 // +----------------------------------------------------------------------
 // | ThinkPHP [ WE CAN DO IT JUST THINK IT ]
 // +----------------------------------------------------------------------
@@ -44,6 +45,7 @@ class Console
         $request     = Container::get('request');
         $contentType = $response->getHeader('Content-Type');
         $accept      = $request->header('accept');
+
         if (strpos($accept, 'application/json') === 0 || $request->isAjax()) {
             return false;
         } elseif (!empty($contentType) && strpos($contentType, 'html') === false) {
@@ -76,20 +78,25 @@ class Console
 
         // 页面Trace信息
         $trace = [];
+
         foreach ($this->config['tabs'] as $name => $title) {
             $name = strtolower($name);
+
             switch ($name) {
                 case 'base': // 基本信息
                     $trace[$title] = $base;
+
                     break;
                 case 'file': // 文件信息
                     $trace[$title] = $info;
+
                     break;
                 default: // 调试信息
                     if (strpos($name, '|')) {
                         // 多组信息
                         $names  = explode('|', $name);
                         $result = [];
+
                         foreach ($names as $name) {
                             $result = array_merge($result, isset($log[$name]) ? $log[$name] : []);
                         }
@@ -102,6 +109,7 @@ class Console
 
         //输出到控制台
         $lines = '';
+
         foreach ($trace as $type => $msg) {
             $lines .= $this->console($type, $msg);
         }
@@ -111,6 +119,7 @@ class Console
 {$lines}
 </script>
 JS;
+
         return $js;
     }
 
@@ -126,31 +135,36 @@ JS;
             switch ($type) {
                 case '调试':
                     $var_type = gettype($m);
+
                     if (in_array($var_type, ['array', 'string'])) {
-                        $line[] = "console.log(" . json_encode($m) . ");";
+                        $line[] = 'console.log(' . json_encode($m) . ');';
                     } else {
-                        $line[] = "console.log(" . json_encode(var_export($m, 1)) . ");";
+                        $line[] = 'console.log(' . json_encode(var_export($m, 1)) . ');';
                     }
+
                     break;
                 case '错误':
                     $msg    = str_replace("\n", '\n', addslashes(is_scalar($m) ? $m : json_encode($m)));
                     $style  = 'color:#F4006B;font-size:14px;';
                     $line[] = "console.error(\"%c{$msg}\", \"{$style}\");";
+
                     break;
                 case 'sql':
                     $msg    = str_replace("\n", '\n', addslashes($m));
-                    $style  = "color:#009bb4;";
+                    $style  = 'color:#009bb4;';
                     $line[] = "console.log(\"%c{$msg}\", \"{$style}\");";
+
                     break;
                 default:
                     $m      = is_string($key) ? $key . ' ' . $m : $key + 1 . ' ' . $m;
                     $msg    = json_encode($m);
                     $line[] = "console.log({$msg});";
+
                     break;
             }
         }
-        $line[] = "console.groupEnd();";
+        $line[] = 'console.groupEnd();';
+
         return implode(PHP_EOL, $line);
     }
-
 }

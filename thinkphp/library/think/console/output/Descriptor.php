@@ -1,4 +1,5 @@
 <?php
+
 // +----------------------------------------------------------------------
 // | ThinkPHP [ WE CAN DO IT JUST THINK ]
 // +----------------------------------------------------------------------
@@ -21,7 +22,6 @@ use think\console\output\descriptor\Console as ConsoleDescription;
 
 class Descriptor
 {
-
     /**
      * @var Output
      */
@@ -37,18 +37,23 @@ class Descriptor
         switch (true) {
             case $object instanceof InputArgument:
                 $this->describeInputArgument($object, $options);
+
                 break;
             case $object instanceof InputOption:
                 $this->describeInputOption($object, $options);
+
                 break;
             case $object instanceof InputDefinition:
                 $this->describeInputDefinition($object, $options);
+
                 break;
             case $object instanceof Command:
                 $this->describeCommand($object, $options);
+
                 break;
             case $object instanceof Console:
                 $this->describeConsole($object, $options);
+
                 break;
             default:
                 throw new \InvalidArgumentException(sprintf('Object of type "%s" is not describable.', get_class($object)));
@@ -85,7 +90,7 @@ class Descriptor
         $totalWidth   = isset($options['total_width']) ? $options['total_width'] : strlen($argument->getName());
         $spacingWidth = $totalWidth - strlen($argument->getName()) + 2;
 
-        $this->writeText(sprintf("  <info>%s</info>%s%s%s", $argument->getName(), str_repeat(' ', $spacingWidth), // + 17 = 2 spaces + <info> + </info> + 2 spaces
+        $this->writeText(sprintf('  <info>%s</info>%s%s%s', $argument->getName(), str_repeat(' ', $spacingWidth), // + 17 = 2 spaces + <info> + </info> + 2 spaces
             preg_replace('/\s*\R\s*/', PHP_EOL . str_repeat(' ', $totalWidth + 17), $argument->getDescription()), $default), $options);
     }
 
@@ -107,6 +112,7 @@ class Descriptor
         }
 
         $value = '';
+
         if ($option->acceptValue()) {
             $value = '=' . strtoupper($option->getName());
 
@@ -120,7 +126,7 @@ class Descriptor
 
         $spacingWidth = $totalWidth - strlen($synopsis) + 2;
 
-        $this->writeText(sprintf("  <info>%s</info>%s%s%s%s", $synopsis, str_repeat(' ', $spacingWidth), // + 17 = 2 spaces + <info> + </info> + 2 spaces
+        $this->writeText(sprintf('  <info>%s</info>%s%s%s%s', $synopsis, str_repeat(' ', $spacingWidth), // + 17 = 2 spaces + <info> + </info> + 2 spaces
             preg_replace('/\s*\R\s*/', "\n" . str_repeat(' ', $totalWidth + 17), $option->getDescription()), $default, $option->isArray() ? '<comment> (multiple values allowed)</comment>' : ''), $options);
     }
 
@@ -133,6 +139,7 @@ class Descriptor
     protected function describeInputDefinition(InputDefinition $definition, array $options = [])
     {
         $totalWidth = $this->calculateTotalWidthForOptions($definition->getOptions());
+
         foreach ($definition->getArguments() as $argument) {
             $totalWidth = max($totalWidth, strlen($argument->getName()));
         }
@@ -140,6 +147,7 @@ class Descriptor
         if ($definition->getArguments()) {
             $this->writeText('<comment>Arguments:</comment>', $options);
             $this->writeText("\n");
+
             foreach ($definition->getArguments() as $argument) {
                 $this->describeInputArgument($argument, array_merge($options, ['total_width' => $totalWidth]));
                 $this->writeText("\n");
@@ -154,14 +162,17 @@ class Descriptor
             $laterOptions = [];
 
             $this->writeText('<comment>Options:</comment>', $options);
+
             foreach ($definition->getOptions() as $option) {
                 if (strlen($option->getShortcut()) > 1) {
                     $laterOptions[] = $option;
+
                     continue;
                 }
                 $this->writeText("\n");
                 $this->describeInputOption($option, array_merge($options, ['total_width' => $totalWidth]));
             }
+
             foreach ($laterOptions as $option) {
                 $this->writeText("\n");
                 $this->describeInputOption($option, array_merge($options, ['total_width' => $totalWidth]));
@@ -182,6 +193,7 @@ class Descriptor
         $command->mergeConsoleDefinition(false);
 
         $this->writeText('<comment>Usage:</comment>', $options);
+
         foreach (array_merge([$command->getSynopsis(true)], $command->getAliases(), $command->getUsages()) as $usage) {
             $this->writeText("\n");
             $this->writeText('  ' . $usage, $options);
@@ -189,6 +201,7 @@ class Descriptor
         $this->writeText("\n");
 
         $definition = $command->getNativeDefinition();
+
         if ($definition->getOptions() || $definition->getArguments()) {
             $this->writeText("\n");
             $this->describeInputDefinition($definition, $options);
@@ -224,7 +237,7 @@ class Descriptor
             }
         } else {
             if ('' != $help = $console->getHelp()) {
-                $this->writeText("$help\n\n", $options);
+                $this->writeText("${help}\n\n", $options);
             }
 
             $this->writeText("<comment>Usage:</comment>\n", $options);
@@ -253,8 +266,8 @@ class Descriptor
                 foreach ($namespace['commands'] as $name) {
                     $this->writeText("\n");
                     $spacingWidth = $width - strlen($name);
-                    $this->writeText(sprintf("  <info>%s</info>%s%s", $name, str_repeat(' ', $spacingWidth), $description->getCommand($name)
-                            ->getDescription()), $options);
+                    $this->writeText(sprintf('  <info>%s</info>%s%s', $name, str_repeat(' ', $spacingWidth), $description->getCommand($name)
+                        ->getDescription()), $options);
                 }
             }
 
@@ -288,6 +301,7 @@ class Descriptor
     private function getColumnWidth(array $commands)
     {
         $width = 0;
+
         foreach ($commands as $command) {
             $width = strlen($command->getName()) > $width ? strlen($command->getName()) : $width;
         }
@@ -302,6 +316,7 @@ class Descriptor
     private function calculateTotalWidthForOptions($options)
     {
         $totalWidth = 0;
+
         foreach ($options as $option) {
             $nameLength = 4 + strlen($option->getName()) + 2; // - + shortcut + , + whitespace + name + --
 

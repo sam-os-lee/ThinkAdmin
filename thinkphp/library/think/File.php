@@ -1,4 +1,5 @@
 <?php
+
 // +----------------------------------------------------------------------
 // | ThinkPHP [ WE CAN DO IT JUST THINK ]
 // +----------------------------------------------------------------------
@@ -162,6 +163,7 @@ class File extends SplFileObject
         }
 
         $this->error = ['directory {:path} creation failed', ['path' => $path]];
+
         return false;
     }
 
@@ -253,6 +255,7 @@ class File extends SplFileObject
 
         if (!in_array($extension, $ext)) {
             $this->error = 'extensions to upload is not allowed';
+
             return false;
         }
 
@@ -268,9 +271,10 @@ class File extends SplFileObject
     {
         $extension = strtolower(pathinfo($this->getInfo('name'), PATHINFO_EXTENSION));
 
-        /* 对图像文件进行严格检测 */
+        // 对图像文件进行严格检测
         if (in_array($extension, ['gif', 'jpg', 'jpeg', 'bmp', 'png', 'swf']) && !in_array($this->getImageType($this->filename), [1, 2, 3, 4, 6, 13])) {
             $this->error = 'illegal image files';
+
             return false;
         }
 
@@ -286,6 +290,7 @@ class File extends SplFileObject
 
         try {
             $info = getimagesize($image);
+
             return $info ? $info[2] : false;
         } catch (\Exception $e) {
             return false;
@@ -302,6 +307,7 @@ class File extends SplFileObject
     {
         if ($this->getSize() > (int) $size) {
             $this->error = 'filesize not match';
+
             return false;
         }
 
@@ -322,6 +328,7 @@ class File extends SplFileObject
 
         if (!in_array(strtolower($this->getMime()), $mime)) {
             $this->error = 'mimetype to upload is not allowed';
+
             return false;
         }
 
@@ -342,12 +349,14 @@ class File extends SplFileObject
         // 文件上传失败，捕获错误代码
         if (!empty($this->info['error'])) {
             $this->error($this->info['error']);
+
             return false;
         }
 
         // 检测合法性
         if (!$this->isValid()) {
             $this->error = 'upload illegal files';
+
             return false;
         }
 
@@ -366,17 +375,19 @@ class File extends SplFileObject
             return false;
         }
 
-        /* 不覆盖同名文件 */
+        // 不覆盖同名文件
         if (!$replace && is_file($filename)) {
             $this->error = ['has the same filename: {:filename}', ['filename' => $filename]];
+
             return false;
         }
 
-        /* 移动文件 */
+        // 移动文件
         if ($this->isTest) {
             rename($this->filename, $filename);
         } elseif (!move_uploaded_file($this->filename, $filename)) {
             $this->error = 'upload write error';
+
             return false;
         }
 
@@ -425,6 +436,7 @@ class File extends SplFileObject
             switch ($this->rule) {
                 case 'date':
                     $savename = date('Ymd') . DIRECTORY_SEPARATOR . md5(microtime(true));
+
                     break;
                 default:
                     if (in_array($this->rule, hash_algos())) {
@@ -452,18 +464,23 @@ class File extends SplFileObject
             case 1:
             case 2:
                 $this->error = 'upload File size exceeds the maximum value';
+
                 break;
             case 3:
                 $this->error = 'only the portion of file is uploaded';
+
                 break;
             case 4:
                 $this->error = 'no file to uploaded';
+
                 break;
             case 6:
                 $this->error = 'upload temp dir not found';
+
                 break;
             case 7:
                 $this->error = 'file write error';
+
                 break;
             default:
                 $this->error = 'unknown upload error';

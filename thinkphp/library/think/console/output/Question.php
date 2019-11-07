@@ -1,4 +1,5 @@
 <?php
+
 // +----------------------------------------------------------------------
 // | ThinkPHP [ WE CAN DO IT JUST THINK ]
 // +----------------------------------------------------------------------
@@ -13,7 +14,6 @@ namespace think\console\output;
 
 class Question
 {
-
     private $question;
     private $attempts;
     private $hidden         = false;

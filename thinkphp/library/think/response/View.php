@@ -1,4 +1,5 @@
 <?php
+
 // +----------------------------------------------------------------------
 // | ThinkPHP [ WE CAN DO IT JUST THINK ]
 // +----------------------------------------------------------------------
@@ -43,11 +44,11 @@ class View extends Response
      */
     public function getVars($name = null)
     {
-        if (is_null($name)) {
+        if (null === $name) {
             return $this->vars;
-        } else {
-            return isset($this->vars[$name]) ? $this->vars[$name] : null;
         }
+
+        return isset($this->vars[$name]) ? $this->vars[$name] : null;
     }
 
     /**
@@ -77,6 +78,7 @@ class View extends Response
     public function filter($filter)
     {
         $this->filter = $filter;
+
         return $this;
     }
 
@@ -90,5 +92,4 @@ class View extends Response
     {
         return $this->app['view']->exists($name);
     }
-
 }

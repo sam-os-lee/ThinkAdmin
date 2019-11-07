@@ -1,4 +1,5 @@
 <?php
+
 // +----------------------------------------------------------------------
 // | ThinkPHP [ WE CAN DO IT JUST THINK ]
 // +----------------------------------------------------------------------
@@ -19,7 +20,6 @@ use think\db\Connection;
  */
 class Sqlite extends Connection
 {
-
     protected $builder = '\\think\\db\\builder\\Sqlite';
 
     /**
@@ -76,7 +76,7 @@ class Sqlite extends Connection
     public function getTables($dbName = '')
     {
         $sql = "SELECT name FROM sqlite_master WHERE type='table' "
-            . "UNION ALL SELECT name FROM sqlite_temp_master "
+            . 'UNION ALL SELECT name FROM sqlite_temp_master '
             . "WHERE type='table' ORDER BY name";
 
         $pdo    = $this->query($sql, [], false, true);

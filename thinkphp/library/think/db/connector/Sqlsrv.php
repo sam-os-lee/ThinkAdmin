@@ -1,4 +1,5 @@
 <?php
+
 // +----------------------------------------------------------------------
 // | ThinkPHP [ WE CAN DO IT JUST THINK IT ]
 // +----------------------------------------------------------------------
@@ -65,7 +66,7 @@ class Sqlsrv extends Connection
         ON  t.table_catalog = c.table_catalog
         AND t.table_schema  = c.table_schema
         AND t.table_name    = c.table_name
-        WHERE   t.table_name = '$tableName'";
+        WHERE   t.table_name = '${tableName}'";
 
         $pdo    = $this->query($sql, [], false, true);
         $result = $pdo->fetchAll(PDO::FETCH_ASSOC);
@@ -85,7 +86,7 @@ class Sqlsrv extends Connection
             }
         }
 
-        $sql = "SELECT column_name FROM information_schema.key_column_usage WHERE table_name='$tableName'";
+        $sql = "SELECT column_name FROM information_schema.key_column_usage WHERE table_name='${tableName}'";
 
         // 调试开始
         $this->debug(true);
@@ -157,7 +158,7 @@ class Sqlsrv extends Connection
             $query->removeOption('field');
         }
 
-        if (is_null($field)) {
+        if (null === $field) {
             $field = '*';
         } elseif ($key && '*' != $field) {
             $field = $key . ',' . $field;
@@ -214,7 +215,7 @@ class Sqlsrv extends Connection
             }
         }
 
-        if (isset($cache) && isset($guid)) {
+        if (isset($cache, $guid)) {
             // 缓存数据
             $this->cacheData($guid, $result, $cache);
         }

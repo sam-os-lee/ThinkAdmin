@@ -1,4 +1,5 @@
 <?php
+
 // +----------------------------------------------------------------------
 // | ThinkPHP [ WE CAN DO IT JUST THINK IT ]
 // +----------------------------------------------------------------------
@@ -93,9 +94,9 @@ class Handle
 
         if ($e instanceof HttpException) {
             return $this->renderHttpException($e);
-        } else {
-            return $this->convertExceptionToResponse($e);
         }
+
+        return $this->convertExceptionToResponse($e);
     }
 
     /**
@@ -124,9 +125,9 @@ class Handle
 
         if (!Container::get('app')->isDebug() && !empty($template[$status])) {
             return Response::create($template[$status], 'view', $status)->assign(['e' => $e]);
-        } else {
-            return $this->convertExceptionToResponse($e);
         }
+
+        return $this->convertExceptionToResponse($e);
     }
 
     /**
@@ -181,6 +182,7 @@ class Handle
 
         ob_start();
         extract($data);
+
         include Container::get('app')->config('exception_tmpl');
 
         // 获取并清空缓存

@@ -1,4 +1,5 @@
 <?php
+
 // +----------------------------------------------------------------------
 // | ThinkPHP [ WE CAN DO IT JUST THINK ]
 // +----------------------------------------------------------------------
@@ -119,6 +120,7 @@ class Log implements LoggerInterface
 
         if (is_string($msg) && !empty($context)) {
             $replace = [];
+
             foreach ($context as $key => $val) {
                 $replace['{' . $key . '}'] = $val;
             }

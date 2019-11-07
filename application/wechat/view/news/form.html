@@ -105,13 +105,16 @@
                     read_num: 0,
                     local_url: '__ROOT__/static/plugs/uploader/theme/image.png',
                 });
+
                 for (var i in list) {
                     list[i].active = false;
                     list[i].style = "background-image:url('" + list[i].local_url + "')";
                 }
+
                 $rootScope.list = list;
                 $rootScope.item = $rootScope.list[0];
                 $rootScope.setItemValue('active', true);
+
                 setTimeout(function () {
                     $vali.checkAllInput();
                     editor.setData($rootScope.item.content);
@@ -120,39 +123,50 @@
             }
 
             $rootScope.upItem = function (index, $event) {
+
                 $event.stopPropagation();
                 var tmp = [], cur = $rootScope.list[index];
                 if (index < 1) return false;
+
                 for (var i in $rootScope.list) {
                     (parseInt(i) === parseInt(index) - 1) && tmp.push(cur);
                     (parseInt(i) !== parseInt(index)) && tmp.push($rootScope.list[i]);
                 }
+
                 apply(tmp);
             };
 
             $rootScope.dnItem = function (index, $event) {
+
                 $event.stopPropagation();
                 var tmp = [], cur = $rootScope.list[index];
+
                 if (index > $rootScope.list.length - 2) return false;
                 for (var i in $rootScope.list) {
                     (parseInt(i) !== parseInt(index)) && tmp.push($rootScope.list[i]);
                     (parseInt(i) === parseInt(index) + 1) && tmp.push(cur);
                 }
+
                 apply(tmp);
             };
 
             $rootScope.delItem = function (index, $event) {
+
                 $event.stopPropagation();
+
                 var list = $rootScope.list, temp = [];
                 for (var i in list) (parseInt(i) !== parseInt(index)) && temp.push(list[i]);
                 apply(temp);
             };
 
             $rootScope.setItem = function (index, $event) {
+
                 $event.stopPropagation();
+
                 $vali.checkAllInput();
                 if ($form.find('.validate-error').size() > 0) return 0;
                 if (editor.getData().length < 1) return $.msg.tips('文章内容不能为空，请输入文章内容！');
+
                 for (var i in $rootScope.list) {
                     if (parseInt(i) !== parseInt(index)) {
                         $rootScope.list[i].active = false;
@@ -183,10 +197,12 @@
             };
 
             $rootScope.submit = function () {
+
                 $vali.checkAllInput();
                 if ($form.find('.validate-error').size() > 0) {
                     return $.msg.tips('表单验证不成功，请输入需要的内容！');
                 }
+
                 $rootScope.item.content = editor.getData();
                 var data = [];
                 for (var i in $rootScope.list) data.push({
@@ -200,6 +216,7 @@
                     show_cover_pic: $rootScope.list[i].show_cover_pic ? 1 : 0,
                     content_source_url: $rootScope.list[i].content_source_url,
                 });
+
                 $.form.load('{:request()->url()}', {data: data}, "post");
             };
 

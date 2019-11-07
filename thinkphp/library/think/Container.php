@@ -1,4 +1,5 @@
 <?php
+
 // +----------------------------------------------------------------------
 // | ThinkPHP [ WE CAN DO IT JUST THINK ]
 // +----------------------------------------------------------------------
@@ -101,8 +102,8 @@ class Container implements ArrayAccess, IteratorAggregate, Countable
      */
     public static function getInstance()
     {
-        if (is_null(static::$instance)) {
-            static::$instance = new static;
+        if (null === static::$instance) {
+            static::$instance = new static();
         }
 
         return static::$instance;
@@ -278,6 +279,7 @@ class Container implements ArrayAccess, IteratorAggregate, Countable
                 $object = $this->invokeFunction($concrete, $vars);
             } else {
                 $this->name[$abstract] = $concrete;
+
                 return $this->make($concrete, $vars, $newInstance);
             }
         } else {
@@ -428,6 +430,7 @@ class Container implements ArrayAccess, IteratorAggregate, Countable
 
                 if ($method->isPublic() && $method->isStatic()) {
                     $args = $this->bindParams($method, $vars);
+
                     return $method->invokeArgs(null, $args);
                 }
             }
@@ -437,7 +440,6 @@ class Container implements ArrayAccess, IteratorAggregate, Countable
             $args = $constructor ? $this->bindParams($constructor, $vars) : [];
 
             return $reflect->newInstanceArgs($args);
-
         } catch (ReflectionException $e) {
             throw new ClassNotFoundException('class not exists: ' . $class, $class);
         }

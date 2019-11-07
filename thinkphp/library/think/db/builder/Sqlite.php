@@ -1,4 +1,5 @@
 <?php
+
 // +----------------------------------------------------------------------
 // | ThinkPHP [ WE CAN DO IT JUST THINK ]
 // +----------------------------------------------------------------------
@@ -19,7 +20,6 @@ use think\db\Query;
  */
 class Sqlite extends Builder
 {
-
     /**
      * limit
      * @access public
@@ -33,6 +33,7 @@ class Sqlite extends Builder
 
         if (!empty($limit)) {
             $limit = explode(',', $limit);
+
             if (count($limit) > 1) {
                 $limitStr .= ' LIMIT ' . $limit[1] . ' OFFSET ' . $limit[0] . ' ';
             } else {

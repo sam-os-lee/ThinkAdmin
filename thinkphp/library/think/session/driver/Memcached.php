@@ -1,4 +1,5 @@
 <?php
+
 // +----------------------------------------------------------------------
 // | ThinkPHP [ WE CAN DO IT JUST THINK ]
 // +----------------------------------------------------------------------
@@ -45,7 +46,7 @@ class Memcached implements SessionHandlerInterface
             throw new Exception('not support:memcached');
         }
 
-        $this->handler = new \Memcached;
+        $this->handler = new \Memcached();
 
         // 设置连接超时时间（单位：毫秒）
         if ($this->config['timeout'] > 0) {
@@ -62,6 +63,7 @@ class Memcached implements SessionHandlerInterface
 
         // 建立连接
         $servers = [];
+
         foreach ((array) $hosts as $i => $host) {
             $servers[] = [$host, (isset($ports[$i]) ? $ports[$i] : $ports[0]), 1];
         }

@@ -1,4 +1,5 @@
 <?php
+
 // +----------------------------------------------------------------------
 // | ThinkPHP [ WE CAN DO IT JUST THINK ]
 // +----------------------------------------------------------------------
@@ -42,7 +43,7 @@ class HasManyThrough extends Relation
         $this->foreignKey = $foreignKey;
         $this->throughKey = $throughKey;
         $this->localKey   = $localKey;
-        $this->query      = (new $model)->db();
+        $this->query      = (new $model())->db();
     }
 
     /**
@@ -99,7 +100,8 @@ class HasManyThrough extends Relation
      * @return void
      */
     public function eagerlyResultSet(&$resultSet, $relation, $subRelation, $closure)
-    {}
+    {
+    }
 
     /**
      * 预载入关联查询 返回模型对象
@@ -111,7 +113,8 @@ class HasManyThrough extends Relation
      * @return void
      */
     public function eagerlyResult(&$result, $relation, $subRelation, $closure)
-    {}
+    {
+    }
 
     /**
      * 关联统计
@@ -124,7 +127,8 @@ class HasManyThrough extends Relation
      * @return integer
      */
     public function relationCount($result, $closure, $aggregate = 'count', $field = '*', &$name = '')
-    {}
+    {
+    }
 
     /**
      * 执行基础查询（仅执行一次）
@@ -137,7 +141,7 @@ class HasManyThrough extends Relation
             $through      = $this->through;
             $alias        = Loader::parseName(basename(str_replace('\\', '/', $this->model)));
             $throughTable = $through::getTable();
-            $pk           = (new $through)->getPk();
+            $pk           = (new $through())->getPk();
             $throughKey   = $this->throughKey;
             $modelTable   = $this->parent->getTable();
             $fields       = $this->getQueryFields($alias);
@@ -152,5 +156,4 @@ class HasManyThrough extends Relation
             $this->baseQuery = true;
         }
     }
-
 }

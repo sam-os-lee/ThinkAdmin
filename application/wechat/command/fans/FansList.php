@@ -32,5 +32,4 @@ class FansList extends Fans
         $this->module = ['list'];
         $this->setName('xfans:list')->setDescription('从微信获取所有的粉丝信息记录');
     }
-
 }

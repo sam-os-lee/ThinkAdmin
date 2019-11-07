@@ -1,4 +1,5 @@
 <?php
+
 // +----------------------------------------------------------------------
 // | ThinkPHP [ WE CAN DO IT JUST THINK ]
 // +----------------------------------------------------------------------
@@ -15,7 +16,6 @@ use think\console\output\formatter\Style;
 
 class Formatter
 {
-
     private $decorated = false;
     private $styles    = [];
     private $styleStack;
@@ -108,7 +108,8 @@ class Formatter
         $offset   = 0;
         $output   = '';
         $tagRegex = '[a-z][a-z0-9_=;-]*';
-        preg_match_all("#<(($tagRegex) | /($tagRegex)?)>#isx", $message, $matches, PREG_OFFSET_CAPTURE);
+        preg_match_all("#<((${tagRegex}) | /(${tagRegex})?)>#isx", $message, $matches, PREG_OFFSET_CAPTURE);
+
         foreach ($matches[0] as $i => $match) {
             $pos  = $match[1];
             $text = $match[0];
@@ -167,6 +168,7 @@ class Formatter
         }
 
         $style = new Style();
+
         foreach ($matches as $match) {
             array_shift($match);
 

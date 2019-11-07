@@ -29,7 +29,6 @@ use think\exception\HttpResponseException;
  */
 class Index extends Controller
 {
-
     /**
      * 显示后台首页
      * @throws \ReflectionException
@@ -42,6 +41,7 @@ class Index extends Controller
         $this->title = '系统管理后台';
         NodeService::applyUserAuth(true);
         $this->menus = NodeService::getMenuNodeTree();
+
         if (empty($this->menus) && !NodeService::islogin()) {
             $this->redirect('@admin/login');
         } else {
@@ -71,12 +71,15 @@ class Index extends Controller
     public function pass($id)
     {
         $this->applyCsrfToken();
+
         if (intval($id) !== intval(session('admin_user.id'))) {
             $this->error('只能修改当前用户的密码！');
         }
+
         if (!NodeService::islogin()) {
             $this->error('需要登录才能操作哦！');
         }
+
         if ($this->request->isGet()) {
             $this->verify = true;
             $this->_form('SystemUser', 'admin@user/pass', 'id', [], ['id' => $id]);
@@ -96,12 +99,19 @@ class Index extends Controller
                 'repassword.require'  => '重复密码不能为空！',
                 'repassword.confirm'  => '重复密码与登录密码不匹配，请重新输入！',
             ]);
+
             $user = Db::name('SystemUser')->where(['id' => $id])->find();
+
             if (md5($data['oldpassword']) !== $user['password']) {
                 $this->error('旧密码验证失败，请重新输入！');
             }
+
             $result = NodeService::checkpwd($data['password']);
-            if (empty($result['code'])) $this->error($result['msg']);
+
+            if (empty($result['code'])) {
+                $this->error($result['msg']);
+            }
+
             if (Data::save('SystemUser', ['id' => $user['id'], 'password' => md5($data['password'])])) {
                 $this->success('密码修改成功，下次请使用新密码登录！', '');
             } else {
@@ -124,7 +134,9 @@ class Index extends Controller
         if (!NodeService::islogin()) {
             $this->error('需要登录才能操作哦！');
         }
+
         $this->applyCsrfToken();
+
         if (intval($id) === intval(session('admin_user.id'))) {
             $this->_form('SystemUser', 'admin@user/form', 'id', [], ['id' => $id]);
         } else {
@@ -141,9 +153,11 @@ class Index extends Controller
         if (!NodeService::islogin()) {
             $this->error('需要登录才能操作哦！');
         }
+
         try {
             Console::call('clear');
             Console::call('xclean:session');
+
             $this->success('清理运行缓存成功！');
         } catch (HttpResponseException $exception) {
             throw $exception;
@@ -161,11 +175,13 @@ class Index extends Controller
         if (!NodeService::islogin()) {
             $this->error('需要登录才能操作哦！');
         }
+
         try {
             Console::call('optimize:route');
             Console::call('optimize:schema');
             Console::call('optimize:autoload');
             Console::call('optimize:config');
+
             $this->success('压缩发布成功！');
         } catch (HttpResponseException $exception) {
             throw $exception;
@@ -173,5 +189,4 @@ class Index extends Controller
             $this->error("压缩发布失败，{$e->getMessage()}");
         }
     }
-
 }

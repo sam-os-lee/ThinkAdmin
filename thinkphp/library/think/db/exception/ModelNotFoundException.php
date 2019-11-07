@@ -1,4 +1,5 @@
 <?php
+
 // +----------------------------------------------------------------------
 // | ThinkPHP [ WE CAN DO IT JUST THINK ]
 // +----------------------------------------------------------------------
@@ -41,5 +42,4 @@ class ModelNotFoundException extends DbException
     {
         return $this->model;
     }
-
 }

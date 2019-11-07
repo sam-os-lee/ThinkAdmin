@@ -1,4 +1,5 @@
 <?php
+
 // +----------------------------------------------------------------------
 // | ThinkPHP [ WE CAN DO IT JUST THINK ]
 // +----------------------------------------------------------------------
@@ -109,18 +110,19 @@ class RuleName
      */
     public function get($name = null, $domain = null, $method = '*')
     {
-        if (is_null($name)) {
+        if (null === $name) {
             return $this->item;
         }
 
-        $name = strtolower($name);
+        $name   = strtolower($name);
         $method = strtolower($method);
 
         if (isset($this->item[$name])) {
-            if (is_null($domain)) {
+            if (null === $domain) {
                 $result = $this->item[$name];
             } else {
                 $result = [];
+
                 foreach ($this->item[$name] as $item) {
                     if ($item[2] == $domain && ('*' == $item[4] || $method == $item[4])) {
                         $result[] = $item;

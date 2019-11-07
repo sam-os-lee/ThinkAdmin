@@ -101,8 +101,10 @@
          * @type String
          */
         $('body').off('change', 'select[name=type]').on('change', 'select[name=type]', function () {
+
             var value = $(this).val(), $form = $(this).parents('form');
             var $current = $form.find('[data-keys-type="' + value + '"]').removeClass('hide');
+
             $form.find('[data-keys-type]').not($current).addClass('hide');
             switch (value) {
                 case 'news':
@@ -129,14 +131,17 @@
         $('body').off('change', '[name="news_id"]').on('change', '[name="news_id"]', function () {
             showReview({type: 'news', content: this.value});
         });
+
         // 文字显示预览
         $('body').off('change', '[name="content"]').on('change', '[name="content"]', function () {
             showReview({type: 'text', content: this.value});
         });
+
         // 图片显示预览
         $('body').off('change', '[name="image_url"]').on('change', '[name="image_url"]', function () {
             showReview({type: 'image', content: this.value});
         });
+
         // 音乐显示预览
         var musicSelector = '[name="music_url"],[name="music_title"],[name="music_desc"],[name="music_image"]';
         $('body').off('change', musicSelector).on('change', musicSelector, function () {
@@ -147,6 +152,7 @@
             params.desc = $parent.find('[name="music_desc"]').val();
             showReview(params);
         });
+
         // 视频显示预览
         var videoSelector = '[name="video_title"],[name="video_url"],[name="video_desc"]';
         $('body').off('change', videoSelector).on('change', videoSelector, function () {

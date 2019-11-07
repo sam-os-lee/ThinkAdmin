@@ -26,7 +26,6 @@ use think\Db;
  */
 class Index extends Controller
 {
-
     /**
      * 绑定数据表
      * @var string
@@ -47,8 +46,11 @@ class Index extends Controller
     {
         $this->applyCsrfToken();
         $this->title = '公众授权管理';
-        $query = $this->_query($this->table)->like('authorizer_appid,nick_name,principal_name');
-        $query = $query->equal('service_type,status')->dateBetween('create_at');
+
+        $query       = $this->_query($this->table)->like('authorizer_appid,nick_name,principal_name');
+        $query       = $query->equal('service_type,status')->dateBetween('create_at');
+
+        // 注意:分页管理器
         $query->where(['is_deleted' => '0'])->order('id desc')->page();
     }
 
@@ -60,8 +62,9 @@ class Index extends Controller
      */
     public function clearQuota()
     {
-        $appid = input('appid');
+        $appid  = input('appid');
         $result = WechatService::WeChatLimit($appid)->clearQuota();
+
         if (empty($result['errcode']) && $result['errmsg'] === 'ok') {
             $this->success('接口调用次数清零成功！');
         } elseif (isset($result['errmsg'])) {
@@ -78,18 +81,33 @@ class Index extends Controller
     public function sync()
     {
         try {
-            $appid = $this->request->get('appid');
-            $where = ['authorizer_appid' => $appid, 'is_deleted' => '0', 'status' => '1'];
+            $appid  = $this->request->get('appid');
+            $where  = [
+                'authorizer_appid' => $appid,
+                'is_deleted'       => '0',
+                'status'           => '1'
+            ];
+
             $author = Db::name('WechatServiceConfig')->where($where)->find();
-            if (empty($author)) $this->error('无效的授权信息，请同步其它公众号！');
-            $data = BuildService::filter(WechatService::service()->getAuthorizerInfo($appid));
+
+            if (empty($author)) {
+                $this->error('无效的授权信息，请同步其它公众号！');
+            }
+
+            $data                     = BuildService::filter(WechatService::service()->getAuthorizerInfo($appid));
             $data['authorizer_appid'] = $appid;
-            $where = ['authorizer_appid' => $data['authorizer_appid']];
+
+            $where  = ['authorizer_appid' => $data['authorizer_appid']];
             $appkey = Db::name('WechatServiceConfig')->where($where)->value('appkey');
-            if (empty($appkey)) $data['appkey'] = md5(uniqid('', true));
+
+            if (empty($appkey)) {
+                $data['appkey'] = md5(uniqid('', true));
+            }
+
             if (data_save('WechatServiceConfig', $data, 'authorizer_appid')) {
                 $this->success('更新公众号授权成功！', '');
             }
+
         } catch (\think\exception\HttpResponseException $exception) {
             throw $exception;
         } catch (\Exception $e) {
@@ -106,19 +124,29 @@ class Index extends Controller
         try {
             $wechat = WechatService::service();
             $result = $wechat->getAuthorizerList();
-            foreach ($result['list'] as $item) if (!empty($item['refresh_token']) && !empty($item['auth_time'])) {
-                $data = BuildService::filter($wechat->getAuthorizerInfo($item['authorizer_appid']));
-                $data['is_deleted'] = '0';
-                $data['authorizer_appid'] = $item['authorizer_appid'];
-                $data['authorizer_refresh_token'] = $item['refresh_token'];
-                $data['create_at'] = date('Y-m-d H:i:s', $item['auth_time']);
-                $where = ['authorizer_appid' => $data['authorizer_appid']];
-                $appkey = Db::name('WechatServiceConfig')->where($where)->value('appkey');
-                if (empty($appkey)) $data['appkey'] = md5(uniqid('', true));
-                if (!data_save('WechatServiceConfig', $data, 'authorizer_appid')) {
-                    $this->error('获取授权信息失败，请稍候再试！', '');
+
+            foreach ($result['list'] as $item) {
+                if (!empty($item['refresh_token']) && !empty($item['auth_time'])) {
+                    $data = BuildService::filter($wechat->getAuthorizerInfo($item['authorizer_appid']));
+
+                    $data['is_deleted']               = '0';
+                    $data['authorizer_appid']         = $item['authorizer_appid'];
+                    $data['authorizer_refresh_token'] = $item['refresh_token'];
+                    $data['create_at']                = date('Y-m-d H:i:s', $item['auth_time']);
+
+                    $where  = ['authorizer_appid' => $data['authorizer_appid']];
+                    $appkey = Db::name('WechatServiceConfig')->where($where)->value('appkey');
+
+                    if (empty($appkey)) {
+                        $data['appkey'] = md5(uniqid('', true));
+                    }
+
+                    if (!data_save('WechatServiceConfig', $data, 'authorizer_appid')) {
+                        $this->error('获取授权信息失败，请稍候再试！', '');
+                    }
                 }
             }
+
             $this->success('同步所有授权信息成功！', '');
         } catch (\think\exception\HttpResponseException $exception) {
             throw $exception;
@@ -136,6 +164,7 @@ class Index extends Controller
     public function remove()
     {
         $this->applyCsrfToken();
+        // 注意:删除逻辑器
         $this->_delete($this->table);
     }
 
@@ -148,6 +177,7 @@ class Index extends Controller
     public function forbid()
     {
         $this->applyCsrfToken();
+        // 注意:更新逻辑器
         $this->_save($this->table, ['status' => '0']);
     }
 
@@ -160,6 +190,7 @@ class Index extends Controller
     public function resume()
     {
         $this->applyCsrfToken();
+        // 注意:更新逻辑器
         $this->_save($this->table, ['status' => '1']);
     }
 }

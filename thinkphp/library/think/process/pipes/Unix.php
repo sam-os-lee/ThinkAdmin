@@ -1,4 +1,5 @@
 <?php
+
 // +----------------------------------------------------------------------
 // | ThinkPHP [ WE CAN DO IT JUST THINK ]
 // +----------------------------------------------------------------------
@@ -15,7 +16,6 @@ use think\Process;
 
 class Unix extends Pipes
 {
-
     /** @var bool */
     private $ttyMode;
     /** @var bool */
@@ -92,7 +92,6 @@ class Unix extends Pipes
      */
     public function readAndWrite($blocking, $close = false)
     {
-
         if (1 === count($this->pipes) && [0] === array_keys($this->pipes)) {
             fclose($this->pipes[0]);
             unset($this->pipes[0]);
@@ -118,7 +117,6 @@ class Unix extends Pipes
         $e = null;
 
         if (false === $n = @stream_select($r, $w, $e, 0, $blocking ? Process::TIMEOUT_PRECISION * 1E6 : 0)) {
-
             if (!$this->hasSystemCallBeenInterrupted()) {
                 $this->pipes = [];
             }
@@ -131,9 +129,9 @@ class Unix extends Pipes
         }
 
         foreach ($r as $pipe) {
-
             $type = (false !== $found = array_search($pipe, $this->pipes)) ? $found : 'input';
             $data = '';
+
             while ('' !== $dataread = (string) fread($pipe, self::CHUNK_SIZE)) {
                 $data .= $dataread;
             }

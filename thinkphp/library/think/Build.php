@@ -1,4 +1,5 @@
 <?php
+
 // +----------------------------------------------------------------------
 // | ThinkPHP [ WE CAN DO IT JUST THINK ]
 // +----------------------------------------------------------------------
@@ -136,6 +137,7 @@ class Build
         // 创建子目录和文件
         foreach ($list as $path => $file) {
             $modulePath = $this->basePath . $module . DIRECTORY_SEPARATOR;
+
             if ('__dir__' == $path) {
                 // 生成子目录
                 foreach ($file as $dir) {
@@ -155,17 +157,21 @@ class Build
                     $filename = $modulePath . $path . DIRECTORY_SEPARATOR . $val . ($suffix ? ucfirst($path) : '') . '.php';
                     $space    = $namespace . '\\' . ($module ? $module . '\\' : '') . $path;
                     $class    = $val . ($suffix ? ucfirst($path) : '');
+
                     switch ($path) {
                         case 'controller': // 控制器
                             $content = "<?php\nnamespace {$space};\n\nclass {$class}\n{\n\n}";
+
                             break;
                         case 'model': // 模型
                             $content = "<?php\nnamespace {$space};\n\nuse think\Model;\n\nclass {$class} extends Model\n{\n\n}";
+
                             break;
                         case 'view': // 视图
                             $filename = $modulePath . $path . DIRECTORY_SEPARATOR . $val . '.html';
                             $this->checkDirBuild(dirname($filename));
                             $content = '';
+
                             break;
                         default:
                             // 其他文件
@@ -294,6 +300,7 @@ class Build
 
         foreach ($methods as $method) {
             $comment = $this->getMethodRouteComment($module, $controller, $method);
+
             if ($comment) {
                 $content .= PHP_EOL . $comment;
             }
@@ -313,7 +320,9 @@ class Build
     {
         $comment = substr($comment, 3, -2);
         $comment = explode(PHP_EOL, substr(strstr(trim($comment), $tag), 1));
-        $comment = array_map(function ($item) {return trim(trim($item), ' \t*');}, $comment);
+        $comment = array_map(function ($item) {
+            return trim(trim($item), ' \t*');
+        }, $comment);
 
         if (count($comment) > 1) {
             $key     = array_search('', $comment);
@@ -327,6 +336,7 @@ class Build
                 return false !== strpos($matches[0], '"') ? '[' . substr(var_export(json_decode($matches[0], true), true), 7, -1) . ']' : $matches[0];
             }, $comment);
         }
+
         return $comment;
     }
 
@@ -369,6 +379,7 @@ class Build
     protected function buildHello($module, $namespace, $suffix = false)
     {
         $filename = $this->basePath . ($module ? $module . DIRECTORY_SEPARATOR : '') . 'controller' . DIRECTORY_SEPARATOR . 'Index' . ($suffix ? 'Controller' : '') . '.php';
+
         if (!is_file($filename)) {
             $content = file_get_contents($this->app->getThinkPath() . 'tpl' . DIRECTORY_SEPARATOR . 'default_index.tpl');
             $content = str_replace(['{$app}', '{$module}', '{layer}', '{$suffix}'], [$namespace, $module ? $module . '\\' : '', 'controller', $suffix ? 'Controller' : ''], $content);

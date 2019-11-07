@@ -1,4 +1,5 @@
 <?php
+
 // +----------------------------------------------------------------------
 // | ThinkPHP [ WE CAN DO IT JUST THINK IT ]
 // +----------------------------------------------------------------------
@@ -50,9 +51,11 @@ class Schema extends Command
             }
 
             $output->writeln('<info>Succeed!</info>');
+
             return;
         } elseif ($input->hasOption('table')) {
             $table = $input->getOption('table');
+
             if (false === strpos($table, '.')) {
                 $dbName = Db::getConfig('database');
             }
@@ -75,6 +78,7 @@ class Schema extends Command
             }
 
             $output->writeln('<info>Succeed!</info>');
+
             return;
         } else {
             $tables = Db::getConnection()->getTables();
@@ -89,6 +93,7 @@ class Schema extends Command
     protected function buildModelSchema($class)
     {
         $reflect = new \ReflectionClass($class);
+
         if (!$reflect->isAbstract() && $reflect->isSubclassOf('\think\Model')) {
             $table   = $class::getTable();
             $dbName  = $class::getConfig('database');

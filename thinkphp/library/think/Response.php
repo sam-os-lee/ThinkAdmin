@@ -1,4 +1,5 @@
 <?php
+
 // +----------------------------------------------------------------------
 // | ThinkPHP [ WE CAN DO IT JUST THINK ]
 // +----------------------------------------------------------------------
@@ -134,6 +135,7 @@ class Response
 
         if (200 == $this->code && $this->allowCache) {
             $cache = $this->app['request']->getCache();
+
             if ($cache) {
                 $this->header['Cache-Control'] = 'max-age=' . $cache[1] . ',must-revalidate';
                 $this->header['Last-Modified'] = gmdate('D, d M Y H:i:s') . ' GMT';
@@ -148,7 +150,7 @@ class Response
             http_response_code($this->code);
             // 发送头部信息
             foreach ($this->header as $name => $val) {
-                header($name . (!is_null($val) ? ':' . $val : ''));
+                header($name . (null !== $val ? ':' . $val : ''));
             }
         }
 

@@ -53,10 +53,16 @@ class Member extends Controller
     {
         parent::__construct();
         // 会员信息检查
-        $this->mid = $this->request->post('mid');
+        $this->mid    = $this->request->post('mid');
         $this->openid = $this->request->post('openid');
-        if (empty($this->mid)) $this->error('无效的会员ID参数！');
-        if (empty($this->openid)) $this->error('无效的会员绑定OPENID！');
+
+        if (empty($this->mid)) {
+            $this->error('无效的会员ID参数！');
+        }
+
+        if (empty($this->openid)) {
+            $this->error('无效的会员绑定OPENID！');
+        }
         $this->getMember();
     }
 
@@ -68,13 +74,16 @@ class Member extends Controller
      */
     protected function getMember()
     {
-        $where = ['id' => $this->mid, 'openid' => $this->openid];
+        $where        = ['id' => $this->mid, 'openid' => $this->openid];
         $this->member = Db::name('StoreMember')->where($where)->find();
-        if (empty($this->member)) $this->error('无效的会员信息，请重新登录授权！');
+
+        if (empty($this->member)) {
+            $this->error('无效的会员信息，请重新登录授权！');
+        }
         // 会员当前已经领取次数
-        $where = [['mid', 'eq', $this->mid], ['status', 'in', ['2', '3', '4', '5']]];
+        $where                      = [['mid', 'eq', $this->mid], ['status', 'in', ['2', '3', '4', '5']]];
         $this->member['times_used'] = Db::name('StoreOrder')->where($where)->count();
+
         return $this->member;
     }
-
 }

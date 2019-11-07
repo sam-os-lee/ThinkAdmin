@@ -43,7 +43,7 @@ class Message extends Controller
     public function index()
     {
         $this->title = '短信发送管理';
-        $query = $this->_query($this->table)->like('phone,content,result');
+        $query       = $this->_query($this->table)->like('phone,content,result');
         $query->dateBetween('create_at')->order('id desc')->page();
     }
 
@@ -55,7 +55,7 @@ class Message extends Controller
      */
     public function remove()
     {
+        // 注意:删除逻辑器
         $this->_delete($this->table);
     }
-
 }

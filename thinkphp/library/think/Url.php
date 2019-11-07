@@ -1,4 +1,5 @@
 <?php
+
 // +----------------------------------------------------------------------
 // | ThinkPHP [ WE CAN DO IT JUST THINK ]
 // +----------------------------------------------------------------------
@@ -117,7 +118,7 @@ class Url
 
             $rule = $this->app['route']->getName($checkName, $checkDomain);
 
-            if (is_null($rule) && isset($info['query'])) {
+            if (null === $rule && isset($info['query'])) {
                 $rule = $this->app['route']->getName($url);
                 // 解析地址里面参数 合并到vars
                 parse_str($info['query'], $params);
@@ -132,7 +133,7 @@ class Url
 
             $domain = $match[1];
 
-            if (!is_null($match[2])) {
+            if (null !== $match[2]) {
                 $suffix = $match[2];
             }
         } elseif (!empty($rule) && isset($name)) {
@@ -150,6 +151,7 @@ class Url
                     if (0 === strpos($url, $val)) {
                         $url        = $key . substr($url, strlen($val));
                         $matchAlias = true;
+
                         break;
                     }
                 }
@@ -173,6 +175,7 @@ class Url
                         if (is_string($val) && 0 === strpos($url, $val) && substr_count($val, '/') > 1) {
                             $url    = substr($url, strlen($val) + 1);
                             $domain = $key;
+
                             break;
                         }
                     }
@@ -284,6 +287,7 @@ class Url
         }
 
         $rootDomain = $this->app['request']->rootDomain();
+
         if (true === $domain) {
             // 自动判断域名
             $domain = $this->config['app_host'] ?: $this->app['request']->host();
@@ -292,10 +296,12 @@ class Url
 
             if ($domains) {
                 $route_domain = array_keys($domains);
+
                 foreach ($route_domain as $domain_prefix) {
                     if (0 === strpos($domain_prefix, '*.') && strpos($domain, ltrim($domain_prefix, '*.')) !== false) {
                         foreach ($domains as $key => $rule) {
                             $rule = is_array($rule) ? $rule[0] : $rule;
+
                             if (is_string($rule) && false === strpos($key, '*') && 0 === strpos($url, $rule)) {
                                 $url    = ltrim($url, $rule);
                                 $domain = $key;
@@ -304,6 +310,7 @@ class Url
                                 if (!empty($rootDomain)) {
                                     $domain .= $rootDomain;
                                 }
+
                                 break;
                             } elseif (false !== strpos($key, '*')) {
                                 if (!empty($rootDomain)) {
@@ -324,7 +331,6 @@ class Url
             $scheme = '';
         } else {
             $scheme = $this->app['request']->isSsl() || $this->config['is_https'] ? 'https://' : 'http://';
-
         }
 
         return $scheme . $domain;

@@ -1,4 +1,5 @@
 <?php
+
 // +----------------------------------------------------------------------
 // | ThinkPHP [ WE CAN DO IT JUST THINK IT ]
 // +----------------------------------------------------------------------
@@ -22,7 +23,6 @@ use think\template\TagLib;
  */
 class Cx extends Taglib
 {
-
     // 标签定义
     protected $tags = [
         // 标签定义： attr 属性列表 close 是否闭合（0 或者1 默认1） alias 标签别名 level 嵌套层次
@@ -63,6 +63,7 @@ class Cx extends Taglib
     public function tagPhp($tag, $content)
     {
         $parseStr = '<?php ' . $content . ' ?>';
+
         return $parseStr;
     }
 
@@ -119,8 +120,6 @@ class Cx extends Taglib
         if (!empty($parseStr)) {
             return $parseStr;
         }
-
-        return;
     }
 
     /**
@@ -143,6 +142,7 @@ class Cx extends Taglib
             $parseStr   = '<?php foreach(' . $expression . '): ?>';
             $parseStr .= $content;
             $parseStr .= '<?php endforeach; ?>';
+
             return $parseStr;
         }
 
@@ -191,6 +191,7 @@ class Cx extends Taglib
         // 设置了索引项
         if (isset($tag['index'])) {
             $index = $tag['index'];
+
             if (isset($tag['mod'])) {
                 $mod = (int) $tag['mod'];
                 $parseStr .= '$mod = ($' . $index . ' % ' . $mod . '); ';
@@ -206,8 +207,6 @@ class Cx extends Taglib
         if (!empty($parseStr)) {
             return $parseStr;
         }
-
-        return;
     }
 
     /**
@@ -303,6 +302,7 @@ class Cx extends Taglib
         } elseif (strpos($value, '|')) {
             $values = explode('|', $value);
             $value  = '';
+
             foreach ($values as $val) {
                 $value .= 'case "' . addslashes($val) . '":';
             }
@@ -361,9 +361,11 @@ class Cx extends Taglib
         switch ($type) {
             case 'equal':
                 $type = 'eq';
+
                 break;
             case 'notequal':
                 $type = 'neq';
+
                 break;
         }
         $type     = $this->parseCondition(' ' . $type . ' ');
@@ -545,15 +547,19 @@ class Cx extends Taglib
 
         foreach ($array as $val) {
             $type = strtolower(substr(strrchr($val, '.'), 1));
+
             switch ($type) {
                 case 'js':
                     $parseStr .= '<script type="text/javascript" src="' . $val . '"></script>';
+
                     break;
                 case 'css':
                     $parseStr .= '<link rel="stylesheet" type="text/css" href="' . $val . '" />';
+
                     break;
                 case 'php':
                     $parseStr .= '<?php include "' . $val . '"; ?>';
+
                     break;
             }
         }
@@ -636,6 +642,7 @@ class Cx extends Taglib
         foreach ($tag as $key => $value) {
             $value = trim($value);
             $flag  = substr($value, 0, 1);
+
             if ('$' == $flag || ':' == $flag) {
                 $value = $this->autoBuildVar($value);
             }
@@ -643,18 +650,23 @@ class Cx extends Taglib
             switch ($key) {
                 case 'start':
                     $start = $value;
+
                     break;
                 case 'end':
                     $end = $value;
+
                     break;
                 case 'step':
                     $step = $value;
+
                     break;
                 case 'comparison':
                     $comparison = $value;
+
                     break;
                 case 'name':
                     $name = $value;
+
                     break;
             }
         }

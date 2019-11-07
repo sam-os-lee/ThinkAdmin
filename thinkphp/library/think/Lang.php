@@ -1,4 +1,5 @@
 <?php
+
 // +----------------------------------------------------------------------
 // | ThinkPHP [ WE CAN DO IT JUST THINK ]
 // +----------------------------------------------------------------------
@@ -67,9 +68,8 @@ class Lang
     {
         if ('' == $range) {
             return $this->range;
-        } else {
-            $this->range = $range;
         }
+        $this->range = $range;
     }
 
     /**
@@ -105,6 +105,7 @@ class Lang
     public function load($file, $range = '')
     {
         $range = $range ?: $this->range;
+
         if (!isset($this->lang[$range])) {
             $this->lang[$range] = [];
         }
@@ -121,6 +122,7 @@ class Lang
                 // 记录加载信息
                 $this->app->log('[ LANG ] ' . $_file);
                 $_lang = include $_file;
+
                 if (is_array($_lang)) {
                     $lang = array_change_key_case($_lang) + $lang;
                 }
@@ -161,7 +163,7 @@ class Lang
         $range = $range ?: $this->range;
 
         // 空参数返回所有定义
-        if (is_null($name)) {
+        if (null === $name) {
             return $this->lang[$range];
         }
 
@@ -182,6 +184,7 @@ class Lang
             } else {
                 // 关联索引解析
                 $replace = array_keys($vars);
+
                 foreach ($replace as &$v) {
                     $v = "{:{$v}}";
                 }
@@ -212,6 +215,7 @@ class Lang
             // 自动侦测浏览器语言
             preg_match('/^([a-z\d\-]+)/i', $_SERVER['HTTP_ACCEPT_LANGUAGE'], $matches);
             $langSet = strtolower($matches[1]);
+
             if (isset($this->acceptLanguage[$langSet])) {
                 $langSet = $this->acceptLanguage[$langSet];
             }

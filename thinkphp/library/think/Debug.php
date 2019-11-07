@@ -1,4 +1,5 @@
 <?php
+
 // +----------------------------------------------------------------------
 // | ThinkPHP [ WE CAN DO IT JUST THINK ]
 // +----------------------------------------------------------------------
@@ -135,7 +136,7 @@ class Debug
             $pos++;
         }
 
-        return round($size, $dec) . " " . $a[$pos];
+        return round($size, $dec) . ' ' . $a[$pos];
     }
 
     /**
@@ -155,7 +156,7 @@ class Debug
             $pos++;
         }
 
-        return round($size, $dec) . " " . $a[$pos];
+        return round($size, $dec) . ' ' . $a[$pos];
     }
 
     /**
@@ -181,7 +182,7 @@ class Debug
             $pos++;
         }
 
-        return round($size, $dec) . " " . $a[$pos];
+        return round($size, $dec) . ' ' . $a[$pos];
     }
 
     /**
@@ -218,6 +219,7 @@ class Debug
     public function dump($var, $echo = true, $label = null, $flags = ENT_SUBSTITUTE)
     {
         $label = (null === $label) ? '' : rtrim($label) . ':';
+
         if ($var instanceof Model || $var instanceof ModelCollection) {
             $var = $var->toArray();
         }
@@ -236,10 +238,13 @@ class Debug
             }
             $output = '<pre>' . $label . $output . '</pre>';
         }
+
         if ($echo) {
-            echo($output);
+            echo $output;
+
             return;
         }
+
         return $output;
     }
 
@@ -256,9 +261,11 @@ class Debug
             //TODO 记录
         } else {
             $output = $trace->output($response, $this->app['log']->getLog());
+
             if (is_string($output)) {
                 // trace调试信息注入
                 $pos = strripos($content, '</body>');
+
                 if (false !== $pos) {
                     $content = substr($content, 0, $pos) . $output . substr($content, $pos);
                 } else {

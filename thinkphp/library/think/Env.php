@@ -1,4 +1,5 @@
 <?php
+
 // +----------------------------------------------------------------------
 // | ThinkPHP [ WE CAN DO IT JUST THINK ]
 // +----------------------------------------------------------------------
@@ -45,7 +46,7 @@ class Env
      */
     public function get($name = null, $default = null, $php_prefix = true)
     {
-        if (is_null($name)) {
+        if (null === $name) {
             return $this->data;
         }
 

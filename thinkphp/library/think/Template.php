@@ -1,4 +1,5 @@
 <?php
+
 // +----------------------------------------------------------------------
 // | ThinkPHP [ WE CAN DO IT JUST THINK ]
 // +----------------------------------------------------------------------
@@ -170,6 +171,7 @@ class Template
                 $data = $data[$val];
             } else {
                 $data = null;
+
                 break;
             }
         }
@@ -203,6 +205,7 @@ class Template
 
             if (false !== $cacheContent) {
                 echo $cacheContent;
+
                 return;
             }
         }
@@ -304,7 +307,7 @@ class Template
      */
     private function checkCache($cacheFile)
     {
-        if (!$this->config['tpl_cache'] || !is_file($cacheFile) || !$handle = @fopen($cacheFile, "r")) {
+        if (!$this->config['tpl_cache'] || !is_file($cacheFile) || !$handle = @fopen($cacheFile, 'r')) {
             return false;
         }
 
@@ -380,7 +383,7 @@ class Template
         $this->parse($content);
 
         if ($this->config['strip_space']) {
-            /* 去除html空格与换行 */
+            // 去除html空格与换行
             $find    = ['~>\s+<~', '~>(\s+\n|\r)~'];
             $replace = ['><', '>'];
             $content = preg_replace($find, $replace, $content);
@@ -603,6 +606,7 @@ class Template
         if (!empty($extend)) {
             if ($baseBlocks) {
                 $children = [];
+
                 foreach ($baseBlocks as $name => $val) {
                     $replace = $val['content'];
 
@@ -844,9 +848,11 @@ class Template
                                     case '?':
                                         $this->parseVarFunction($name);
                                         $str = '<?php echo (' . $name . ') ? ' . $name . ' : ' . substr($str, 1) . '; ?>';
+
                                         break;
                                     case '=':
                                         $str = '<?php if(' . $name . ') echo ' . substr($str, 1) . '; ?>';
+
                                         break;
                                     default:
                                         $str = '<?php echo ' . $name . '?' . $str . '; ?>';
@@ -862,6 +868,7 @@ class Template
 
                                 if (in_array($first, ['?', '=', ':'])) {
                                     $str = trim(substr($str, 1));
+
                                     if ('$' == substr($str, 0, 1)) {
                                         $str = $this->parseVarFunction($str);
                                     }
@@ -872,14 +879,17 @@ class Template
                                     case '?':
                                         // {$varname??'xxx'} $varname有定义则输出$varname,否则输出xxx
                                         $str = '<?php echo ' . ($express ?: 'isset(' . $name . ')') . ' ? ' . $this->parseVarFunction($name) . ' : ' . $str . '; ?>';
+
                                         break;
                                     case '=':
                                         // {$varname?='xxx'} $varname为真时才输出xxx
                                         $str = '<?php if(' . ($express ?: '!empty(' . $name . ')') . ') echo ' . $str . '; ?>';
+
                                         break;
                                     case ':':
                                         // {$varname?:'xxx'} $varname为真时输出$varname,否则输出xxx
                                         $str = '<?php echo ' . ($express ?: '!empty(' . $name . ')') . ' ? ' . $this->parseVarFunction($name) . ' : ' . $str . '; ?>';
+
                                         break;
                                     default:
                                         if (strpos($str, ':')) {
@@ -899,35 +909,42 @@ class Template
                             $this->parseVarFunction($str);
                             $str = '<?php echo ' . $str . '; ?>';
                         }
+
                         break;
                     case ':':
                         // 输出某个函数的结果
                         $str = substr($str, 1);
                         $this->parseVar($str);
                         $str = '<?php echo ' . $str . '; ?>';
+
                         break;
                     case '~':
                         // 执行某个函数
                         $str = substr($str, 1);
                         $this->parseVar($str);
                         $str = '<?php ' . $str . '; ?>';
+
                         break;
                     case '-':
                     case '+':
                         // 输出计算
                         $this->parseVar($str);
                         $str = '<?php echo ' . $str . '; ?>';
+
                         break;
                     case '/':
                         // 注释标签
                         $flag2 = substr($str, 1, 1);
+
                         if ('/' == $flag2 || ('*' == $flag2 && substr(rtrim($str), -2) == '*/')) {
                             $str = '';
                         }
+
                         break;
                     default:
                         // 未识别的标签直接返回
                         $str = $this->config['tpl_begin'] . $str . $this->config['tpl_end'];
+
                         break;
                 }
 
@@ -969,8 +986,10 @@ class Template
                         } elseif ('$Request' == $first) {
                             // 获取Request请求对象参数
                             $method = array_shift($vars);
+
                             if (!empty($vars)) {
                                 $params = implode('.', $vars);
+
                                 if ('true' != $params) {
                                     $params = '\'' . $params . '\'';
                                 }
@@ -983,9 +1002,11 @@ class Template
                             switch ($this->config['tpl_var_identify']) {
                                 case 'array': // 识别为数组
                                     $parseStr = $first . '[\'' . implode('\'][\'', $vars) . '\']';
+
                                     break;
                                 case 'obj': // 识别为对象
                                     $parseStr = $first . '->' . implode('->', $vars);
+
                                     break;
                                 default: // 自动判断数组或对象
                                     $parseStr = '(is_array(' . $first . ')?' . $first . '[\'' . implode('\'][\'', $vars) . '\']:' . $first . '->' . implode('->', $vars) . ')';
@@ -1044,6 +1065,7 @@ class Template
 
                 // 模板函数过滤
                 $fun = trim($args[0]);
+
                 if (in_array($fun, $template_deny_funs)) {
                     continue;
                 }
@@ -1053,21 +1075,27 @@ class Template
                         break;
                     case 'date':
                         $name = 'date(' . $args[1] . ',!is_numeric(' . $name . ')? strtotime(' . $name . ') : ' . $name . ')';
+
                         break;
                     case 'first':
                         $name = 'current(' . $name . ')';
+
                         break;
                     case 'last':
                         $name = 'end(' . $name . ')';
+
                         break;
                     case 'upper':
                         $name = 'strtoupper(' . $name . ')';
+
                         break;
                     case 'lower':
                         $name = 'strtolower(' . $name . ')';
+
                         break;
                     case 'format':
                         $name = 'sprintf(' . $args[1] . ',' . $name . ')';
+
                         break;
                     case 'default': // 特殊模板函数
                         if (false === strpos($name, '(')) {
@@ -1075,18 +1103,19 @@ class Template
                         } else {
                             $name = '(' . $name . ' ?: ' . $args[1] . ')';
                         }
+
                         break;
                     default: // 通用模板函数
                         if (isset($args[1])) {
                             if (strstr($args[1], '###')) {
                                 $args[1] = str_replace('###', $name, $args[1]);
-                                $name    = "$fun($args[1])";
+                                $name    = "${fun}({$args[1]})";
                             } else {
-                                $name = "$fun($name,$args[1])";
+                                $name = "${fun}(${name},{$args[1]})";
                             }
                         } else {
                             if (!empty($args[0])) {
-                                $name = "$fun($name)";
+                                $name = "${fun}(${name})";
                             }
                         }
                 }
@@ -1095,6 +1124,7 @@ class Template
             $_varFunctionList[$_key] = $name;
             $varStr                  = $name;
         }
+
         return $varStr;
     }
 
@@ -1114,51 +1144,66 @@ class Template
             switch ($type) {
                 case 'SERVER':
                     $parseStr = 'app(\'request\')->server(\'' . $param . '\')';
+
                     break;
                 case 'GET':
                     $parseStr = 'app(\'request\')->get(\'' . $param . '\')';
+
                     break;
                 case 'POST':
                     $parseStr = 'app(\'request\')->post(\'' . $param . '\')';
+
                     break;
                 case 'COOKIE':
                     $parseStr = 'app(\'cookie\')->get(\'' . $param . '\')';
+
                     break;
                 case 'SESSION':
                     $parseStr = 'app(\'session\')->get(\'' . $param . '\')';
+
                     break;
                 case 'ENV':
                     $parseStr = 'app(\'request\')->env(\'' . $param . '\')';
+
                     break;
                 case 'REQUEST':
                     $parseStr = 'app(\'request\')->request(\'' . $param . '\')';
+
                     break;
                 case 'CONST':
                     $parseStr = strtoupper($param);
+
                     break;
                 case 'LANG':
                     $parseStr = 'app(\'lang\')->get(\'' . $param . '\')';
+
                     break;
                 case 'CONFIG':
                     $parseStr = 'app(\'config\')->get(\'' . $param . '\')';
+
                     break;
                 default:
                     $parseStr = '\'\'';
+
                     break;
             }
         } else {
             switch ($type) {
                 case 'NOW':
                     $parseStr = "date('Y-m-d g:i a',time())";
+
                     break;
                 case 'VERSION':
                     $parseStr = 'app()->version()';
+
                     break;
                 case 'LDELIM':
                     $parseStr = '\'' . ltrim($this->config['tpl_begin'], '\\') . '\'';
+
                     break;
                 case 'RDELIM':
                     $parseStr = '\'' . ltrim($this->config['tpl_end'], '\\') . '\'';
+
                     break;
                 default:
                     if (defined($type)) {
@@ -1252,6 +1297,7 @@ class Template
     private function getRegex($tagName)
     {
         $regex = '';
+
         if ('tag' == $tagName) {
             $begin = $this->config['tpl_begin'];
             $end   = $this->config['tpl_end'];
@@ -1273,6 +1319,7 @@ class Template
                     } else {
                         $regex = $begin . '(?:' . $tagName . '\b\s+(?>(?:(?!name=).)*)\bname=([\'\"])(?P<name>[\$\w\-\/\.]+)\\1(?>(?:(?!' . $end . ').)*)|\/' . $tagName . ')' . $end;
                     }
+
                     break;
                 case 'literal':
                     if ($single) {
@@ -1284,23 +1331,28 @@ class Template
                         $regex .= '(?:(?>(?:(?!' . $begin . ').)*)(?>(?!' . $begin . '(?>' . $tagName . '\b(?>(?:(?!' . $end . ').)*)|\/' . $tagName . ')' . $end . ')' . $begin . '(?>(?:(?!' . $begin . ').)*))*)';
                         $regex .= '(' . $begin . '\/' . $tagName . $end . ')';
                     }
+
                     break;
                 case 'restoreliteral':
                     $regex = '<!--###literal(\d+)###-->';
+
                     break;
                 case 'include':
                     $name = 'file';
+                    // no break
                 case 'taglib':
                 case 'layout':
                 case 'extend':
                     if (empty($name)) {
                         $name = 'name';
                     }
+
                     if ($single) {
                         $regex = $begin . $tagName . '\b\s+(?>(?:(?!' . $name . '=).)*)\b' . $name . '=([\'\"])(?P<name>[\$\w\-\/\.\:@,\\\\]+)\\1(?>[^' . $end . ']*)' . $end;
                     } else {
                         $regex = $begin . $tagName . '\b\s+(?>(?:(?!' . $name . '=).)*)\b' . $name . '=([\'\"])(?P<name>[\$\w\-\/\.\:@,\\\\]+)\\1(?>(?:(?!' . $end . ').)*)' . $end;
                     }
+
                     break;
             }
         }

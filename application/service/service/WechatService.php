@@ -73,7 +73,6 @@ use think\Db;
  */
 class WechatService
 {
-
     /**
      * 接口类型模式
      * @var string
@@ -98,30 +97,40 @@ class WechatService
             'component_appsecret'      => sysconf('component_appsecret'),
             'component_encodingaeskey' => sysconf('component_encodingaeskey'),
         ];
+
         // 注册授权公众号 AccessToken 处理
         $config['GetAccessTokenCallback'] = function ($authorizerAppid) use ($config) {
             $where = ['authorizer_appid' => $authorizerAppid];
+
             if (!($refreshToken = Db::name('WechatServiceConfig')->where($where)->value('authorizer_refresh_token'))) {
                 throw new \think\Exception('The WeChat information is not configured.', '404');
             }
-            $open = new \WeOpen\MiniApp($config);
+
+            $open   = new \WeOpen\MiniApp($config);
             $result = $open->refreshAccessToken($authorizerAppid, $refreshToken);
+
             if (empty($result['authorizer_access_token']) || empty($result['authorizer_refresh_token'])) {
                 throw new \think\Exception($result['errmsg'], '0');
             }
+
             Db::name('WechatServiceConfig')->where($where)->update([
                 'authorizer_access_token'  => $result['authorizer_access_token'],
                 'authorizer_refresh_token' => $result['authorizer_refresh_token'],
             ]);
+
             return $result['authorizer_access_token'];
         };
+
         $app = new \WeOpen\MiniApp($config);
+
         if (in_array(strtolower($name), ['service', 'miniapp'])) {
             return $app;
         }
+
         if (!in_array($type, ['WeChat', 'WeMini'])) {
             $type = self::$type;
         }
+
         return $app->instance($name, $appid, $type);
     }
 
@@ -137,15 +146,15 @@ class WechatService
     {
         if (substr($name, 0, 6) === 'WeMini') {
             self::$type = 'WeMini';
-            $name = substr($name, 6);
+            $name       = substr($name, 6);
         } elseif (substr($name, 0, 6) === 'WeChat') {
             self::$type = 'WeChat';
-            $name = substr($name, 6);
+            $name       = substr($name, 6);
         } elseif (substr($name, 0, 5) === 'WePay') {
             self::$type = 'WePay';
-            $name = substr($name, 5);
+            $name       = substr($name, 5);
         }
+
         return self::instance($name, isset($arguments[0]) ? $arguments[0] : '', self::$type);
     }
-
 }

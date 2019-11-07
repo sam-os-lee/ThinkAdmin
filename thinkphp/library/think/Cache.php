@@ -1,4 +1,5 @@
 <?php
+
 // +----------------------------------------------------------------------
 // | ThinkPHP [ WE CAN DO IT JUST THINK ]
 // +----------------------------------------------------------------------
@@ -82,8 +83,7 @@ class Cache
      */
     public function init(array $options = [], $force = false)
     {
-        if (is_null($this->handler) || $force) {
-
+        if (null === $this->handler || $force) {
             if ('complex' == $options['type']) {
                 $default = $options['default'];
                 $options = isset($options[$default['type']]) ? $options[$default['type']] : $default;
@@ -129,5 +129,4 @@ class Cache
     {
         return call_user_func_array([$this->init(), $method], $args);
     }
-
 }

@@ -24,7 +24,6 @@ use library\Controller;
  */
 class Config extends Controller
 {
-
     /**
      * 定义当前操作表名
      * @var string
@@ -32,31 +31,35 @@ class Config extends Controller
     public $table = 'WechatServiceConfig';
 
     /**
-     * 显示平台配置
+     * 显示参数配置
      * @auth true
      * @menu true
      */
     public function index()
     {
-        $this->title = '开放平台配置';
+        $this->title = '开放平台参数配置';
         $this->fetch();
     }
 
     /**
-     * 修改平台配置
+     * 修改参数配置
      * @throws \think\Exception
      * @throws \think\exception\PDOException
      */
     public function edit()
     {
         $this->applyCsrfToken();
+
         if ($this->request->isGet()) {
             $this->fetch('form');
         } else {
             $post = $this->request->post();
-            foreach ($post as $k => $v) sysconf($k, $v);
+
+            foreach ($post as $k => $v) {
+                sysconf($k, $v);
+            }
+
             $this->success('参数修改成功！');
         }
     }
-
 }

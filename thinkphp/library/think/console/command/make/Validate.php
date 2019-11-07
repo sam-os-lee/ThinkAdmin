@@ -1,4 +1,5 @@
 <?php
+
 // +----------------------------------------------------------------------
 // | ThinkPHP [ WE CAN DO IT JUST THINK ]
 // +----------------------------------------------------------------------
@@ -15,7 +16,7 @@ use think\console\command\Make;
 
 class Validate extends Make
 {
-    protected $type = "Validate";
+    protected $type = 'Validate';
 
     protected function configure()
     {
@@ -35,5 +36,4 @@ class Validate extends Make
     {
         return parent::getNamespace($appNamespace, $module) . '\validate';
     }
-
 }

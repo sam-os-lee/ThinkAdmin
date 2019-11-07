@@ -1,4 +1,5 @@
 <?php
+
 // +----------------------------------------------------------------------
 // | ThinkPHP [ WE CAN DO IT JUST THINK ]
 // +----------------------------------------------------------------------
@@ -45,7 +46,7 @@ class Redis implements SessionHandlerInterface
     public function open($savePath, $sessName)
     {
         if (extension_loaded('redis')) {
-            $this->handler = new \Redis;
+            $this->handler = new \Redis();
 
             // 建立连接
             $func = $this->config['persistent'] ? 'pconnect' : 'connect';
@@ -60,6 +61,7 @@ class Redis implements SessionHandlerInterface
             }
         } elseif (class_exists('\Predis\Client')) {
             $params = [];
+
             foreach ($this->config as $key => $val) {
                 if (in_array($key, ['aggregate', 'cluster', 'connections', 'exceptions', 'prefix', 'profile', 'replication'])) {
                     $params[$key] = $val;
@@ -154,9 +156,11 @@ class Redis implements SessionHandlerInterface
         $lockKey = 'LOCK_PREFIX_' . $sessID;
         // 使用setnx操作加锁
         $isLock = $this->handler->setnx($lockKey, 1);
+
         if ($isLock) {
             // 设置过期时间，防止死任务的出现
             $this->handler->expire($lockKey, $timeout);
+
             return true;
         }
 

@@ -57,10 +57,10 @@ class Menu extends Controller
     {
         if ($this->request->get('output') === 'json') {
             $where = [['keys', 'notin', ['subscribe', 'default']], ['status', 'eq', '1']];
-            $keys = Db::name('WechatKeys')->where($where)->order('sort desc,id desc')->select();
+            $keys  = Db::name('WechatKeys')->where($where)->order('sort desc,id desc')->select();
             $this->success('获取数据成功!', ['menudata' => sysdata('menudata'), 'keysdata' => $keys]);
         } else {
-            $this->title = '微信菜单定制';
+            $this->title     = '微信菜单定制';
             $this->menuTypes = $this->menuType;
             $this->fetch();
         }
@@ -74,10 +74,12 @@ class Menu extends Controller
     {
         if ($this->request->isPost()) {
             $data = $this->request->post('data');
+
             if (empty($data)) { // 删除菜单
                 try {
                     WechatService::WeChatMenu()->delete();
                     sysoplog('微信管理', '删除微信菜单成功');
+
                     $this->success('删除微信菜单成功！', '');
                 } catch (HttpResponseException $exception) {
                     throw $exception;
@@ -90,6 +92,7 @@ class Menu extends Controller
                     sysdata('menudata', $this->_buildMenuData($menudata = json_decode($data, true)));
                     WechatService::WeChatMenu()->create(['button' => sysdata('menudata')]);
                     sysoplog('微信管理', '发布微信菜单成功');
+
                     $this->success('保存发布菜单成功！', '');
                 } catch (HttpResponseException $exception) {
                     throw $exception;
@@ -110,17 +113,21 @@ class Menu extends Controller
     {
         foreach ($list as &$vo) {
             unset($vo['active'], $vo['show']);
+
             if (empty($vo['sub_button'])) {
                 $vo = $this->_buildMenuItemData($vo);
             } else {
                 $item = ['name' => $vo['name'], 'sub_button' => []];
+
                 foreach ($vo['sub_button'] as &$sub) {
                     unset($sub['active'], $sub['show']);
                     array_push($item['sub_button'], $this->_buildMenuItemData($sub));
                 }
+
                 $vo = $item;
             }
         }
+
         return $list;
     }
 
@@ -138,14 +145,35 @@ class Menu extends Controller
             case 'location_select':
             case 'scancode_waitmsg':
             case 'pic_photo_or_album':
-                return ['name' => $item['name'], 'type' => $item['type'], 'key' => isset($item['key']) ? $item['key'] : $item['type']];
+                return [
+                    'name' => $item['name'],
+                    'type' => $item['type'],
+                    'key' => isset($item['key']) ? $item['key'] : $item['type']
+                ];
             case 'click':
-                if (empty($item['key'])) $this->error('匹配规则存在空的选项');
-                return ['name' => $item['name'], 'type' => $item['type'], 'key' => $item['key']];
+                if (empty($item['key'])) {
+                    $this->error('匹配规则存在空的选项');
+                }
+
+                return [
+                    'name' => $item['name'],
+                    'type' => $item['type'],
+                    'key' => $item['key']
+                ];
             case 'view':
-                return ['name' => $item['name'], 'type' => $item['type'], 'url' => $item['url']];
+                return [
+                    'name' => $item['name'],
+                    'type' => $item['type'],
+                    'url' => $item['url']
+                ];
             case 'miniprogram':
-                return ['name' => $item['name'], 'type' => $item['type'], 'url' => $item['url'], 'appid' => $item['appid'], 'pagepath' => $item['pagepath']];
+                return [
+                    'name' => $item['name'],
+                    'type' => $item['type'],
+                    'url' => $item['url'],
+                    'appid' => $item['appid'],
+                    'pagepath' => $item['pagepath']
+                ];
         }
     }
 
@@ -160,10 +188,10 @@ class Menu extends Controller
             $this->success('菜单取消成功，重新关注可立即生效！', '');
         } catch (HttpResponseException $exception) {
             sysoplog('微信管理', '取消微信菜单成功');
+
             throw $exception;
         } catch (\Exception $e) {
             $this->error("菜单取消失败，请稍候再试！<br> {$e->getMessage()}");
         }
     }
-
 }

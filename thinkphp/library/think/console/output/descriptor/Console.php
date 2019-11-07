@@ -1,4 +1,5 @@
 <?php
+
 // +----------------------------------------------------------------------
 // | ThinkPHP [ WE CAN DO IT JUST THINK ]
 // +----------------------------------------------------------------------
@@ -16,7 +17,6 @@ use think\console\Command;
 
 class Console
 {
-
     const GLOBAL_NAMESPACE = '_global';
 
     /**
@@ -99,6 +99,7 @@ class Console
         $this->namespaces = [];
 
         $all = $this->console->all($this->namespace ? $this->console->findNamespace($this->namespace) : null);
+
         foreach ($this->sortCommands($all) as $namespace => $commands) {
             $names = [];
 
@@ -132,8 +133,10 @@ class Console
     private function sortCommands(array $commands)
     {
         $namespacedCommands = [];
+
         foreach ($commands as $name => $command) {
             $key = $this->console->extractNamespace($name, 1);
+
             if (!$key) {
                 $key = self::GLOBAL_NAMESPACE;
             }

@@ -1,4 +1,5 @@
 <?php
+
 // +----------------------------------------------------------------------
 // | ThinkPHP [ WE CAN DO IT JUST THINK ]
 // +----------------------------------------------------------------------
@@ -32,7 +33,7 @@ class HasOne extends OneToOne
         $this->foreignKey = $foreignKey;
         $this->localKey   = $localKey;
         $this->joinType   = 'INNER';
-        $this->query      = (new $model)->db();
+        $this->query      = (new $model())->db();
 
         if (get_class($parent) == $model) {
             $this->selfRelation = true;
@@ -113,6 +114,7 @@ class HasOne extends OneToOne
 
         if ($closure) {
             $return = $closure($this->query);
+
             if ($return && is_string($return)) {
                 $name = $return;
             }
@@ -190,6 +192,7 @@ class HasOne extends OneToOne
         $foreignKey = $this->foreignKey;
 
         $range = [];
+
         foreach ($resultSet as $result) {
             // 获取关联外键列表
             if (isset($result->$localKey)) {

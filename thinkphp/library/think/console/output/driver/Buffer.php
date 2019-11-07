@@ -1,4 +1,5 @@
 <?php
+
 // +----------------------------------------------------------------------
 // | ThinkPHP [ WE CAN DO IT JUST THINK IT ]
 // +----------------------------------------------------------------------
@@ -29,6 +30,7 @@ class Buffer
     {
         $content      = $this->buffer;
         $this->buffer = '';
+
         return $content;
     }
 
@@ -39,6 +41,7 @@ class Buffer
         foreach ($messages as $message) {
             $this->buffer .= $message;
         }
+
         if ($newline) {
             $this->buffer .= "\n";
         }
@@ -48,5 +51,4 @@ class Buffer
     {
         // do nothing
     }
-
 }

@@ -1,4 +1,5 @@
 <?php
+
 // +----------------------------------------------------------------------
 // | ThinkPHP [ WE CAN DO IT JUST THINK ]
 // +----------------------------------------------------------------------
@@ -55,7 +56,7 @@ class RuleGroup extends Rule
      * @param  array       $option   路由参数
      * @param  array       $pattern  变量规则
      */
-    public function __construct(Route $router, RuleGroup $parent = null, $name = '', $rule = [], $option = [], $pattern = [])
+    public function __construct(Route $router, self $parent = null, $name = '', $rule = [], $option = [], $pattern = [])
     {
         $this->router  = $router;
         $this->parent  = $parent;
@@ -284,8 +285,10 @@ class RuleGroup extends Rule
         foreach ($rules as $key => $item) {
             if ($item instanceof RuleItem) {
                 $rule = $depr . str_replace('/', $depr, $item->getRule());
+
                 if ($depr == $rule && $depr != $url) {
                     unset($rules[$key]);
+
                     continue;
                 }
 
@@ -297,6 +300,7 @@ class RuleGroup extends Rule
                     }
 
                     unset($rules[$key]);
+
                     continue;
                 }
 
@@ -305,6 +309,7 @@ class RuleGroup extends Rule
                 if ($matchRule = preg_split('/[' . $slash . ']<\w+\??>/', $rule, 2)) {
                     if ($matchRule[0] && 0 !== strncasecmp($rule, $url, strlen($matchRule[0]))) {
                         unset($rules[$key]);
+
                         continue;
                     }
                 }
@@ -332,6 +337,7 @@ class RuleGroup extends Rule
 
         if ($result) {
             $var = [];
+
             foreach ($match as $key => $val) {
                 if (is_string($key) && '' !== $val) {
                     list($name, $pos) = explode('_THINK_', $key);
@@ -344,6 +350,7 @@ class RuleGroup extends Rule
                 foreach ($regex as $key => $item) {
                     if (0 === strpos(str_replace(['\/', '\-', '\\' . $depr], ['/', '-', $depr], $item), $match[0])) {
                         $pos = $key;
+
                         break;
                     }
                 }

@@ -26,7 +26,6 @@ use think\Db;
  */
 class News extends Controller
 {
-
     /**
      * 设置默认操作表
      * @var string
@@ -46,6 +45,7 @@ class News extends Controller
     public function index()
     {
         $this->title = '微信图文列表';
+        // 注意:分页管理器
         $this->_query($this->table)->where(['is_deleted' => '0'])->order('id desc')->page();
     }
 
@@ -58,7 +58,9 @@ class News extends Controller
      */
     protected function _index_page_filter(&$data)
     {
-        foreach ($data as &$vo) $vo = MediaService::news($vo['id']);
+        foreach ($data as &$vo) {
+            $vo = MediaService::news($vo['id']);
+        }
     }
 
     /**
@@ -85,7 +87,9 @@ class News extends Controller
      */
     protected function _select_page_filter(&$data)
     {
-        foreach ($data as &$vo) $vo = MediaService::news($vo['id']);
+        foreach ($data as &$vo) {
+            $vo = MediaService::news($vo['id']);
+        }
     }
 
     /**
@@ -101,12 +105,15 @@ class News extends Controller
             $this->fetch('form');
         } else {
             $data = $this->request->post();
+
             if (($ids = $this->_apply_news_article($data['data'])) && !empty($ids)) {
                 if (data_save($this->table, ['article_id' => $ids, 'create_by' => session('user.id')], 'id') !== false) {
+
                     $url = url('@admin') . '#' . url('@wechat/news/index') . '?spm=' . $this->request->get('spm');
                     $this->success('图文添加成功！', $url);
                 }
             }
+
             $this->error('图文添加失败，请稍候再试！');
         }
     }
@@ -122,6 +129,7 @@ class News extends Controller
         if (($this->id = $this->request->get('id')) < 1) {
             $this->error('参数错误，请稍候再试！');
         }
+
         if ($this->request->isGet()) {
             if ($this->request->get('output') === 'json') {
                 $this->success('获取数据成功！', MediaService::news($this->id));
@@ -130,11 +138,13 @@ class News extends Controller
             }
         } else {
             $post = $this->request->post();
+
             if (isset($post['data']) && ($ids = $this->_apply_news_article($post['data']))) {
                 if (data_save('wechat_news', ['id' => $this->id, 'article_id' => $ids], 'id')) {
                     $this->success('图文更新成功！', url('@admin') . '#' . url('@wechat/news/index'));
                 }
             }
+
             $this->error('图文更新失败，请稍候再试！');
         }
     }
@@ -153,17 +163,21 @@ class News extends Controller
             if (empty($vo['digest'])) {
                 $vo['digest'] = mb_substr(strip_tags(str_replace(["\s", '　'], '', $vo['content'])), 0, 120);
             }
+
             $vo['create_at'] = date('Y-m-d H:i:s');
+
             if (empty($vo['id'])) {
                 $result = $id = Db::name('WechatNewsArticle')->insertGetId($vo);
             } else {
-                $id = intval($vo['id']);
+                $id     = intval($vo['id']);
                 $result = Db::name('WechatNewsArticle')->where('id', $id)->update($vo);
             }
+
             if ($result !== false) {
                 array_push($ids, $id);
             }
         }
+
         return join(',', $ids);
     }
 
@@ -172,7 +186,7 @@ class News extends Controller
      */
     public function remove()
     {
+        // 注意:删除逻辑器
         $this->_delete($this->table);
     }
-
 }

@@ -49,9 +49,15 @@ class OrderService
      */
     public static function syncStock($order_no)
     {
-        $map = ['order_no' => $order_no];
+        $map      = ['order_no' => $order_no];
         $goodsIds = Db::name('StoreOrderList')->where($map)->column('goods_id');
-        foreach (array_unique($goodsIds) as $goodsId) if (!GoodsService::syncStock($goodsId)) return false;
+
+        foreach (array_unique($goodsIds) as $goodsId) {
+            if (!GoodsService::syncStock($goodsId)) {
+                return false;
+            }
+        }
+
         return true;
     }
 

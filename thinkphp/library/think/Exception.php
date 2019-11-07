@@ -1,4 +1,5 @@
 <?php
+
 // +----------------------------------------------------------------------
 // | ThinkPHP [ WE CAN DO IT JUST THINK ]
 // +----------------------------------------------------------------------
@@ -13,7 +14,6 @@ namespace think;
 
 class Exception extends \Exception
 {
-
     /**
      * 保存异常页面显示的额外Debug数据
      * @var array
@@ -52,5 +52,4 @@ class Exception extends \Exception
     {
         return $this->data;
     }
-
 }

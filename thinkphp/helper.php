@@ -1,4 +1,5 @@
 <?php
+
 // +----------------------------------------------------------------------
 // | ThinkPHP [ WE CAN DO IT JUST THINK ]
 // +----------------------------------------------------------------------
@@ -43,9 +44,9 @@ if (!function_exists('abort')) {
     {
         if ($code instanceof Response) {
             throw new HttpResponseException($code);
-        } else {
-            throw new HttpException($code, $message, null, $header);
         }
+
+        throw new HttpException($code, $message, null, $header);
     }
 }
 
@@ -127,7 +128,7 @@ if (!function_exists('cache')) {
         if ('' === $value) {
             // 获取缓存
             return 0 === strpos($name, '?') ? Cache::has(substr($name, 1)) : Cache::get($name);
-        } elseif (is_null($value)) {
+        } elseif (null === $value) {
             // 删除缓存
             return Cache::rm($name);
         }
@@ -139,11 +140,11 @@ if (!function_exists('cache')) {
             $expire = is_numeric($options) ? $options : null; //默认快捷缓存设置过期时间
         }
 
-        if (is_null($tag)) {
+        if (null === $tag) {
             return Cache::set($name, $value, $expire);
-        } else {
-            return Cache::tag($tag)->set($name, $value, $expire);
         }
+
+        return Cache::tag($tag)->set($name, $value, $expire);
     }
 }
 
@@ -170,6 +171,7 @@ if (!function_exists('class_basename')) {
     function class_basename($class)
     {
         $class = is_object($class) ? get_class($class) : $class;
+
         return basename(str_replace('\\', '/', $class));
     }
 }
@@ -189,6 +191,7 @@ if (!function_exists('class_uses_recursive')) {
 
         $results = [];
         $classes = array_merge([$class => $class], class_parents($class));
+
         foreach ($classes as $class) {
             $results += trait_uses_recursive($class);
         }
@@ -206,15 +209,15 @@ if (!function_exists('config')) {
      */
     function config($name = '', $value = null)
     {
-        if (is_null($value) && is_string($name)) {
+        if (null === $value && is_string($name)) {
             if ('.' == substr($name, -1)) {
                 return Config::pull(substr($name, 0, -1));
             }
 
             return 0 === strpos($name, '?') ? Config::has(substr($name, 1)) : Config::get($name);
-        } else {
-            return Config::set($name, $value);
         }
+
+        return Config::set($name, $value);
     }
 }
 
@@ -256,13 +259,13 @@ if (!function_exists('cookie')) {
         if (is_array($name)) {
             // 初始化
             Cookie::init($name);
-        } elseif (is_null($name)) {
+        } elseif (null === $name) {
             // 清除
             Cookie::clear($value);
         } elseif ('' === $value) {
             // 获取
             return 0 === strpos($name, '?') ? Cookie::has(substr($name, 1), $option) : Cookie::get($name);
-        } elseif (is_null($value)) {
+        } elseif (null === $value) {
             // 删除
             return Cookie::delete($name);
         } else {
@@ -360,6 +363,7 @@ if (!function_exists('exception')) {
     function exception($msg, $code = 0, $exception = '')
     {
         $e = $exception ?: '\think\Exception';
+
         throw new $e($msg, $code);
     }
 }
@@ -373,7 +377,7 @@ if (!function_exists('halt')) {
     {
         dump($var);
 
-        throw new HttpResponseException(new Response);
+        throw new HttpResponseException(new Response());
     }
 }
 
@@ -395,6 +399,7 @@ if (!function_exists('input')) {
         if ($pos = strpos($key, '.')) {
             // 指定参数来源
             $method = substr($key, 0, $pos);
+
             if (in_array($method, ['get', 'post', 'put', 'patch', 'delete', 'route', 'param', 'request', 'session', 'cookie', 'server', 'env', 'path', 'file'])) {
                 $key = substr($key, $pos + 1);
             } else {
@@ -407,9 +412,9 @@ if (!function_exists('input')) {
 
         if (isset($has)) {
             return request()->has($key, $method, $default);
-        } else {
-            return request()->$method($key, $default, $filter);
         }
+
+        return request()->$method($key, $default, $filter);
     }
 }
 
@@ -488,9 +493,9 @@ if (!function_exists('parse_name')) {
             }, $name);
 
             return $ucfirst ? ucfirst($name) : lcfirst($name);
-        } else {
-            return strtolower(trim(preg_replace("/[A-Z]/", "_\\0", $name), "_"));
         }
+
+        return strtolower(trim(preg_replace('/[A-Z]/', '_\\0', $name), '_'));
     }
 }
 
@@ -567,13 +572,13 @@ if (!function_exists('session')) {
         if (is_array($name)) {
             // 初始化
             Session::init($name);
-        } elseif (is_null($name)) {
+        } elseif (null === $name) {
             // 清除
             Session::clear($value);
         } elseif ('' === $value) {
             // 判断或获取
             return 0 === strpos($name, '?') ? Session::has(substr($name, 1), $prefix) : Session::get($name, $prefix);
-        } elseif (is_null($value)) {
+        } elseif (null === $value) {
             // 删除
             return Session::delete($name, $prefix);
         } else {
@@ -609,9 +614,8 @@ if (!function_exists('trace')) {
     {
         if ('[think]' === $log) {
             return Log::getLog();
-        } else {
-            Log::record($log, $level);
         }
+        Log::record($log, $level);
     }
 }
 
@@ -625,6 +629,7 @@ if (!function_exists('trait_uses_recursive')) {
     function trait_uses_recursive($trait)
     {
         $traits = class_uses($trait);
+
         foreach ($traits as $trait) {
             $traits += trait_uses_recursive($trait);
         }

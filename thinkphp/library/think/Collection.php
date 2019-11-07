@@ -1,4 +1,5 @@
 <?php
+
 // +----------------------------------------------------------------------
 // | ThinkPHP [ WE CAN DO IT JUST THINK ]
 // +----------------------------------------------------------------------
@@ -94,7 +95,7 @@ class Collection implements ArrayAccess, Countable, IteratorAggregate, JsonSeria
             $items = $items->all();
         }
 
-        $items = is_null($items) ? $this->items : $items;
+        $items = null === $items ? $this->items : $items;
 
         if ($items && empty($indexKey)) {
             $indexKey = is_array($items[0]) ? 'id' : $items[0]->getPk();
@@ -239,7 +240,7 @@ class Collection implements ArrayAccess, Countable, IteratorAggregate, JsonSeria
      */
     public function push($value, $key = null)
     {
-        if (is_null($key)) {
+        if (null === $key) {
             $this->items[] = $value;
         } else {
             $this->items[$key] = $value;
@@ -274,7 +275,7 @@ class Collection implements ArrayAccess, Countable, IteratorAggregate, JsonSeria
      */
     public function unshift($value, $key = null)
     {
-        if (is_null($key)) {
+        if (null === $key) {
             array_unshift($this->items, $value);
         } else {
             $this->items = [$key => $value] + $this->items;
@@ -339,7 +340,7 @@ class Collection implements ArrayAccess, Countable, IteratorAggregate, JsonSeria
      */
     public function where($field, $operator, $value = null)
     {
-        if (is_null($value)) {
+        if (null === $value) {
             $value    = $operator;
             $operator = '=';
         }
@@ -379,9 +380,11 @@ class Collection implements ArrayAccess, Countable, IteratorAggregate, JsonSeria
                     return is_scalar($result) && !in_array($result, $value, true);
                 case 'between':
                     list($min, $max) = is_string($value) ? explode(',', $value) : $value;
+
                     return is_scalar($result) && $result >= $min && $result <= $max;
                 case 'not between':
                     list($min, $max) = is_string($value) ? explode(',', $value) : $value;
+
                     return is_scalar($result) && $result > $max || $result < $min;
                 case '==':
                 case '=':
@@ -416,7 +419,6 @@ class Collection implements ArrayAccess, Countable, IteratorAggregate, JsonSeria
 
         $callback = $callback ?: function ($a, $b) {
             return $a == $b ? 0 : (($a < $b) ? -1 : 1);
-
         };
 
         uasort($items, $callback);
@@ -440,9 +442,9 @@ class Collection implements ArrayAccess, Countable, IteratorAggregate, JsonSeria
 
             if ($intSort) {
                 return 'desc' == strtolower($order) ? $fieldB >= $fieldA : $fieldA >= $fieldB;
-            } else {
-                return 'desc' == strtolower($order) ? strcmp($fieldB, $fieldA) : strcmp($fieldA, $fieldB);
             }
+
+            return 'desc' == strtolower($order) ? strcmp($fieldB, $fieldA) : strcmp($fieldA, $fieldB);
         });
     }
 
@@ -488,7 +490,7 @@ class Collection implements ArrayAccess, Countable, IteratorAggregate, JsonSeria
 
     public function offsetSet($offset, $value)
     {
-        if (is_null($offset)) {
+        if (null === $offset) {
             $this->items[] = $value;
         } else {
             $this->items[$offset] = $value;

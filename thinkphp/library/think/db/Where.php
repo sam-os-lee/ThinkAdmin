@@ -1,4 +1,5 @@
 <?php
+
 // +----------------------------------------------------------------------
 // | ThinkPHP [ WE CAN DO IT JUST THINK ]
 // +----------------------------------------------------------------------
@@ -48,6 +49,7 @@ class Where implements ArrayAccess
     public function enclose($enclose = true)
     {
         $this->enclose = $enclose;
+
         return $this;
     }
 
@@ -63,7 +65,7 @@ class Where implements ArrayAccess
         foreach ($this->where as $key => $val) {
             if ($val instanceof Expression) {
                 $where[] = [$key, 'exp', $val];
-            } elseif (is_null($val)) {
+            } elseif (null === $val) {
                 $where[] = [$key, 'NULL', ''];
             } elseif (is_array($val)) {
                 $where[] = $this->parseItem($key, $val);
@@ -90,7 +92,7 @@ class Where implements ArrayAccess
         if (is_array($op)) {
             // 同一字段多条件查询
             array_unshift($where, $field);
-        } elseif (is_null($condition)) {
+        } elseif (null === $condition) {
             if (in_array(strtoupper($op), ['NULL', 'NOTNULL', 'NOT NULL'], true)) {
                 // null查询
                 $where = [$field, $op, ''];
@@ -174,5 +176,4 @@ class Where implements ArrayAccess
     {
         return $this->__get($name);
     }
-
 }

@@ -1,4 +1,5 @@
 <?php
+
 // +----------------------------------------------------------------------
 // | TopThink [ WE CAN DO IT JUST THINK IT ]
 // +----------------------------------------------------------------------
@@ -11,7 +12,6 @@ namespace think\process;
 
 class Utils
 {
-
     /**
      * 转义字符串
      * @param string $argument
@@ -19,12 +19,12 @@ class Utils
      */
     public static function escapeArgument($argument)
     {
-
         if ('' === $argument) {
             return escapeshellarg($argument);
         }
         $escapedArgument = '';
         $quote           = false;
+
         foreach (preg_split('/(")/i', $argument, -1, PREG_SPLIT_NO_EMPTY | PREG_SPLIT_DELIM_CAPTURE) as $part) {
             if ('"' === $part) {
                 $escapedArgument .= '\\"';
@@ -40,9 +40,11 @@ class Utils
                 $escapedArgument .= $part;
             }
         }
+
         if ($quote) {
             $escapedArgument = '"' . $escapedArgument . '"';
         }
+
         return $escapedArgument;
     }
 
@@ -59,11 +61,14 @@ class Utils
             if (is_resource($input)) {
                 return $input;
             }
+
             if (is_scalar($input)) {
                 return (string) $input;
             }
+
             throw new \InvalidArgumentException(sprintf('%s only accepts strings or stream resources.', $caller));
         }
+
         return $input;
     }
 
@@ -71,5 +76,4 @@ class Utils
     {
         return 2 < strlen($arg) && $char === $arg[0] && $char === $arg[strlen($arg) - 1];
     }
-
 }

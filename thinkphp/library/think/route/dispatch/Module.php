@@ -1,4 +1,5 @@
 <?php
+
 // +----------------------------------------------------------------------
 // | ThinkPHP [ WE CAN DO IT JUST THINK ]
 // +----------------------------------------------------------------------
@@ -12,7 +13,6 @@
 namespace think\route\dispatch;
 
 use ReflectionMethod;
-use think\Controller;
 use think\exception\ClassNotFoundException;
 use think\exception\HttpException;
 use think\Loader;
@@ -43,6 +43,7 @@ class Module extends Dispatch
             if ($bind && preg_match('/^[a-z]/is', $bind)) {
                 // 绑定模块
                 list($bindModule) = explode('/', $bind);
+
                 if (empty($result[0])) {
                     $module = $bindModule;
                 }
@@ -89,10 +90,12 @@ class Module extends Dispatch
 
         try {
             // 实例化控制器
-            $instance = $this->app->controller($this->controller,
+            $instance = $this->app->controller(
+                $this->controller,
                 $this->rule->getConfig('url_controller_layer'),
                 $this->rule->getConfig('controller_suffix'),
-                $this->rule->getConfig('empty_controller'));
+                $this->rule->getConfig('empty_controller')
+            );
         } catch (ClassNotFoundException $e) {
             throw new HttpException(404, 'controller not exists:' . $e->getClass());
         }

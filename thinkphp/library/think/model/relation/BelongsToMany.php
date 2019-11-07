@@ -1,4 +1,5 @@
 <?php
+
 // +----------------------------------------------------------------------
 // | ThinkPHP [ WE CAN DO IT JUST THINK ]
 // +----------------------------------------------------------------------
@@ -53,7 +54,7 @@ class BelongsToMany extends Relation
             $this->middle = $table;
         }
 
-        $this->query = (new $model)->db();
+        $this->query = (new $model())->db();
         $this->pivot = $this->newPivot();
     }
 
@@ -66,6 +67,7 @@ class BelongsToMany extends Relation
     public function pivot($pivot)
     {
         $this->pivotName = $pivot;
+
         return $this;
     }
 
@@ -78,6 +80,7 @@ class BelongsToMany extends Relation
     public function pivotDataName($name)
     {
         $this->pivotDataName = $name;
+
         return $this;
     }
 
@@ -215,6 +218,7 @@ class BelongsToMany extends Relation
     public function find($data = null)
     {
         $result = $this->buildQuery()->find($data);
+
         if ($result) {
             $this->hydratePivot([$result]);
         }
@@ -282,6 +286,7 @@ class BelongsToMany extends Relation
     public function wherePivot($field, $op = null, $condition = null)
     {
         $this->query->where('pivot.' . $field, $op, $condition);
+
         return $this;
     }
 
@@ -301,6 +306,7 @@ class BelongsToMany extends Relation
 
         $pk    = $resultSet[0]->getPk();
         $range = [];
+
         foreach ($resultSet as $result) {
             // 获取关联外键列表
             if (isset($result->$pk)) {
@@ -438,11 +444,14 @@ class BelongsToMany extends Relation
 
         // 组装模型数据
         $data = [];
+
         foreach ($list as $set) {
             $pivot = [];
+
             foreach ($set->getData() as $key => $val) {
                 if (strpos($key, '__')) {
                     list($name, $attr) = explode('__', $key, 2);
+
                     if ('pivot' == $name) {
                         $pivot[$attr] = $val;
                         unset($set->$key);
@@ -539,7 +548,7 @@ class BelongsToMany extends Relation
                 $id = $data;
             } else {
                 // 保存关联表数据
-                $model = new $this->model;
+                $model = new $this->model();
                 $id    = $model->insertGetId($data);
             }
         } elseif (is_numeric($data) || is_string($data)) {
@@ -572,9 +581,9 @@ class BelongsToMany extends Relation
             }
 
             return $result;
-        } else {
-            throw new Exception('miss relation data');
         }
+
+        throw new Exception('miss relation data');
     }
 
     /**
@@ -706,5 +715,4 @@ class BelongsToMany extends Relation
             $this->baseQuery = true;
         }
     }
-
 }

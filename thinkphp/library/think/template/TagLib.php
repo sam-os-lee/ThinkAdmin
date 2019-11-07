@@ -1,4 +1,5 @@
 <?php
+
 // +----------------------------------------------------------------------
 // | ThinkPHP [ WE CAN DO IT JUST THINK ]
 // +----------------------------------------------------------------------
@@ -22,7 +23,6 @@ use think\Exception;
  */
 class TagLib
 {
-
     /**
      * 标签库定义XML文件
      * @var string
@@ -92,9 +92,11 @@ class TagLib
         foreach ($this->tags as $name => $val) {
             $close                      = !isset($val['close']) || $val['close'] ? 1 : 0;
             $tags[$close][$lib . $name] = $name;
+
             if (isset($val['alias'])) {
                 // 别名设置
                 $array = (array) $val['alias'];
+
                 foreach (explode(',', $array[0]) as $v) {
                     $tags[$close][$lib . $v] = $name;
                 }
@@ -105,8 +107,10 @@ class TagLib
         if (!empty($tags[1])) {
             $nodes = [];
             $regex = $this->getRegex(array_keys($tags[1]), 1);
+
             if (preg_match_all($regex, $content, $matches, PREG_SET_ORDER | PREG_OFFSET_CAPTURE)) {
                 $right = [];
+
                 foreach ($matches as $match) {
                     if ('' == $match[1][0]) {
                         $name = strtolower($match[2][0]);
@@ -130,6 +134,7 @@ class TagLib
             }
 
             $break = '<!--###break###--!>';
+
             if ($nodes) {
                 $beginArray = [];
                 // 标签替换 从后向前
@@ -151,12 +156,11 @@ class TagLib
                             // 判断当前标签尾的位置是否在栈中最后一个标签头的后面，是则为子标签
                             if ($node['end'][1] > $begin['pos']) {
                                 break;
-                            } else {
-                                // 不为子标签时，取出栈中最后一个标签头
-                                $begin = array_pop($beginArray);
-                                // 替换标签头部
-                                $content = substr_replace($content, $begin['str'], $begin['pos'], $begin['len']);
                             }
+                            // 不为子标签时，取出栈中最后一个标签头
+                            $begin = array_pop($beginArray);
+                            // 替换标签头部
+                            $content = substr_replace($content, $begin['str'], $begin['pos'], $begin['len']);
                         }
                         // 替换标签尾部
                         $content = substr_replace($content, $replace[1], $node['end'][1], strlen($node['end'][0]));
@@ -182,11 +186,10 @@ class TagLib
                 // 解析标签属性
                 $attrs  = $this->parseAttr($matches[0], $name, $alias);
                 $method = 'tag' . $name;
+
                 return $this->$method($attrs, '');
             }, $content);
         }
-
-        return;
     }
 
     /**
@@ -245,10 +248,12 @@ class TagLib
                 foreach ($this->tags as $key => $val) {
                     if (isset($val['alias'])) {
                         $array = (array) $val['alias'];
+
                         if (in_array($name, explode(',', $array[0]))) {
                             $tag           = $val;
                             $type          = !empty($array[1]) ? $array[1] : 'type';
                             $result[$type] = $name;
+
                             break;
                         }
                     }
@@ -264,6 +269,7 @@ class TagLib
 
             if (!empty($tag['must'])) {
                 $must = explode(',', $tag['must']);
+
                 foreach ($must as $name) {
                     if (!isset($result[$name])) {
                         throw new Exception('tag attr must:' . $name);
@@ -274,6 +280,7 @@ class TagLib
             // 允许直接使用表达式的标签
             if (!empty($this->tags[$name]['expression'])) {
                 static $_taglibs;
+
                 if (!isset($_taglibs[$name])) {
                     $_taglibs[$name][0] = strlen($this->tpl->config('taglib_begin_origin') . $name);
                     $_taglibs[$name][1] = strlen($this->tpl->config('taglib_end_origin'));

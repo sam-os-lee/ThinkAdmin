@@ -1,4 +1,5 @@
 <?php
+
 // +----------------------------------------------------------------------
 // | ThinkPHP [ WE CAN DO IT JUST THINK ]
 // +----------------------------------------------------------------------
@@ -44,8 +45,8 @@ class Json extends Response
             if ($e->getPrevious()) {
                 throw $e->getPrevious();
             }
+
             throw $e;
         }
     }
-
 }

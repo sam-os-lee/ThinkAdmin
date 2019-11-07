@@ -1,4 +1,5 @@
 <?php
+
 // +----------------------------------------------------------------------
 // | ThinkPHP [ WE CAN DO IT JUST THINK ]
 // +----------------------------------------------------------------------
@@ -19,7 +20,6 @@ use think\db\Query;
  */
 class Pgsql extends Builder
 {
-
     protected $insertSql    = 'INSERT INTO %TABLE% (%FIELD%) VALUES (%DATA%) %COMMENT%';
     protected $insertAllSql = 'INSERT INTO %TABLE% (%FIELD%) %DATA% %COMMENT%';
 
@@ -36,6 +36,7 @@ class Pgsql extends Builder
 
         if (!empty($limit)) {
             $limit = explode(',', $limit);
+
             if (count($limit) > 1) {
                 $limitStr .= ' LIMIT ' . $limit[1] . ' OFFSET ' . $limit[0] . ' ';
             } else {
@@ -100,5 +101,4 @@ class Pgsql extends Builder
     {
         return 'RANDOM()';
     }
-
 }

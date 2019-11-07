@@ -4,6 +4,7 @@
         {$group_title|default='邮费规则分组'} <span class="color-desc font-s12"> RuleGroup</span>
     </legend>
 
+    <!--is_default=0 非默认规则,可删除-->
     {empty name='is_default'}
     <a onclick="delRuleItem(this)" class="layui-btn layui-btn-xs layui-btn-danger text-center layui-icon layui-icon-close" data-tips-text="移除规则" style="position:absolute;top:15px;right:5px;padding:0 5px"></a>
     {/empty}
@@ -36,6 +37,7 @@
     </div>
 
     <div class="layui-form-item">
+        <!--is_default=1 默认规则-->
         {notempty name='is_default'}
         <input type="hidden" name="is_default_{$index}" value="1">
         <input type="hidden" name="rule_{$index}[]" value="{$group_title|default='邮费规则分组'}">

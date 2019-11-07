@@ -1,4 +1,5 @@
 <?php
+
 // +----------------------------------------------------------------------
 // | ThinkPHP [ WE CAN DO IT JUST THINK ]
 // +----------------------------------------------------------------------
@@ -100,6 +101,7 @@ trait ModelEvent
     public function withEvent($event)
     {
         $this->withEvent = $event;
+
         return $this;
     }
 

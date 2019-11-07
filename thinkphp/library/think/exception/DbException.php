@@ -1,4 +1,5 @@
 <?php
+
 // +----------------------------------------------------------------------
 // | ThinkPHP [ WE CAN DO IT JUST THINK ]
 // +----------------------------------------------------------------------
@@ -40,5 +41,4 @@ class DbException extends Exception
         unset($config['username'], $config['password']);
         $this->setData('Database Config', $config);
     }
-
 }

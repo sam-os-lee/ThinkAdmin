@@ -1,4 +1,5 @@
 <?php
+
 // +----------------------------------------------------------------------
 // | ThinkPHP [ WE CAN DO IT JUST THINK ]
 // +----------------------------------------------------------------------
@@ -60,7 +61,7 @@ class Middleware
      */
     public function add($middleware, $type = 'route')
     {
-        if (is_null($middleware)) {
+        if (null === $middleware) {
             return;
         }
 
@@ -89,7 +90,7 @@ class Middleware
      */
     public function unshift($middleware, $type = 'route')
     {
-        if (is_null($middleware)) {
+        if (null === $middleware) {
             return;
         }
 
@@ -172,7 +173,6 @@ class Middleware
     protected function resolve($type = 'route')
     {
         return function (Request $request) use ($type) {
-
             $middleware = array_shift($this->queue[$type]);
 
             if (null === $middleware) {

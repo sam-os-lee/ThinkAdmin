@@ -1,4 +1,5 @@
 <?php
+
 // +----------------------------------------------------------------------
 // | ThinkPHP [ WE CAN DO IT JUST THINK ]
 // +----------------------------------------------------------------------
@@ -17,7 +18,7 @@ use think\facade\Config;
 
 class Controller extends Make
 {
-    protected $type = "Controller";
+    protected $type = 'Controller';
 
     protected function configure()
     {
@@ -52,5 +53,4 @@ class Controller extends Make
     {
         return parent::getNamespace($appNamespace, $module) . '\controller';
     }
-
 }

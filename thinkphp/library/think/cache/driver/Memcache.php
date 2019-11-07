@@ -1,4 +1,5 @@
 <?php
+
 // +----------------------------------------------------------------------
 // | ThinkPHP [ WE CAN DO IT JUST THINK ]
 // +----------------------------------------------------------------------
@@ -41,7 +42,7 @@ class Memcache extends Driver
             $this->options = array_merge($this->options, $options);
         }
 
-        $this->handler = new \Memcache;
+        $this->handler = new \Memcache();
 
         // 支持集群
         $hosts = explode(',', $this->options['host']);
@@ -101,7 +102,7 @@ class Memcache extends Driver
     {
         $this->writeTimes++;
 
-        if (is_null($expire)) {
+        if (null === $expire) {
             $expire = $this->options['expire'];
         }
 
@@ -115,6 +116,7 @@ class Memcache extends Driver
 
         if ($this->handler->set($key, $value, 0, $expire)) {
             isset($first) && $this->setTagItem($key);
+
             return true;
         }
 
@@ -195,6 +197,7 @@ class Memcache extends Driver
 
             $tagName = $this->getTagKey($tag);
             $this->rm($tagName);
+
             return true;
         }
 
@@ -202,5 +205,4 @@ class Memcache extends Driver
 
         return $this->handler->flush();
     }
-
 }

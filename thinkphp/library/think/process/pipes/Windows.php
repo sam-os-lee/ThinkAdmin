@@ -1,4 +1,5 @@
 <?php
+
 // +----------------------------------------------------------------------
 // | ThinkPHP [ WE CAN DO IT JUST THINK ]
 // +----------------------------------------------------------------------
@@ -15,7 +16,6 @@ use think\Process;
 
 class Windows extends Pipes
 {
-
     /** @var array */
     private $files = [];
     /** @var array */
@@ -33,13 +33,14 @@ class Windows extends Pipes
         $this->disableOutput = (bool) $disableOutput;
 
         if (!$this->disableOutput) {
-
             $this->files = [
                 Process::STDOUT => tempnam(sys_get_temp_dir(), 'sf_proc_stdout'),
                 Process::STDERR => tempnam(sys_get_temp_dir(), 'sf_proc_stderr'),
             ];
+
             foreach ($this->files as $offset => $file) {
-                $this->fileHandles[$offset] = fopen($this->files[$offset], 'rb');
+                $this->fileHandles[$offset] = fopen($this->files[$offset], 'r');
+
                 if (false === $this->fileHandles[$offset]) {
                     throw new \RuntimeException('A temporary file could not be opened to write the process output to, verify that your TEMP environment variable is writable');
                 }
@@ -98,17 +99,20 @@ class Windows extends Pipes
 
         $read = [];
         $fh   = $this->fileHandles;
+
         foreach ($fh as $type => $fileHandle) {
             if (0 !== fseek($fileHandle, $this->readBytes[$type])) {
                 continue;
             }
             $data     = '';
             $dataread = null;
+
             while (!feof($fileHandle)) {
                 if (false !== $dataread = fread($fileHandle, self::CHUNK_SIZE)) {
                     $data .= $dataread;
                 }
             }
+
             if (0 < $length = strlen($data)) {
                 $this->readBytes[$type] += $length;
                 $read[$type] = $data;
@@ -137,6 +141,7 @@ class Windows extends Pipes
     public function close()
     {
         parent::close();
+
         foreach ($this->fileHandles as $handle) {
             fclose($handle);
         }
@@ -198,6 +203,7 @@ class Windows extends Pipes
 
         if (null !== $r && 0 < count($r)) {
             $data = '';
+
             while ($dataread = fread($r['input'], self::CHUNK_SIZE)) {
                 $data .= $dataread;
             }
@@ -212,6 +218,7 @@ class Windows extends Pipes
         if (null !== $w && 0 < count($w)) {
             while (strlen($this->inputBuffer)) {
                 $written = fwrite($w[0], $this->inputBuffer, 2 << 18);
+
                 if ($written > 0) {
                     $this->inputBuffer = (string) substr($this->inputBuffer, $written);
                 } else {

@@ -70,6 +70,11 @@
     <!-- 顶部菜单 结束 -->
 
     <!-- 左则菜单 开始 -->
+    <!--
+        .layui-layout.layui-layout-left-hide > .layui-side {
+            display: none;
+        }
+    -->
     <div class="layui-side layui-bg-black notselect">
         <div class="layui-side-scroll">
 
@@ -78,6 +83,7 @@
             <ul class="layui-nav layui-nav-tree layui-hide" data-menu-layout="m-{$oneMenu.id}">
                 {foreach $oneMenu.sub as $twoMenu}
                 {empty name='twoMenu.sub'}
+                {// 二级节点没有子节点,则data-menu-node="m-顶级节点-二级节点"}
                 <li class="layui-nav-item">
                     <a data-target-tips="{$twoMenu.title}" data-menu-node="m-{$oneMenu.id}-{$twoMenu.id}" data-open="{$twoMenu.url}">
                         <span class='{$twoMenu.icon|default="layui-icon layui-icon-link"}'></span>
@@ -85,6 +91,7 @@
                     </a>
                 </li>
                 {else}
+                {// 二级节点具有子节点,则data-submenu-layout="m-顶级节点-二级节点"}
                 <li class="layui-nav-item" data-submenu-layout='m-{$oneMenu.id}-{$twoMenu.id}'>
                     <a data-target-tips="{$twoMenu.title}" style="background:#393D49">
                         <span class='nav-icon layui-hide {$twoMenu.icon|default="layui-icon layui-icon-triangle-d"}'></span>
@@ -93,6 +100,7 @@
                     <dl class="layui-nav-child">
                         {foreach $twoMenu.sub as $thrMenu}
                         <dd>
+                            {// 三级节点,则data-menu-node="m-顶级节点-二级节点-三级节点"}
                             <a data-target-tips="{$thrMenu.title}" data-open="{$thrMenu.url}" data-menu-node="m-{$oneMenu.id}-{$twoMenu.id}-{$thrMenu.id}">
                                 <span class='nav-icon padding-left-5 {$thrMenu.icon|default="layui-icon layui-icon-link"}'></span>
                                 <span class="nav-text padding-left-5">{$thrMenu.title}</span>

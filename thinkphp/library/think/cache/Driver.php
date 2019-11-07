@@ -1,4 +1,5 @@
 <?php
+
 // +----------------------------------------------------------------------
 // | ThinkPHP [ WE CAN DO IT JUST THINK ]
 // +----------------------------------------------------------------------
@@ -153,9 +154,8 @@ abstract class Driver
 
         if ($result) {
             $this->rm($name);
+
             return $result;
-        } else {
-            return;
         }
     }
 
@@ -171,6 +171,7 @@ abstract class Driver
     {
         if (!$this->has($name)) {
             $time = time();
+
             while ($time + 5 > time() && $this->has($name . '_lock')) {
                 // 存在锁定则等待
                 usleep(200000);
@@ -192,9 +193,11 @@ abstract class Driver
                 $this->rm($name . '_lock');
             } catch (\Exception $e) {
                 $this->rm($name . '_lock');
+
                 throw $e;
             } catch (\throwable $e) {
                 $this->rm($name . '_lock');
+
                 throw $e;
             }
         } else {
@@ -214,9 +217,8 @@ abstract class Driver
      */
     public function tag($name, $keys = null, $overlay = false)
     {
-        if (is_null($name)) {
-
-        } elseif (is_null($keys)) {
+        if (null === $name) {
+        } elseif (null === $keys) {
             $this->tag = $name;
         } else {
             $key = $this->getTagkey($name);
@@ -281,9 +283,9 @@ abstract class Driver
 
         if ($value) {
             return array_filter(explode(',', $value));
-        } else {
-            return [];
         }
+
+        return [];
     }
 
     protected function getTagKey($tag)
@@ -320,9 +322,9 @@ abstract class Driver
             $unserialize = self::$serialize[1];
 
             return $unserialize(substr($data, self::$serialize[3]));
-        } else {
-            return $data;
         }
+
+        return $data;
     }
 
     /**

@@ -44,7 +44,8 @@ class ExpressCompany extends Controller
     public function index()
     {
         $this->title = '快递公司管理';
-        $query = $this->_query($this->table)->equal('status')->like('express_title,express_code');
+        $query       = $this->_query($this->table)->equal('status')->like('express_title,express_code');
+        // 注意:分页管理器
         $query->dateBetween('create_at')->order('status desc,sort desc,id desc')->where(['is_deleted' => '0'])->page();
     }
 
@@ -54,6 +55,7 @@ class ExpressCompany extends Controller
      */
     public function add()
     {
+        // 注意:form逻辑器
         $this->_form($this->table, 'form');
     }
 
@@ -63,6 +65,7 @@ class ExpressCompany extends Controller
      */
     public function edit()
     {
+        // 注意:form逻辑器
         $this->_form($this->table, 'form');
     }
 
@@ -74,8 +77,15 @@ class ExpressCompany extends Controller
     protected function _form_filter(array $data)
     {
         if ($this->request->isPost()) {
-            $where = [['express_code', 'eq', $data['express_code']], ['is_deleted', 'eq', '0']];
-            if (!empty($data['id'])) $where[] = ['id ', 'neq', $data['id']];
+            $where = [
+                ['express_code', 'eq', $data['express_code']],
+                ['is_deleted', 'eq', '0']
+            ];
+
+            if (!empty($data['id'])) {
+                $where[] = ['id ', 'neq', $data['id']];
+            }
+
             if (Db::name($this->table)->where($where)->count() > 0) {
                 $this->error('该快递编码已经存在，请使用其它编码！');
             }
@@ -88,6 +98,7 @@ class ExpressCompany extends Controller
      */
     public function forbid()
     {
+        // 注意:更新逻辑器
         $this->_save($this->table, ['status' => '0']);
     }
 
@@ -97,6 +108,7 @@ class ExpressCompany extends Controller
      */
     public function resume()
     {
+        // 注意:更新逻辑器
         $this->_save($this->table, ['status' => '1']);
     }
 
@@ -106,7 +118,7 @@ class ExpressCompany extends Controller
      */
     public function remove()
     {
+        // 注意:删除逻辑器
         $this->_delete($this->table);
     }
-
 }

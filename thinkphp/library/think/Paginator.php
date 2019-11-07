@@ -1,4 +1,5 @@
 <?php
+
 // +----------------------------------------------------------------------
 // | ThinkPHP [ WE CAN DO IT JUST THINK ]
 // +----------------------------------------------------------------------
@@ -149,6 +150,7 @@ abstract class Paginator implements ArrayAccess, Countable, IteratorAggregate, J
         }
 
         $url = $path;
+
         if (!empty($parameters)) {
             $url .= '?' . http_build_query($parameters, null, '&');
         }
@@ -441,5 +443,4 @@ abstract class Paginator implements ArrayAccess, Countable, IteratorAggregate, J
 
         return $result;
     }
-
 }

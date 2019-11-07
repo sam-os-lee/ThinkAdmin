@@ -1,4 +1,5 @@
 <?php
+
 // +----------------------------------------------------------------------
 // | ThinkPHP [ WE CAN DO IT JUST THINK ]
 // +----------------------------------------------------------------------
@@ -60,6 +61,7 @@ class Config implements \ArrayAccess
     {
         $path = $app->getConfigPath();
         $ext  = $app->getConfigExt();
+
         return new static($path, $ext);
     }
 
@@ -191,7 +193,7 @@ class Config implements \ArrayAccess
             $name = $this->prefix . '.' . $name;
         }
 
-        return !is_null($this->get($name));
+        return null !== $this->get($name);
     }
 
     /**
@@ -209,6 +211,7 @@ class Config implements \ArrayAccess
 
             if (Yaconf::has($yaconfName)) {
                 $config = Yaconf::get($yaconfName);
+
                 return isset($this->config[$name]) ? array_merge($this->config[$name], $config) : $config;
             }
         }

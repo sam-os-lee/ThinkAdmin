@@ -1,4 +1,5 @@
 <?php
+
 // +----------------------------------------------------------------------
 // | ThinkPHP [ WE CAN DO IT JUST THINK ]
 // +----------------------------------------------------------------------
@@ -22,10 +23,12 @@ Error::register();
 // 实现日志接口
 if (interface_exists('Psr\Log\LoggerInterface')) {
     interface LoggerInterface extends \Psr\Log\LoggerInterface
-    {}
+    {
+    }
 } else {
     interface LoggerInterface
-    {}
+    {
+    }
 }
 
 // 注册类库别名

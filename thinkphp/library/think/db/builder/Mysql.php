@@ -1,4 +1,5 @@
 <?php
+
 // +----------------------------------------------------------------------
 // | ThinkPHP [ WE CAN DO IT JUST THINK ]
 // +----------------------------------------------------------------------
@@ -72,6 +73,7 @@ class Mysql extends Builder
         }
 
         $fields = [];
+
         foreach ($insertFields as $field) {
             $fields[] = $this->parseKey($query, $field);
         }
@@ -85,7 +87,8 @@ class Mysql extends Builder
                 implode(' , ', $values),
                 $this->parseComment($query, $options['comment']),
             ],
-            $this->insertAllSql);
+            $this->insertAllSql
+        );
     }
 
     /**
@@ -174,5 +177,4 @@ class Mysql extends Builder
     {
         return 'rand()';
     }
-
 }

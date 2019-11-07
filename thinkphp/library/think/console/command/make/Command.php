@@ -1,4 +1,5 @@
 <?php
+
 // +----------------------------------------------------------------------
 // | ThinkPHP [ WE CAN DO IT JUST THINK ]
 // +----------------------------------------------------------------------
@@ -17,13 +18,13 @@ use think\facade\App;
 
 class Command extends Make
 {
-    protected $type = "Command";
+    protected $type = 'Command';
 
     protected function configure()
     {
         parent::configure();
         $this->setName('make:command')
-            ->addArgument('commandName', Argument::OPTIONAL, "The name of the command")
+            ->addArgument('commandName', Argument::OPTIONAL, 'The name of the command')
             ->setDescription('Create a new command class');
     }
 
@@ -52,5 +53,4 @@ class Command extends Make
     {
         return $appNamespace . '\\command';
     }
-
 }

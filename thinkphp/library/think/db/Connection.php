@@ -1,4 +1,5 @@
 <?php
+
 // +----------------------------------------------------------------------
 // | ThinkPHP [ WE CAN DO IT JUST THINK ]
 // +----------------------------------------------------------------------
@@ -167,7 +168,8 @@ abstract class Connection
      * @return void
      */
     protected function initialize()
-    {}
+    {
+    }
 
     /**
      * 取得数据库连接类实例
@@ -282,9 +284,11 @@ abstract class Connection
         switch ($this->attrCase) {
             case PDO::CASE_LOWER:
                 $info = array_change_key_case($info);
+
                 break;
             case PDO::CASE_UPPER:
                 $info = array_change_key_case($info, CASE_UPPER);
+
                 break;
             case PDO::CASE_NATURAL:
             default:
@@ -326,7 +330,7 @@ abstract class Connection
     public function parseSqlTable($sql)
     {
         if (false !== strpos($sql, '__')) {
-            $sql = preg_replace_callback("/__([A-Z0-9_-]+)__/sU", function ($match) {
+            $sql = preg_replace_callback('/__([A-Z0-9_-]+)__/sU', function ($match) {
                 return $this->getConfig('prefix') . strtolower($match[1]);
             }, $sql);
         }
@@ -350,9 +354,8 @@ abstract class Connection
         if (strpos($tableName, ',')) {
             // 多表不获取字段信息
             return false;
-        } else {
-            $tableName = $this->parseSqlTable($tableName);
         }
+        $tableName = $this->parseSqlTable($tableName);
 
         // 修正子查询作为表名的问题
         if (strpos($tableName, ')')) {
@@ -536,10 +539,11 @@ abstract class Connection
         } catch (\PDOException $e) {
             if ($autoConnection) {
                 $this->log($e->getMessage(), 'error');
+
                 return $this->connect($autoConnection, $linkNum);
-            } else {
-                throw $e;
             }
+
+            throw $e;
         }
     }
 
@@ -726,6 +730,7 @@ abstract class Connection
         $this->bind = $bind;
 
         Db::$executeTimes++;
+
         try {
             // 调试开始
             $this->debug(true);
@@ -971,6 +976,7 @@ abstract class Connection
 
             if ($lastInsId) {
                 $pk = $query->getPk($options);
+
                 if (is_string($pk)) {
                     $data[$pk] = $lastInsId;
                 }
@@ -1030,9 +1036,11 @@ abstract class Connection
                 $this->commit();
             } catch (\Exception $e) {
                 $this->rollback();
+
                 throw $e;
             } catch (\Throwable $e) {
                 $this->rollback();
+
                 throw $e;
             }
 
@@ -1099,6 +1107,7 @@ abstract class Connection
             // 如果存在主键数据 则自动作为更新条件
             if (is_string($pk) && isset($data[$pk])) {
                 $where[$pk] = [$pk, '=', $data[$pk]];
+
                 if (!isset($key)) {
                     $key = $this->getCacheKey($query, $data[$pk]);
                 }
@@ -1119,10 +1128,9 @@ abstract class Connection
             if (!isset($where)) {
                 // 如果没有任何更新条件则不执行
                 throw new Exception('miss update condition');
-            } else {
-                $options['where']['AND'] = $where;
-                $query->setOption('where', ['AND' => $where]);
             }
+            $options['where']['AND'] = $where;
+            $query->setOption('where', ['AND' => $where]);
         } elseif (!isset($key) && is_string($pk) && isset($options['where']['AND'])) {
             foreach ($options['where']['AND'] as $val) {
                 if (is_array($val) && $val[0] == $pk) {
@@ -1188,7 +1196,7 @@ abstract class Connection
 
         if (isset($options['cache']) && is_string($options['cache']['key'])) {
             $key = $options['cache']['key'];
-        } elseif (!is_null($data) && true !== $data && !is_array($data)) {
+        } elseif (null !== $data && true !== $data && !is_array($data)) {
             $key = $this->getCacheKey($query, $data);
         } elseif (is_string($pk) && isset($options['where']['AND'])) {
             foreach ($options['where']['AND'] as $val) {
@@ -1343,7 +1351,7 @@ abstract class Connection
             $query->removeOption('field');
         }
 
-        if (is_null($field)) {
+        if (null === $field) {
             $field = ['*'];
         } elseif (is_string($field)) {
             $field = array_map('trim', explode(',', $field));
@@ -1418,7 +1426,7 @@ abstract class Connection
             }
         }
 
-        if (isset($cache) && isset($guid)) {
+        if (isset($cache, $guid)) {
             // 缓存数据
             $this->cacheData($guid, $result, $cache);
         }
@@ -1592,6 +1600,7 @@ abstract class Connection
 
         do {
             $result = $this->getResult();
+
             if ($result) {
                 $item[] = $result;
             }
@@ -1617,17 +1626,21 @@ abstract class Connection
 
         try {
             $result = null;
+
             if (is_callable($callback)) {
                 $result = call_user_func_array($callback, [$this]);
             }
 
             $this->commit();
+
             return $result;
         } catch (\Exception $e) {
             $this->rollback();
+
             throw $e;
         } catch (\Throwable $e) {
             $this->rollback();
+
             throw $e;
         }
     }
@@ -1639,7 +1652,8 @@ abstract class Connection
      * @return void
      */
     public function startTransXa($xid)
-    {}
+    {
+    }
 
     /**
      * 预编译XA事务
@@ -1648,7 +1662,8 @@ abstract class Connection
      * @return void
      */
     public function prepareXa($xid)
-    {}
+    {
+    }
 
     /**
      * 提交XA事务
@@ -1657,7 +1672,8 @@ abstract class Connection
      * @return void
      */
     public function commitXa($xid)
-    {}
+    {
+    }
 
     /**
      * 回滚XA事务
@@ -1666,7 +1682,8 @@ abstract class Connection
      * @return void
      */
     public function rollbackXa($xid)
-    {}
+    {
+    }
 
     /**
      * 启动事务
@@ -1678,6 +1695,7 @@ abstract class Connection
     public function startTrans()
     {
         $this->initConnect(true);
+
         if (!$this->linkID) {
             return false;
         }
@@ -1695,8 +1713,10 @@ abstract class Connection
         } catch (\Exception $e) {
             if ($this->isBreak($e)) {
                 --$this->transTimes;
+
                 return $this->close()->startTrans();
             }
+
             throw $e;
         }
     }
@@ -1795,6 +1815,7 @@ abstract class Connection
             $this->commit();
         } catch (\Exception $e) {
             $this->rollback();
+
             throw $e;
         }
 
@@ -1859,6 +1880,7 @@ abstract class Connection
                 return true;
             }
         }
+
         return false;
     }
 
@@ -2047,8 +2069,7 @@ abstract class Connection
 
         if ($this->config['rw_separate']) {
             // 主从式采用读写分离
-            if ($master) // 主服务器写入
-            {
+            if ($master) { // 主服务器写入
                 $r = $m;
             } elseif (is_numeric($this->config['slave_no'])) {
                 // 指定服务器读
@@ -2065,6 +2086,7 @@ abstract class Connection
 
         if ($m != $r) {
             $dbMaster = [];
+
             foreach (['username', 'password', 'hostname', 'hostport', 'database', 'dsn', 'charset'] as $name) {
                 $dbMaster[$name] = isset($_config[$name][$m]) ? $_config[$name][$m] : $_config[$name][0];
             }
@@ -2150,5 +2172,4 @@ abstract class Connection
             throw new Exception('closure not support cache(true)');
         }
     }
-
 }

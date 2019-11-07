@@ -1,4 +1,5 @@
 <?php
+
 // +----------------------------------------------------------------------
 // | ThinkPHP [ WE CAN DO IT JUST THINK ]
 // +----------------------------------------------------------------------
@@ -26,7 +27,8 @@ class Url extends Dispatch
     }
 
     public function exec()
-    {}
+    {
+    }
 
     /**
      * 解析URL地址
@@ -46,6 +48,7 @@ class Url extends Dispatch
         }
 
         list($path, $var) = $this->rule->parseUrlPath($url);
+
         if (empty($path)) {
             return [null, null, null];
         }
@@ -148,12 +151,13 @@ class Url extends Dispatch
             $item[] = $val;
             $file   = $dir . '/' . str_replace('.', '/', $val) . $suffix . '.php';
             $file   = pathinfo($file, PATHINFO_DIRNAME) . '/' . Loader::parseName(pathinfo($file, PATHINFO_FILENAME), 1) . '.php';
+
             if (is_file($file)) {
                 $find = true;
+
                 break;
-            } else {
-                $dir .= '/' . Loader::parseName($val);
             }
+            $dir .= '/' . Loader::parseName($val);
         }
 
         if ($find) {
@@ -165,5 +169,4 @@ class Url extends Dispatch
 
         return $controller;
     }
-
 }

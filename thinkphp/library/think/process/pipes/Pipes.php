@@ -1,4 +1,5 @@
 <?php
+
 // +----------------------------------------------------------------------
 // | ThinkPHP [ WE CAN DO IT JUST THINK ]
 // +----------------------------------------------------------------------
@@ -13,7 +14,6 @@ namespace think\process\pipes;
 
 abstract class Pipes
 {
-
     /** @var array */
     public $pipes = [];
 
@@ -84,6 +84,7 @@ abstract class Pipes
         foreach ($this->pipes as $pipe) {
             stream_set_blocking($pipe, 0);
         }
+
         if (null !== $this->input) {
             stream_set_blocking($this->input, 0);
         }

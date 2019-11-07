@@ -1,4 +1,5 @@
 <?php
+
 // +----------------------------------------------------------------------
 // | ThinkPHP [ WE CAN DO IT JUST THINK ]
 // +----------------------------------------------------------------------
@@ -83,6 +84,7 @@ class Php
             ->log('[ VIEW ] ' . $template . ' [ ' . var_export(array_keys($data), true) . ' ]');
 
         extract($data, EXTR_OVERWRITE);
+
         include $this->template;
     }
 
@@ -169,7 +171,7 @@ class Php
     {
         if (is_array($name)) {
             $this->config = array_merge($this->config, $name);
-        } elseif (is_null($value)) {
+        } elseif (null === $value) {
             return isset($this->config[$name]) ? $this->config[$name] : null;
         } else {
             $this->config[$name] = $value;

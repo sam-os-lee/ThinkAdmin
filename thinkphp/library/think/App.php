@@ -1,4 +1,5 @@
 <?php
+
 // +----------------------------------------------------------------------
 // | ThinkPHP [ WE CAN DO IT JUST THINK ]
 // +----------------------------------------------------------------------
@@ -139,6 +140,7 @@ class App extends Container
     public function bind($bind)
     {
         $this->bindModule = $bind;
+
         return $this;
     }
 
@@ -225,6 +227,7 @@ class App extends Container
                 $output = ob_get_clean();
             }
             ob_start();
+
             if (!empty($output)) {
                 echo $output;
             }
@@ -280,6 +283,7 @@ class App extends Container
             // 加载行为扩展文件
             if (is_file($path . 'tags.php')) {
                 $tags = include $path . 'tags.php';
+
                 if (is_array($tags)) {
                     $this->hook->import($tags);
                 }
@@ -298,6 +302,7 @@ class App extends Container
             // 加载中间件
             if (is_file($path . 'middleware.php')) {
                 $middleware = include $path . 'middleware.php';
+
                 if (is_array($middleware)) {
                     $this->middleware->import($middleware);
                 }
@@ -306,6 +311,7 @@ class App extends Container
             // 注册服务的容器对象实例
             if (is_file($path . 'provider.php')) {
                 $provider = include $path . 'provider.php';
+
                 if (is_array($provider)) {
                     $this->bindTo($provider);
                 }
@@ -387,6 +393,7 @@ class App extends Container
             } elseif ($this->config('app.auto_bind_module')) {
                 // 入口自动绑定
                 $name = pathinfo($this->request->baseFile(), PATHINFO_FILENAME);
+
                 if ($name && 'index' != $name && is_dir($this->appPath . $name)) {
                     $this->route->bind($name);
                 }
@@ -429,7 +436,7 @@ class App extends Container
         }
 
         $this->middleware->add(function (Request $request, $next) use ($dispatch, $data) {
-            return is_null($data) ? $dispatch->run() : $data;
+            return null === $data ? $dispatch->run() : $data;
         });
 
         $response = $this->middleware->dispatch($this->request);
@@ -496,11 +503,13 @@ class App extends Container
         if (strtotime($this->request->server('HTTP_IF_MODIFIED_SINCE')) + $expire > $this->request->server('REQUEST_TIME')) {
             // 读取缓存
             $response = Response::create()->code(304);
+
             throw new HttpResponseException($response);
         } elseif ($this->cache->has($key)) {
             list($content, $header) = $this->cache->get($key);
 
             $response = Response::create($content)->header($header);
+
             throw new HttpResponseException($response);
         }
     }
@@ -514,6 +523,7 @@ class App extends Container
     public function dispatch(Dispatch $dispatch)
     {
         $this->dispatch = $dispatch;
+
         return $this;
     }
 
@@ -549,11 +559,13 @@ class App extends Container
     {
         // 路由检测
         $files = scandir($this->routePath);
+
         foreach ($files as $file) {
             if (strpos($file, '.php')) {
                 $filename = $this->routePath . $file;
                 // 导入路由配置
                 $rules = include $filename;
+
                 if (is_array($rules)) {
                     $this->route->import($rules);
                 }
@@ -598,7 +610,7 @@ class App extends Container
         $path = $this->request->path();
 
         // 是否强制路由模式
-        $must = !is_null($this->routeMust) ? $this->routeMust : $this->route->config('url_route_must');
+        $must = null !== $this->routeMust ? $this->routeMust : $this->route->config('url_route_must');
 
         // 路由检测 返回一个Dispatch对象
         $dispatch = $this->route->check($path, $must);
@@ -627,6 +639,7 @@ class App extends Container
     public function routeMust($must = false)
     {
         $this->routeMust = $must;
+
         return $this;
     }
 
@@ -680,6 +693,7 @@ class App extends Container
             $object = $this->__get($class);
         } else {
             $class = str_replace('\\' . $module . '\\', '\\' . $common . '\\', $class);
+
             if (class_exists($class)) {
                 $object = $this->__get($class);
             } else {
@@ -745,7 +759,7 @@ class App extends Container
         $name = $name ?: $this->config('default_validate');
 
         if (empty($name)) {
-            return new Validate;
+            return new Validate();
         }
 
         return $this->create($name, $layer, $appendSuffix, $common);
@@ -869,7 +883,7 @@ class App extends Container
      */
     public function getAppPath()
     {
-        if (is_null($this->appPath)) {
+        if (null === $this->appPath) {
             $this->appPath = Loader::getRootPath() . 'application' . DIRECTORY_SEPARATOR;
         }
 
@@ -945,6 +959,7 @@ class App extends Container
     public function setNamespace($namespace)
     {
         $this->namespace = $namespace;
+
         return $this;
     }
 
@@ -977,5 +992,4 @@ class App extends Container
     {
         return $this->beginMem;
     }
-
 }

@@ -1,4 +1,5 @@
 <?php
+
 // +----------------------------------------------------------------------
 // | ThinkPHP [ WE CAN DO IT JUST THINK ]
 // +----------------------------------------------------------------------
@@ -79,7 +80,8 @@ class Controller
 
     // 初始化
     protected function initialize()
-    {}
+    {
+    }
 
     // 注册控制器中间件
     public function registerMiddleware()
@@ -102,9 +104,8 @@ class Controller
                     continue;
                 } elseif (isset($except) && in_array($this->request->action(), $except)) {
                     continue;
-                } else {
-                    $val = $key;
                 }
+                $val = $key;
             }
 
             $this->app['middleware']->controller($val);
@@ -249,6 +250,7 @@ class Controller
                 list($validate, $scene) = explode('.', $validate);
             }
             $v = $this->app->validate($validate);
+
             if (!empty($scene)) {
                 $v->scene($scene);
             }
@@ -271,6 +273,7 @@ class Controller
             if ($this->failException) {
                 throw new ValidateException($v->getError());
             }
+
             return $v->getError();
         }
 

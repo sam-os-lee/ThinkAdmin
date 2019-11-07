@@ -21,7 +21,9 @@
     "zoujingli/ip2region": "^1.0",
     "topthink/think-queue": "^2.0",
     "zoujingli/think-library": "5.1.*-dev",
-    "zoujingli/weopen-developer": "dev-master"
+    "zoujingli/weopen-developer": "dev-master",
+    "topthink/think-worker": "2.0.x-dev",
+    "workerman/workerman-for-win": "^3.5"
   },
   "repositories": {
     "packagist": {

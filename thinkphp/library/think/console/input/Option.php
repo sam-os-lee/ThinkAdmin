@@ -1,4 +1,5 @@
 <?php
+
 // +----------------------------------------------------------------------
 // | ThinkPHP [ WE CAN DO IT JUST THINK ]
 // +----------------------------------------------------------------------
@@ -13,7 +14,6 @@ namespace think\console\input;
 
 class Option
 {
-
     const VALUE_NONE     = 1;
     const VALUE_REQUIRED = 2;
     const VALUE_OPTIONAL = 4;
@@ -178,12 +178,12 @@ class Option
      * @param Option $option
      * @return bool
      */
-    public function equals(Option $option)
+    public function equals(self $option)
     {
-        return $option->getName() === $this->getName()
-        && $option->getShortcut() === $this->getShortcut()
-        && $option->getDefault() === $this->getDefault()
-        && $option->isArray() === $this->isArray()
+        return $option->getName()     === $this->getName()
+        && $option->getShortcut()     === $this->getShortcut()
+        && $option->getDefault()      === $this->getDefault()
+        && $option->isArray()         === $this->isArray()
         && $option->isValueRequired() === $this->isValueRequired()
         && $option->isValueOptional() === $this->isValueOptional();
     }

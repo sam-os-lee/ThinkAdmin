@@ -1,4 +1,5 @@
 <?php
+
 // +----------------------------------------------------------------------
 // | ThinkPHP [ WE CAN DO IT JUST THINK ]
 // +----------------------------------------------------------------------
@@ -130,6 +131,7 @@ class Loader
             }
 
             __include_file($file);
+
             return true;
         }
     }
@@ -151,6 +153,7 @@ class Loader
         $logicalPathPsr4 = strtr($class, '\\', DIRECTORY_SEPARATOR) . '.php';
 
         $first = $class[0];
+
         if (isset(self::$prefixLengthsPsr4[$first])) {
             foreach (self::$prefixLengthsPsr4[$first] as $prefix => $length) {
                 if (0 === strpos($class, $prefix)) {
@@ -244,6 +247,7 @@ class Loader
         }
 
         $first = $prefix[0];
+
         if (!isset(self::$prefixesPsr0[$first][$prefix])) {
             self::$prefixesPsr0[$first][$prefix] = (array) $paths;
 
@@ -282,8 +286,9 @@ class Loader
         } elseif (!isset(self::$prefixDirsPsr4[$prefix])) {
             // Register directories for a new namespace.
             $length = strlen($prefix);
+
             if ('\\' !== $prefix[$length - 1]) {
-                throw new \InvalidArgumentException("A non-empty PSR-4 prefix must end with a namespace separator.");
+                throw new \InvalidArgumentException('A non-empty PSR-4 prefix must end with a namespace separator.');
             }
 
             self::$prefixLengthsPsr4[$prefix[0]][$prefix] = $length;
@@ -324,6 +329,7 @@ class Loader
     {
         if (is_file($composerPath . 'autoload_namespaces.php')) {
             $map = require $composerPath . 'autoload_namespaces.php';
+
             foreach ($map as $namespace => $path) {
                 self::addPsr0($namespace, $path);
             }
@@ -331,6 +337,7 @@ class Loader
 
         if (is_file($composerPath . 'autoload_psr4.php')) {
             $map = require $composerPath . 'autoload_psr4.php';
+
             foreach ($map as $namespace => $path) {
                 self::addPsr4($namespace, $path);
             }
@@ -338,6 +345,7 @@ class Loader
 
         if (is_file($composerPath . 'autoload_classmap.php')) {
             $classMap = require $composerPath . 'autoload_classmap.php';
+
             if ($classMap) {
                 self::addClassMap($classMap);
             }
@@ -375,10 +383,11 @@ class Loader
             $name = preg_replace_callback('/_([a-zA-Z])/', function ($match) {
                 return strtoupper($match[1]);
             }, $name);
+
             return $ucfirst ? ucfirst($name) : lcfirst($name);
         }
 
-        return strtolower(trim(preg_replace("/[A-Z]/", "_\\0", $name), "_"));
+        return strtolower(trim(preg_replace('/[A-Z]/', '_\\0', $name), '_'));
     }
 
     /**
@@ -394,9 +403,9 @@ class Loader
 
         if (class_exists($class)) {
             return Container::getInstance()->invokeClass($class, $args);
-        } else {
-            throw new ClassNotFoundException('class not exists:' . $class, $class);
         }
+
+        throw new ClassNotFoundException('class not exists:' . $class, $class);
     }
 }
 

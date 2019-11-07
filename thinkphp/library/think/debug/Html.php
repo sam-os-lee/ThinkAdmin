@@ -1,4 +1,5 @@
 <?php
+
 // +----------------------------------------------------------------------
 // | ThinkPHP [ WE CAN DO IT JUST THINK IT ]
 // +----------------------------------------------------------------------
@@ -43,6 +44,7 @@ class Html
         $request     = Container::get('request');
         $contentType = $response->getHeader('Content-Type');
         $accept      = $request->header('accept');
+
         if (strpos($accept, 'application/json') === 0 || $request->isAjax()) {
             return false;
         } elseif (!empty($contentType) && strpos($contentType, 'html') === false) {
@@ -74,20 +76,25 @@ class Html
 
         // 页面Trace信息
         $trace = [];
+
         foreach ($this->config['tabs'] as $name => $title) {
             $name = strtolower($name);
+
             switch ($name) {
                 case 'base': // 基本信息
                     $trace[$title] = $base;
+
                     break;
                 case 'file': // 文件信息
                     $trace[$title] = $info;
+
                     break;
                 default: // 调试信息
                     if (strpos($name, '|')) {
                         // 多组信息
                         $names  = explode('|', $name);
                         $result = [];
+
                         foreach ($names as $name) {
                             $result = array_merge($result, isset($log[$name]) ? $log[$name] : []);
                         }
@@ -99,8 +106,9 @@ class Html
         }
         // 调用Trace页面模板
         ob_start();
+
         include $this->config['file'];
+
         return ob_get_clean();
     }
-
 }

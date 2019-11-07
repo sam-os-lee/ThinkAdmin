@@ -1,4 +1,5 @@
 <?php
+
 // +----------------------------------------------------------------------
 // | ThinkPHP [ WE CAN DO IT JUST THINK ]
 // +----------------------------------------------------------------------
@@ -88,10 +89,9 @@ class AliasRule extends Domain
         } elseif (0 === strpos($this->route, '@')) {
             // 路由到控制器类
             return $this->bindToController($request, $bind, substr($this->route, 1));
-        } else {
-            // 路由到模块/控制器
-            return $this->bindToModule($request, $bind, $this->route);
         }
+        // 路由到模块/控制器
+        return $this->bindToModule($request, $bind, $this->route);
     }
 
     /**
@@ -115,5 +115,4 @@ class AliasRule extends Domain
     {
         return $this->option('except', $action);
     }
-
 }

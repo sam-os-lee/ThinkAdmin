@@ -1,4 +1,5 @@
 <?php
+
 // +----------------------------------------------------------------------
 // | ThinkPHP [ WE CAN DO IT JUST THINK ]
 // +----------------------------------------------------------------------
@@ -121,7 +122,7 @@ class Output
 
     protected function block($style, $message)
     {
-        $this->writeln("<{$style}>{$message}</$style>");
+        $this->writeln("<{$style}>{$message}</${style}>");
     }
 
     /**
@@ -209,14 +210,14 @@ class Output
     {
         if (in_array($method, $this->styles)) {
             array_unshift($args, $method);
+
             return call_user_func_array([$this, 'block'], $args);
         }
 
         if ($this->handle && method_exists($this->handle, $method)) {
             return call_user_func_array([$this->handle, $method], $args);
-        } else {
-            throw new Exception('method not exists:' . __CLASS__ . '->' . $method);
         }
-    }
 
+        throw new Exception('method not exists:' . __CLASS__ . '->' . $method);
+    }
 }

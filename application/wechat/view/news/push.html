@@ -55,19 +55,23 @@
 <script>
     require(['jquery', 'template'], function () {
         var $allbtn = $('[data-check-all]').on('click', function () {
+
             var check_status = check_checked();
             $('input[name*=fans_tags]').map(function () {
                 this.checked = !check_status;
             });
+
             check_checked(), postpush();
         });
 
         /*重置和全选的效果处理*/
         function check_checked() {
+
             var allcheck = true;
             $('input[name*=fans_tags]').map(function () {
                 (!this.checked) && (allcheck = false);
             });
+
             return ((allcheck) ? $allbtn.html('重置') : $allbtn.html('全选')), allcheck;
         }
 
@@ -79,13 +83,16 @@
 
         /*数据异步获取并显示出来*/
         function postpush() {
+
             var inp = $('input[name*=fans_tags]');
             var group = [];
+
             for (var i = 0; i < inp.length; i++) {
                 if (inp[i].checked === true) {
                     group.push(inp[i].value);
                 }
             }
+
             $.post("{:url('wechat/news/push')}?action=getuser", {group: group.join(',')}, function (ret) {
                 var html = template('push', ret);
                 document.getElementById('push-tags').innerHTML = html;

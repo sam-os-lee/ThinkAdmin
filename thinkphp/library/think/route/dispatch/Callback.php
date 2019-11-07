@@ -1,4 +1,5 @@
 <?php
+
 // +----------------------------------------------------------------------
 // | ThinkPHP [ WE CAN DO IT JUST THINK ]
 // +----------------------------------------------------------------------
@@ -22,5 +23,4 @@ class Callback extends Dispatch
 
         return $this->app->invoke($this->dispatch, $vars);
     }
-
 }

@@ -1,4 +1,5 @@
 <?php
+
 // +----------------------------------------------------------------------
 // | ThinkPHP [ WE CAN DO IT JUST THINK ]
 // +----------------------------------------------------------------------
@@ -51,6 +52,7 @@ class Hook
     public function portal($name)
     {
         self::$portal = $name;
+
         return $this;
     }
 
@@ -148,7 +150,7 @@ class Hook
         foreach ($tags as $key => $name) {
             $results[$key] = $this->execTag($name, $tag, $params);
 
-            if (false === $results[$key] || (!is_null($results[$key]) && $once)) {
+            if (false === $results[$key] || (null !== $results[$key] && $once)) {
                 break;
             }
         }

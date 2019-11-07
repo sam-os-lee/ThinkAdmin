@@ -1,4 +1,5 @@
 <?php
+
 // +----------------------------------------------------------------------
 // | ThinkPHP [ WE CAN DO IT JUST THINK ]
 // +----------------------------------------------------------------------
@@ -84,6 +85,7 @@ trait TimeStamp
             if ($this->createTime && !isset($this->data[$this->createTime])) {
                 $this->data[$this->createTime] = $this->autoWriteTimestamp($this->createTime);
             }
+
             if ($this->updateTime && !isset($this->data[$this->updateTime])) {
                 $this->data[$this->updateTime] = $this->autoWriteTimestamp($this->updateTime);
             }

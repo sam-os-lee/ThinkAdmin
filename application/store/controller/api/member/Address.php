@@ -25,7 +25,6 @@ use think\Db;
  */
 class Address extends Member
 {
-
     /**
      * 获取会员收货地址信息
      * @throws \think\db\exception\DataNotFoundException
@@ -75,12 +74,15 @@ class Address extends Member
             'area.require'     => '收货地址区域不能为空！',
             'address.require'  => '收货详情地址不能为空！',
         ]);
+
         if (!empty($data['is_default'])) {
             Db::name('StoreMemberAddress')->where(['mid' => $this->member['id']])->setField('is_default', '0');
         }
+
         if ($this->request->has('id', 'post', true)) {
             $data['id'] = $this->request->post('id');
         }
+
         if (data_save('StoreMemberAddress', $data, 'id')) {
             $this->success('收货地址更新成功！');
         }
@@ -95,8 +97,12 @@ class Address extends Member
     public function del()
     {
         $id = $this->request->post('address_id');
-        if (empty($id)) $this->error('待处理的收货地址ID不能为空！');
+
+        if (empty($id)) {
+            $this->error('待处理的收货地址ID不能为空！');
+        }
         $where = ['id' => $id, 'mid' => $this->member['id']];
+
         if (Db::name('StoreMemberAddress')->where($where)->delete() !== false) {
             $this->success('删除收货地址成功！');
         }
@@ -114,15 +120,21 @@ class Address extends Member
     public function setDefault()
     {
         $id = $this->request->post('address_id');
-        if (empty($id)) $this->error('待处理的收货地址ID不存在！');
-        $where = ['id' => $id, 'mid' => $this->member['id']];
+
+        if (empty($id)) {
+            $this->error('待处理的收货地址ID不存在！');
+        }
+        $where   = ['id' => $id, 'mid' => $this->member['id']];
         $address = Db::name('StoreMemberAddress')->where($where)->find();
-        if (empty($address)) $this->error('待处理的收货地址获取失败，请稍候再试！');
+
+        if (empty($address)) {
+            $this->error('待处理的收货地址获取失败，请稍候再试！');
+        }
         Db::name('StoreMemberAddress')->where(['mid' => $this->member['id']])->update(['is_default' => '0']);
+
         if (Db::name('StoreMemberAddress')->where($where)->update(['is_default' => '1']) !== false) {
             $this->success('设置默认收货地址成功！');
         }
         $this->error('设置默认收货地址失败！');
     }
-
 }

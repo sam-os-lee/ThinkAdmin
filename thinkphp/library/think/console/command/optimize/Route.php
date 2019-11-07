@@ -1,4 +1,5 @@
 <?php
+
 // +----------------------------------------------------------------------
 // | ThinkPHP [ WE CAN DO IT JUST THINK IT ]
 // +----------------------------------------------------------------------
@@ -26,6 +27,7 @@ class Route extends Command
     protected function execute(Input $input, Output $output)
     {
         $filename = Container::get('app')->getRuntimePath() . 'route.php';
+
         if (is_file($filename)) {
             unlink($filename);
         }
@@ -47,6 +49,7 @@ class Route extends Command
                 $filename = $path . DIRECTORY_SEPARATOR . $file;
                 // 导入路由配置
                 $rules = include $filename;
+
                 if (is_array($rules)) {
                     Container::get('route')->import($rules);
                 }
@@ -55,12 +58,13 @@ class Route extends Command
 
         if (Container::get('config')->get('route_annotation')) {
             $suffix = Container::get('config')->get('controller_suffix') || Container::get('config')->get('class_suffix');
+
             include Container::get('build')->buildRoute($suffix);
         }
 
         $content = '<?php ' . PHP_EOL . 'return ';
         $content .= var_export(Container::get('route')->getName(), true) . ';';
+
         return $content;
     }
-
 }

@@ -45,7 +45,8 @@ class Goods extends Controller
     public function index()
     {
         $this->title = '商品信息管理';
-        $query = $this->_query($this->table)->equal('status,cate_id')->like('title');
+        $query       = $this->_query($this->table)->equal('status,cate_id')->like('title');
+        // 注意:分页管理器
         $query->where(['is_deleted' => '0'])->order('sort desc,id desc')->page();
     }
 
@@ -59,11 +60,22 @@ class Goods extends Controller
     protected function _index_page_filter(&$data)
     {
         $this->clist = Db::name('StoreGoodsCate')->where(['is_deleted' => '0', 'status' => '1'])->select();
-        $list = Db::name('StoreGoodsList')->where('status', '1')->whereIn('goods_id', array_unique(array_column($data, 'id')))->select();
+        $list        = Db::name('StoreGoodsList')->where('status', '1')->whereIn('goods_id', array_unique(array_column($data, 'id')))->select();
+
         foreach ($data as &$vo) {
             list($vo['list'], $vo['cate']) = [[], []];
-            foreach ($list as $goods) if ($goods['goods_id'] === $vo['id']) array_push($vo['list'], $goods);
-            foreach ($this->clist as $cate) if ($cate['id'] === $vo['cate_id']) $vo['cate'] = $cate;
+
+            foreach ($list as $goods) {
+                if ($goods['goods_id'] === $vo['id']) {
+                    array_push($vo['list'], $goods);
+                }
+            }
+
+            foreach ($this->clist as $cate) {
+                if ($cate['id'] === $vo['cate_id']) {
+                    $vo['cate'] = $cate;
+                }
+            }
         }
     }
 
@@ -79,25 +91,38 @@ class Goods extends Controller
     public function stock()
     {
         if ($this->request->isGet()) {
+
             $GoodsId = $this->request->get('id');
-            $goods = Db::name('StoreGoods')->where(['id' => $GoodsId])->find();
+            $goods   = Db::name('StoreGoods')->where(['id' => $GoodsId])->find();
+
             empty($goods) && $this->error('无效的商品信息，请稍候再试！');
             $goods['list'] = Db::name('StoreGoodsList')->where(['goods_id' => $GoodsId])->select();
+
             $this->fetch('', ['vo' => $goods]);
         } else {
+
             list($post, $data) = [$this->request->post(), []];
-            if (isset($post['id']) && isset($post['goods_id']) && is_array($post['goods_id'])) {
-                foreach (array_keys($post['goods_id']) as $key) if ($post['goods_number'][$key] > 0) array_push($data, [
-                    'goods_id'     => $post['goods_id'][$key],
-                    'goods_spec'   => $post['goods_spec'][$key],
-                    'number_stock' => $post['goods_number'][$key],
-                ]);
+
+            if (isset($post['id'], $post['goods_id']) && is_array($post['goods_id'])) {
+
+                foreach (array_keys($post['goods_id']) as $key) {
+                    if ($post['goods_number'][$key] > 0) {
+                        array_push($data, [
+                            'goods_id'     => $post['goods_id'][$key],
+                            'goods_spec'   => $post['goods_spec'][$key],
+                            'number_stock' => $post['goods_number'][$key],
+                        ]);
+                    }
+                }
+
                 if (!empty($data)) {
+
                     Db::name('StoreGoodsStock')->insertAll($data);
                     \app\store\service\GoodsService::syncStock($post['id']);
                     $this->success('商品信息入库成功！');
                 }
             }
+
             $this->error('没有需要商品入库的数据！');
         }
     }
@@ -108,8 +133,9 @@ class Goods extends Controller
      */
     public function add()
     {
-        $this->title = '添加商品信息';
+        $this->title     = '添加商品信息';
         $this->isAddMode = '1';
+        // 注意:form逻辑器
         $this->_form($this->table, 'form');
     }
 
@@ -119,8 +145,9 @@ class Goods extends Controller
      */
     public function edit()
     {
-        $this->title = '编辑商品信息';
+        $this->title     = '编辑商品信息';
         $this->isAddMode = '0';
+        // 注意:form逻辑器
         $this->_form($this->table, 'form');
     }
 
@@ -136,23 +163,41 @@ class Goods extends Controller
     protected function _form_filter(&$data)
     {
         // 生成商品ID
-        if (empty($data['id'])) $data['id'] = Data::uniqidNumberCode(10);
+        if (empty($data['id'])) {
+            $data['id'] = Data::uniqidNumberCode(10);
+        }
+
         if ($this->request->isGet()) {
-            $fields = 'goods_spec,goods_id,status,price_market market,price_selling selling,number_virtual `virtual`,number_express express';
-            $defaultValues = Db::name('StoreGoodsList')->where(['goods_id' => $data['id']])->column($fields);
+            $fields             = 'goods_spec,goods_id,status,price_market market,price_selling selling,number_virtual `virtual`,number_express express';
+            $defaultValues       = Db::name('StoreGoodsList')->where(['goods_id' => $data['id']])->column($fields);
+
+            //
+            /**
+             * $this->var 赋值view变量
+             * 等同于assgin(,)
+             */
             $this->defaultValues = json_encode($defaultValues, JSON_UNESCAPED_UNICODE);
-            $this->cates = Db::name('StoreGoodsCate')->where(['is_deleted' => '0', 'status' => '1'])->order('sort desc,id desc')->select();
+            // 商品分类
+            $this->cates         = Db::name('StoreGoodsCate')->where([
+                'is_deleted' => '0',
+                'status' => '1'
+            ])->order('sort desc,id desc')
+                ->select();
         } elseif ($this->request->isPost()) {
-            Db::name('StoreGoodsList')->where(['goods_id' => $data['id']])->update(['status' => '0']);
-            foreach (json_decode($data['lists'], true) as $vo) Data::save('StoreGoodsList', [
-                'goods_id'       => $data['id'],
-                'goods_spec'     => $vo[0]['key'],
-                'price_market'   => $vo[0]['market'],
-                'price_selling'  => $vo[0]['selling'],
-                'number_virtual' => $vo[0]['virtual'],
-                'number_express' => $vo[0]['express'],
-                'status'         => $vo[0]['status'] ? 1 : 0,
-            ], 'goods_spec', ['goods_id' => $data['id']]);
+            Db::name('StoreGoodsList')->where(['goods_id' => $data['id']])
+                ->update(['status' => '0']);
+
+            foreach (json_decode($data['lists'], true) as $vo) {
+                Data::save('StoreGoodsList', [
+                    'goods_id'       => $data['id'],
+                    'goods_spec'     => $vo[0]['key'],
+                    'price_market'   => $vo[0]['market'],
+                    'price_selling'  => $vo[0]['selling'],
+                    'number_virtual' => $vo[0]['virtual'],
+                    'number_express' => $vo[0]['express'],
+                    'status'         => $vo[0]['status'] ? 1 : 0,
+                ], 'goods_spec', ['goods_id' => $data['id']]);
+            }
         }
     }
 
@@ -173,6 +218,7 @@ class Goods extends Controller
      */
     public function forbid()
     {
+        // 注意:更新逻辑器
         $this->_save($this->table, ['status' => '0']);
     }
 
@@ -182,6 +228,7 @@ class Goods extends Controller
      */
     public function resume()
     {
+        // 注意:更新逻辑器
         $this->_save($this->table, ['status' => '1']);
     }
 
@@ -191,7 +238,7 @@ class Goods extends Controller
      */
     public function remove()
     {
+        // 注意:删除逻辑器
         $this->_delete($this->table);
     }
-
 }

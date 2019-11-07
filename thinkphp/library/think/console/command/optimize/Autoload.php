@@ -1,4 +1,5 @@
 <?php
+
 // +----------------------------------------------------------------------
 // | ThinkPHP [ WE CAN DO IT JUST THINK IT ]
 // +----------------------------------------------------------------------
@@ -25,7 +26,6 @@ class Autoload extends Command
 
     protected function execute(Input $input, Output $output)
     {
-
         $classmapFile = <<<EOF
 <?php
 /**
@@ -45,8 +45,8 @@ EOF;
 
         krsort($namespacesToScan);
         $classMap = [];
-        foreach ($namespacesToScan as $namespace => $dir) {
 
+        foreach ($namespacesToScan as $namespace => $dir) {
             if (!is_dir($dir)) {
                 continue;
             }
@@ -56,11 +56,13 @@ EOF;
         }
 
         ksort($classMap);
+
         foreach ($classMap as $class => $code) {
             $classmapFile .= '    ' . var_export($class, true) . ' => ' . $code;
         }
         $classmapFile .= "];\n";
         $runtimePath = $app->getRuntimePath();
+
         if (!is_dir($runtimePath)) {
             @mkdir($runtimePath, 0755, true);
         }
@@ -73,7 +75,6 @@ EOF;
     protected function addClassMapCode($dir, $namespace, $classMap)
     {
         foreach ($this->createMap($dir, $namespace) as $class => $path) {
-
             $pathCode = $this->getPathCode($path) . ",\n";
 
             if (!isset($classMap[$class])) {
@@ -87,6 +88,7 @@ EOF;
                 );
             }
         }
+
         return $classMap;
     }
 
@@ -111,10 +113,10 @@ EOF;
         }
 
         if (false !== $path) {
-            $baseDir .= " . ";
+            $baseDir .= ' . ';
         }
 
-        return $baseDir . ((false !== $path) ? var_export($path, true) : "");
+        return $baseDir . ((false !== $path) ? var_export($path, true) : '');
     }
 
     protected function normalizePath($path)
@@ -135,6 +137,7 @@ EOF;
         }
 
         $up = false;
+
         foreach (explode('/', $path) as $chunk) {
             if ('..' === $chunk && ($absolute || $up)) {
                 array_pop($parts);
@@ -154,7 +157,6 @@ EOF;
             if (is_file($path)) {
                 $path = [new \SplFileInfo($path)];
             } elseif (is_dir($path)) {
-
                 $objects = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($path), \RecursiveIteratorIterator::SELF_FIRST);
 
                 $path = [];
@@ -209,6 +211,7 @@ EOF;
         $extraTypes = '|trait';
 
         $contents = @php_strip_whitespace($path);
+
         if (!$contents) {
             if (!file_exists($path)) {
                 $message = 'File at "%s" does not exist, check your classmap definitions';
@@ -220,9 +223,11 @@ EOF;
                 $message = 'File at "%s" could not be parsed as PHP, it may be binary or corrupted';
             }
             $error = error_get_last();
+
             if (isset($error['message'])) {
                 $message .= PHP_EOL . 'The following message may be helpful:' . PHP_EOL . $error['message'];
             }
+
             throw new \RuntimeException(sprintf($message, $path));
         }
 
@@ -237,6 +242,7 @@ EOF;
         // strip leading non-php code if needed
         if (substr($contents, 0, 2) !== '<?') {
             $contents = preg_replace('{^.+?<\?}s', '<?', $contents, 1, $replacements);
+
             if (0 === $replacements) {
                 return [];
             }
@@ -245,6 +251,7 @@ EOF;
         $contents = preg_replace('{\?>.+<\?}s', '?><?', $contents);
         // strip trailing non-php code if needed
         $pos = strrpos($contents, '?>');
+
         if (false !== $pos && false === strpos(substr($contents, $pos), '<?')) {
             $contents = substr($contents, 0, $pos);
         }
@@ -264,6 +271,7 @@ EOF;
                 $namespace = str_replace([' ', "\t", "\r", "\n"], '', $matches['nsname'][$i]) . '\\';
             } else {
                 $name = $matches['name'][$i];
+
                 if (':' === $name[0]) {
                     $name = 'xhp' . substr(str_replace(['-', ':'], ['_', '__'], $name), 1);
                 } elseif ('enum' === $matches['type'][$i]) {
@@ -275,5 +283,4 @@ EOF;
 
         return $classes;
     }
-
 }

@@ -1,4 +1,5 @@
 <?php
+
 // +----------------------------------------------------------------------
 // | ThinkPHP [ WE CAN DO IT JUST THINK ]
 // +----------------------------------------------------------------------
@@ -41,7 +42,7 @@ class MorphOne extends Relation
         $this->type      = $type;
         $this->morphKey  = $morphKey;
         $this->morphType = $morphType;
-        $this->query     = (new $model)->db();
+        $this->query     = (new $model())->db();
     }
 
     /**
@@ -212,6 +213,7 @@ class MorphOne extends Relation
     public function save($data)
     {
         $model = $this->make();
+
         return $model->save($data) ? $model : false;
     }
 
@@ -252,5 +254,4 @@ class MorphOne extends Relation
             $this->baseQuery = true;
         }
     }
-
 }

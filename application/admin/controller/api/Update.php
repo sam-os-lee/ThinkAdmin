@@ -47,6 +47,7 @@ class Update extends Controller
     public function read($encode)
     {
         $this->file = env('root_path') . decode($encode);
+
         if (file_exists($this->file)) {
             $this->success('读取文件成功！', [
                 'format'  => 'base64',
@@ -56,5 +57,4 @@ class Update extends Controller
             $this->error('获取文件内容失败！');
         }
     }
-
 }

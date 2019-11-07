@@ -1,4 +1,5 @@
 <?php
+
 // +----------------------------------------------------------------------
 // | ThinkPHP [ WE CAN DO IT JUST THINK ]
 // +----------------------------------------------------------------------
@@ -144,7 +145,7 @@ class Route
 
     public function config($name = null)
     {
-        if (is_null($name)) {
+        if (null === $name) {
             return $this->config;
         }
 
@@ -194,6 +195,7 @@ class Route
     public function lazy($lazy = true)
     {
         $this->lazy = $lazy;
+
         return $this;
     }
 
@@ -241,6 +243,7 @@ class Route
     public function autoSearchController($auto = true)
     {
         $this->autoSearchController = $auto;
+
         return $this;
     }
 
@@ -343,6 +346,7 @@ class Route
 
         if (is_array($name) && !empty($name)) {
             $root = $this->request->rootDomain();
+
             foreach ($name as $item) {
                 if (false === strpos($item, '.')) {
                     $item .= '.' . $root;
@@ -375,7 +379,7 @@ class Route
      */
     public function bind($bind, $domain = null)
     {
-        $domain = is_null($domain) ? $this->domain : $domain;
+        $domain = null === $domain ? $this->domain : $domain;
 
         $this->bind[$domain] = $bind;
 
@@ -390,7 +394,7 @@ class Route
      */
     public function getBind($domain = null)
     {
-        if (is_null($domain)) {
+        if (null === $domain) {
             $domain = $this->domain;
         } elseif (true === $domain) {
             return $this->bind;
@@ -406,7 +410,7 @@ class Route
 
         if (isset($this->bind[$domain])) {
             $result = $this->bind[$domain];
-        } elseif (isset($name) && isset($this->bind[$name])) {
+        } elseif (isset($name, $this->bind[$name])) {
             $result = $this->bind[$name];
         } elseif (!empty($subDomain) && isset($this->bind['*'])) {
             $result = $this->bind['*'];
@@ -438,7 +442,7 @@ class Route
      */
     public function getRule($rule, $domain = null)
     {
-        if (is_null($domain)) {
+        if (null === $domain) {
             $domain = $this->domain;
         }
 
@@ -465,6 +469,7 @@ class Route
     public function setName($name)
     {
         $this->app['rule_name']->import($name);
+
         return $this;
     }
 
@@ -770,7 +775,7 @@ class Route
      */
     public function getAlias($name = null)
     {
-        if (is_null($name)) {
+        if (null === $name) {
             return $this->alias;
         }
 
@@ -835,7 +840,7 @@ class Route
      */
     public function getRest($name = null)
     {
-        if (is_null($name)) {
+        if (null === $name) {
             return $this->rest;
         }
 

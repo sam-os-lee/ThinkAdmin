@@ -1,4 +1,5 @@
 <?php
+
 // +----------------------------------------------------------------------
 // | ThinkPHP [ WE CAN DO IT JUST THINK ]
 // +----------------------------------------------------------------------
@@ -90,7 +91,7 @@ class Cookie
     public function set($name, $value = '', $option = null)
     {
         // 参数设置(会覆盖黙认设置)
-        if (!is_null($option)) {
+        if (null !== $option) {
             if (is_numeric($option)) {
                 $option = ['expire' => $option];
             } elseif (is_string($option)) {
@@ -143,7 +144,7 @@ class Cookie
      */
     public function forever($name, $value = '', $option = null)
     {
-        if (is_null($option) || is_numeric($option)) {
+        if (null === $option || is_numeric($option)) {
             $option = [];
         }
 
@@ -161,7 +162,7 @@ class Cookie
      */
     public function has($name, $prefix = null)
     {
-        $prefix = !is_null($prefix) ? $prefix : $this->config['prefix'];
+        $prefix = null !== $prefix ? $prefix : $this->config['prefix'];
         $name   = $prefix . $name;
 
         return isset($_COOKIE[$name]);
@@ -176,12 +177,13 @@ class Cookie
      */
     public function get($name = '', $prefix = null)
     {
-        $prefix = !is_null($prefix) ? $prefix : $this->config['prefix'];
+        $prefix = null !== $prefix ? $prefix : $this->config['prefix'];
         $key    = $prefix . $name;
 
         if ('' == $name) {
             if ($prefix) {
                 $value = [];
+
                 foreach ($_COOKIE as $k => $val) {
                     if (0 === strpos($k, $prefix)) {
                         $value[$k] = $val;
@@ -215,7 +217,7 @@ class Cookie
     public function delete($name, $prefix = null)
     {
         $config = $this->config;
-        $prefix = !is_null($prefix) ? $prefix : $config['prefix'];
+        $prefix = null !== $prefix ? $prefix : $config['prefix'];
         $name   = $prefix . $name;
 
         if ($config['setcookie']) {
@@ -241,7 +243,7 @@ class Cookie
 
         // 要删除的cookie前缀，不指定则删除config设置的指定前缀
         $config = $this->config;
-        $prefix = !is_null($prefix) ? $prefix : $config['prefix'];
+        $prefix = null !== $prefix ? $prefix : $config['prefix'];
 
         if ($prefix) {
             // 如果前缀为空字符串将不作处理直接返回
@@ -254,8 +256,6 @@ class Cookie
                 }
             }
         }
-
-        return;
     }
 
     private function jsonFormatProtect(&$val, $key, $type = 'encode')
@@ -264,5 +264,4 @@ class Cookie
             $val = 'decode' == $type ? urldecode($val) : urlencode($val);
         }
     }
-
 }

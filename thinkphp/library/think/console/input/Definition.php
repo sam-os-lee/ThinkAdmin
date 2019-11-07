@@ -1,4 +1,5 @@
 <?php
+
 // +----------------------------------------------------------------------
 // | ThinkPHP [ WE CAN DO IT JUST THINK ]
 // +----------------------------------------------------------------------
@@ -13,7 +14,6 @@ namespace think\console\input;
 
 class Definition
 {
-
     /**
      * @var Argument[]
      */
@@ -47,6 +47,7 @@ class Definition
     {
         $arguments = [];
         $options   = [];
+
         foreach ($definition as $item) {
             if ($item instanceof Option) {
                 $options[] = $item;
@@ -182,6 +183,7 @@ class Definition
     public function getArgumentDefaults()
     {
         $values = [];
+
         foreach ($this->arguments as $argument) {
             $values[$argument->getName()] = $argument->getDefault();
         }
@@ -235,6 +237,7 @@ class Definition
         }
 
         $this->options[$option->getName()] = $option;
+
         if ($option->getShortcut()) {
             foreach (explode('|', $option->getShortcut()) as $shortcut) {
                 $this->shortcuts[$shortcut] = $option->getName();
@@ -306,6 +309,7 @@ class Definition
     public function getOptionDefaults()
     {
         $values = [];
+
         foreach ($this->options as $option) {
             $values[$option->getName()] = $option->getDefault();
         }
@@ -342,6 +346,7 @@ class Definition
         } elseif (!$short) {
             foreach ($this->getOptions() as $option) {
                 $value = '';
+
                 if ($option->acceptValue()) {
                     $value = sprintf(' %s%s%s', $option->isValueOptional() ? '[' : '', strtoupper($option->getName()), $option->isValueOptional() ? ']' : '');
                 }
@@ -357,6 +362,7 @@ class Definition
 
         foreach ($this->getArguments() as $argument) {
             $element = '<' . $argument->getName() . '>';
+
             if (!$argument->isRequired()) {
                 $element = '[' . $element . ']';
             } elseif ($argument->isArray()) {

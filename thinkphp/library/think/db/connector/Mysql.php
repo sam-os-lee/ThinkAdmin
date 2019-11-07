@@ -1,4 +1,5 @@
 <?php
+
 // +----------------------------------------------------------------------
 // | ThinkPHP [ WE CAN DO IT JUST THINK ]
 // +----------------------------------------------------------------------
@@ -20,7 +21,6 @@ use think\db\Query;
  */
 class Mysql extends Connection
 {
-
     protected $builder = '\\think\\db\\builder\\Mysql';
 
     /**
@@ -32,7 +32,7 @@ class Mysql extends Connection
     {
         // Point类型支持
         Query::extend('point', function ($query, $field, $value = null, $fun = 'GeomFromText', $type = 'POINT') {
-            if (!is_null($value)) {
+            if (null !== $value) {
                 $query->data($field, ['point', $value, $fun, $type]);
             } else {
                 if (is_string($field)) {
@@ -136,7 +136,7 @@ class Mysql extends Connection
      */
     protected function getExplain($sql)
     {
-        $pdo    = $this->linkID->query("EXPLAIN " . $sql);
+        $pdo    = $this->linkID->query('EXPLAIN ' . $sql);
         $result = $pdo->fetch(PDO::FETCH_ASSOC);
         $result = array_change_key_case($result);
 
@@ -163,11 +163,12 @@ class Mysql extends Connection
     public function startTransXa($xid)
     {
         $this->initConnect(true);
+
         if (!$this->linkID) {
             return false;
         }
 
-        $this->execute("XA START '$xid'");
+        $this->execute("XA START '${xid}'");
     }
 
     /**
@@ -179,8 +180,8 @@ class Mysql extends Connection
     public function prepareXa($xid)
     {
         $this->initConnect(true);
-        $this->execute("XA END '$xid'");
-        $this->execute("XA PREPARE '$xid'");
+        $this->execute("XA END '${xid}'");
+        $this->execute("XA PREPARE '${xid}'");
     }
 
     /**
@@ -192,7 +193,7 @@ class Mysql extends Connection
     public function commitXa($xid)
     {
         $this->initConnect(true);
-        $this->execute("XA COMMIT '$xid'");
+        $this->execute("XA COMMIT '${xid}'");
     }
 
     /**
@@ -204,6 +205,6 @@ class Mysql extends Connection
     public function rollbackXa($xid)
     {
         $this->initConnect(true);
-        $this->execute("XA ROLLBACK '$xid'");
+        $this->execute("XA ROLLBACK '${xid}'");
     }
 }

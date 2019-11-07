@@ -35,7 +35,7 @@ class Tools extends Controller
      */
     public function oauth()
     {
-        $this->url = $this->request->url(true);
+        $this->url  = $this->request->url(true);
         $this->fans = WechatService::getWebOauthInfo($this->url, 1);
         $this->fetch();
     }
@@ -50,6 +50,7 @@ class Tools extends Controller
     public function oauth_qrc()
     {
         $url = url('@wechat/api.tools/oauth', '', true, true);
+
         return $this->showQrc($url);
     }
 
@@ -76,6 +77,7 @@ class Tools extends Controller
     public function jssdk_qrc()
     {
         $this->url = url('@wechat/api.tools/jssdk', '', true, true);
+
         return $this->showQrc($this->url);
     }
 
@@ -87,7 +89,7 @@ class Tools extends Controller
      */
     public function scanOneQrc()
     {
-        $pay = WechatService::WePayOrder();
+        $pay    = WechatService::WePayOrder();
         $result = $pay->qrcParams('8888888');
         $this->showQrc($result);
     }
@@ -101,7 +103,7 @@ class Tools extends Controller
      */
     public function scanOneNotify()
     {
-        $pay = WechatService::WePayOrder();
+        $pay    = WechatService::WePayOrder();
         $notify = $pay->getNotify();
         p('======= 来自扫码支付1的数据 ======');
         p($notify);
@@ -132,6 +134,7 @@ class Tools extends Controller
         $result['sign'] = $pay->getPaySign($result);
         p('======= 来自扫码支付1返回的结果 ======');
         p($result);
+
         return \WeChat\Contracts\Tools::arr2xml($result);
     }
 
@@ -145,7 +148,7 @@ class Tools extends Controller
      */
     public function scanQrc()
     {
-        $pay = WechatService::WePayOrder();
+        $pay    = WechatService::WePayOrder();
         $result = $pay->create([
             'body'             => '测试商品',
             'out_trade_no'     => time(),
@@ -157,7 +160,6 @@ class Tools extends Controller
         $this->showQrc($result['code_url']);
     }
 
-
     /**
      * 微信JSAPI支付二维码
      * @return \think\Response
@@ -168,6 +170,7 @@ class Tools extends Controller
     public function jsapiQrc()
     {
         $this->url = url('@wechat/api.tools/jsapi', '', true, true);
+
         return $this->showQrc($this->url);
     }
 
@@ -181,8 +184,8 @@ class Tools extends Controller
      */
     public function jsapi()
     {
-        $pay = WechatService::WePayOrder();
-        $openid = WechatService::getWebOauthInfo(request()->url(true), 0)['openid'];
+        $pay     = WechatService::WePayOrder();
+        $openid  = WechatService::getWebOauthInfo(request()->url(true), 0)['openid'];
         $options = [
             'body'             => '测试商品',
             'out_trade_no'     => time(),
@@ -195,7 +198,7 @@ class Tools extends Controller
         // 生成预支付码
         $result = $pay->create($options);
         // 创建JSAPI参数签名
-        $options = $pay->jsapiParams($result['prepay_id']);
+        $options    = $pay->jsapiParams($result['prepay_id']);
         $optionJSON = json_encode($options, JSON_UNESCAPED_UNICODE);
         // JSSDK 签名配置
         $configJSON = json_encode(WechatService::getWebJssdkSign(), JSON_UNESCAPED_UNICODE);
@@ -214,9 +217,9 @@ class Tools extends Controller
         echo "
         <script src='//res.wx.qq.com/open/js/jweixin-1.2.0.js'></script>
         <script>
-            wx.config($configJSON);
+            wx.config(${configJSON});
             document.getElementById('paytest').onclick = function(){
-                var options = $optionJSON;
+                var options = ${optionJSON};
                 options.success = function(){
                     alert('支付成功');
                 }
@@ -234,6 +237,7 @@ class Tools extends Controller
     {
         $wechat = WechatService::WePayOrder();
         p($wechat->getNotify());
+
         return 'SUCCESS';
     }
 
@@ -250,5 +254,4 @@ class Tools extends Controller
         $qrCode->setText($url)->setSize(300)->setPadding(20)->setImageType('png');
         response($qrCode->get(), 200, ['Content-Type' => 'image/png'])->send();
     }
-
 }

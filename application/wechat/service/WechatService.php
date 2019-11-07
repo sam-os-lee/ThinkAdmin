@@ -37,7 +37,6 @@ namespace app\wechat\service;
  */
 class WechatService extends \We
 {
-
     /**
      * 获取微信支付配置
      * @param array|null $options
@@ -47,23 +46,27 @@ class WechatService extends \We
      */
     public static function config($options = null)
     {
-        if (empty($options)) $options = [
-            // 微信功能必需参数
-            'appid'          => self::getAppid(),
-            'token'          => sysconf('wechat_token'),
-            'appsecret'      => sysconf('wechat_appsecret'),
-            'encodingaeskey' => sysconf('wechat_encodingaeskey'),
-            // 微信支付必要参数
-            'mch_id'         => sysconf('wechat_mch_id'),
-            'mch_key'        => sysconf('wechat_mch_key'),
-            'cache_path'     => env('runtime_path') . 'wechat' . DIRECTORY_SEPARATOR,
-        ];
+        if (empty($options)) {
+            $options = [
+                // 微信功能必需参数
+                'appid'          => self::getAppid(),
+                'token'          => sysconf('wechat_token'),
+                'appsecret'      => sysconf('wechat_appsecret'),
+                'encodingaeskey' => sysconf('wechat_encodingaeskey'),
+                // 微信支付必要参数
+                'mch_id'         => sysconf('wechat_mch_id'),
+                'mch_key'        => sysconf('wechat_mch_key'),
+                'cache_path'     => env('runtime_path') . 'wechat' . DIRECTORY_SEPARATOR,
+            ];
+        }
+
         if (sysconf('wechat_mch_ssl_type') === 'p12') {
             $options['ssl_p12'] = self::_parseCertPath(sysconf('wechat_mch_ssl_p12'));
         } else {
             $options['ssl_key'] = self::_parseCertPath(sysconf('wechat_mch_ssl_key'));
             $options['ssl_cer'] = self::_parseCertPath(sysconf('wechat_mch_ssl_cer'));
         }
+
         return parent::config($options);
     }
 
@@ -78,6 +81,7 @@ class WechatService extends \We
         if (preg_match('|^[a-z0-9]{16,16}\/[a-z0-9]{16,16}\.|i', $path)) {
             return \library\File::instance('local')->path($path, true);
         }
+
         return $path;
     }
 
@@ -93,10 +97,12 @@ class WechatService extends \We
     public static function __callStatic($name, $arguments)
     {
         $config = [];
+
         if (is_array($arguments) && count($arguments) > 0) {
             $option = array_shift($arguments);
             $config = is_array($option) ? $option : self::config();
         }
+
         if (in_array($name, ['wechat'])) {
             return self::instance(trim($name, '_'), 'WeChat', $config);
         } elseif (substr($name, 0, 6) === 'WeChat') {
@@ -107,9 +113,9 @@ class WechatService extends \We
             return self::instance(substr($name, 5), 'WePay', $config);
         } elseif (substr($name, 0, 6) === 'AliPay') {
             return self::instance(substr($name, 6), 'AliPay', $config);
-        } else {
-            throw new \think\Exception("class {$name} not found");
         }
+
+        throw new \think\Exception("class {$name} not found");
     }
 
     /**
@@ -127,22 +133,28 @@ class WechatService extends \We
         if (self::getType() === 'api' || in_array($type, ['WePay', 'AliPay']) || "{$type}{$name}" === 'WeChatPay') {
             if (class_exists($class = "\\{$type}\\" . ucfirst(strtolower($name)))) {
                 return new $class(empty($config) ? self::config() : $config);
-            } else {
-                throw new \think\Exception("Class {$class} not found");
             }
-        } else {
-            set_time_limit(3600);
-            list($appid, $appkey) = [sysconf('wechat_thr_appid'), sysconf('wechat_thr_appkey')];
-            $token = strtolower("{$name}-{$appid}-{$appkey}-{$type}");
-            if (class_exists('Yar_Client')) {
-                return new \Yar_Client(config('wechat.service_url') . "/service/api.client/yar/{$token}");
-            } elseif (class_exists('SoapClient')) {
-                $location = config('wechat.service_url') . "/service/api.client/soap/{$token}";
-                return new \SoapClient(null, ['uri' => strtolower($name), 'location' => $location]);
-            } else {
-                throw new \think\Exception("Yar or Soap extensions are not installed.");
-            }
+
+            throw new \think\Exception("Class {$class} not found");
         }
+
+        set_time_limit(3600);
+        list($appid, $appkey) = [
+            sysconf('wechat_thr_appid'),
+            sysconf('wechat_thr_appkey')
+        ];
+
+        $token = strtolower("{$name}-{$appid}-{$appkey}-{$type}");
+
+        if (class_exists('Yar_Client')) {
+            return new \Yar_Client(config('wechat.service_url') . "/service/api.client/yar/{$token}");
+        } elseif (class_exists('SoapClient')) {
+            $location = config('wechat.service_url') . "/service/api.client/soap/{$token}";
+
+            return new \SoapClient(null, ['uri' => strtolower($name), 'location' => $location]);
+        }
+
+        throw new \think\Exception('Yar or Soap extensions are not installed.');
     }
 
     /**
@@ -156,12 +168,13 @@ class WechatService extends \We
      */
     public static function getWebJssdkSign($url = null)
     {
-        $url = is_null($url) ? request()->url(true) : $url;
+        $url = null === $url ? request()->url(true) : $url;
+
         if (self::getType() === 'api') {
             return self::WeChatScript()->getJsSign($url);
-        } else {
-            return self::wechat()->jsSign($url);
         }
+
+        return self::wechat()->jsSign($url);
     }
 
     /**
@@ -178,40 +191,63 @@ class WechatService extends \We
     public static function getWebOauthInfo($url, $isfull = 0, $isRedirect = true)
     {
         $appid = self::getAppid();
-        list($openid, $fansinfo) = [session("{$appid}_openid"), session("{$appid}_fansinfo")];
+
+        list($openid, $fansinfo) = [
+            session("{$appid}_openid"),
+            session("{$appid}_fansinfo")
+        ];
+
         if ((empty($isfull) && !empty($openid)) || (!empty($isfull) && !empty($openid) && !empty($fansinfo))) {
             empty($fansinfo) || FansService::set($fansinfo);
+
             return ['openid' => $openid, 'fansinfo' => $fansinfo];
         }
+
         if (self::getType() === 'api') {
             $wechat = self::WeChatOauth();
+
             if (request()->get('state') !== $appid) {
-                $snsapi = empty($isfull) ? 'snsapi_base' : 'snsapi_userinfo';
-                $param = (strpos($url, '?') !== false ? '&' : '?') . 'rcode=' . encode($url);
+
+                $snsapi   = empty($isfull) ? 'snsapi_base' : 'snsapi_userinfo';
+                $param    = (strpos($url, '?') !== false ? '&' : '?') . 'rcode=' . encode($url);
                 $OauthUrl = $wechat->getOauthRedirect($url . $param, $appid, $snsapi);
-                if ($isRedirect) redirect($OauthUrl, [], 301)->send();
+
+                if ($isRedirect) {
+                    redirect($OauthUrl, [], 301)->send();
+                }
+
                 exit("window.location.href='{$OauthUrl}'");
             }
+
             if (($token = $wechat->getOauthAccessToken()) && isset($token['openid'])) {
                 session("{$appid}_openid", $openid = $token['openid']);
+
                 if (empty($isfull) && request()->get('rcode')) {
                     redirect(decode(request()->get('rcode')), [], 301)->send();
                 }
+
                 session("{$appid}_fansinfo", $fansinfo = $wechat->getUserInfo($token['access_token'], $openid));
                 empty($fansinfo) || FansService::set($fansinfo);
             }
+
             redirect(decode(request()->get('rcode')), [], 301)->send();
         } else {
+
             $result = self::wechat()->oauth(session_id(), $url, $isfull);
+
             session("{$appid}_openid", $openid = $result['openid']);
             session("{$appid}_fansinfo", $fansinfo = $result['fans']);
+
             if ((empty($isfull) && !empty($openid)) || (!empty($isfull) && !empty($openid) && !empty($fansinfo))) {
                 empty($fansinfo) || FansService::set($fansinfo);
+
                 return ['openid' => $openid, 'fansinfo' => $fansinfo];
             }
+
             if ($isRedirect && !empty($result['url'])) {
                 redirect($result['url'], [], 301)->send();
             }
+
             exit("window.location.href='{$result['url']}'");
         }
     }
@@ -226,9 +262,9 @@ class WechatService extends \We
     {
         if (self::getType() === 'api') {
             return sysconf('wechat_appid');
-        } else {
-            return sysconf('wechat_thr_appid');
         }
+
+        return sysconf('wechat_thr_appid');
     }
 
     /**
@@ -240,8 +276,11 @@ class WechatService extends \We
     public static function getType()
     {
         $type = strtolower(sysconf('wechat_type'));
-        if (in_array($type, ['api', 'thr'])) return $type;
+
+        if (in_array($type, ['api', 'thr'])) {
+            return $type;
+        }
+
         throw new \think\Exception('请在后台配置微信对接授权模式');
     }
-
 }

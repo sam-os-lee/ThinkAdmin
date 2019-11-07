@@ -1,4 +1,5 @@
 <?php
+
 // +----------------------------------------------------------------------
 // | ThinkPHP [ WE CAN DO IT JUST THINK ]
 // +----------------------------------------------------------------------
@@ -15,7 +16,6 @@ use think\Process;
 
 class Timeout extends \RuntimeException
 {
-
     const TYPE_GENERAL = 1;
     const TYPE_IDLE    = 2;
 

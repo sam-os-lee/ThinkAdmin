@@ -1,4 +1,5 @@
 <?php
+
 // +----------------------------------------------------------------------
 // | ThinkPHP [ WE CAN DO IT JUST THINK ]
 // +----------------------------------------------------------------------
@@ -15,7 +16,6 @@ use think\Process;
 
 class Faild extends \RuntimeException
 {
-
     private $process;
 
     public function __construct(Process $process)

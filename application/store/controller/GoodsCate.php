@@ -43,7 +43,8 @@ class GoodsCate extends Controller
     public function index()
     {
         $this->title = '商品分类管理';
-        $query = $this->_query($this->table)->like('title')->equal('status');
+        $query       = $this->_query($this->table)->like('title')->equal('status');
+        // 注意:分页管理器
         $query->where(['is_deleted' => '0'])->order('sort desc,id desc')->page();
     }
 
@@ -54,6 +55,7 @@ class GoodsCate extends Controller
     public function add()
     {
         $this->title = '添加商品分类';
+        // 注意:form逻辑器
         $this->_form($this->table, 'form');
     }
 
@@ -64,6 +66,7 @@ class GoodsCate extends Controller
     public function edit()
     {
         $this->title = '编辑商品分类';
+        // 注意:form逻辑器
         $this->_form($this->table, 'form');
     }
 
@@ -73,6 +76,7 @@ class GoodsCate extends Controller
      */
     public function forbid()
     {
+        // 注意:更新逻辑器
         $this->_save($this->table, ['status' => '0']);
     }
 
@@ -82,6 +86,7 @@ class GoodsCate extends Controller
      */
     public function resume()
     {
+        // 注意:更新逻辑器
         $this->_save($this->table, ['status' => '1']);
     }
 
@@ -91,7 +96,7 @@ class GoodsCate extends Controller
      */
     public function remove()
     {
+        // 注意:删除逻辑器
         $this->_delete($this->table);
     }
-
 }

@@ -1,4 +1,5 @@
 <?php
+
 // +----------------------------------------------------------------------
 // | ThinkPHP [ WE CAN DO IT JUST THINK ]
 // +----------------------------------------------------------------------
@@ -74,9 +75,8 @@ class Session
 
         if (empty($prefix) && null !== $prefix) {
             return $this->prefix;
-        } else {
-            $this->prefix = $prefix;
         }
+        $this->prefix = $prefix;
     }
 
     public static function __make(Config $config)
@@ -125,6 +125,7 @@ class Session
         $config = $config ?: $this->config;
 
         $isDoStart = false;
+
         if (isset($config['use_trans_sid'])) {
             ini_set('session.use_trans_sid', $config['use_trans_sid'] ? 1 : 0);
         }
@@ -143,7 +144,7 @@ class Session
             $this->lock = $config['use_lock'];
         }
 
-        if (isset($config['var_session_id']) && isset($_REQUEST[$config['var_session_id']])) {
+        if (isset($config['var_session_id'], $_REQUEST[$config['var_session_id']])) {
             session_id($_REQUEST[$config['var_session_id']]);
         } elseif (isset($config['id']) && !empty($config['id'])) {
             session_id($config['id']);
@@ -212,7 +213,7 @@ class Session
      */
     public function boot()
     {
-        if (is_null($this->init)) {
+        if (null === $this->init) {
             $this->init();
         }
 
@@ -238,11 +239,12 @@ class Session
 
         empty($this->init) && $this->boot();
 
-        $prefix = !is_null($prefix) ? $prefix : $this->prefix;
+        $prefix = null !== $prefix ? $prefix : $this->prefix;
 
         if (strpos($name, '.')) {
             // 二维数组赋值
             list($name1, $name2) = explode('.', $name);
+
             if ($prefix) {
                 $_SESSION[$prefix][$name1][$name2] = $value;
             } else {
@@ -270,7 +272,7 @@ class Session
 
         empty($this->init) && $this->boot();
 
-        $prefix = !is_null($prefix) ? $prefix : $this->prefix;
+        $prefix = null !== $prefix ? $prefix : $this->prefix;
 
         $value = $prefix ? (!empty($_SESSION[$prefix]) ? $_SESSION[$prefix] : []) : $_SESSION;
 
@@ -282,6 +284,7 @@ class Session
                     $value = $value[$val];
                 } else {
                     $value = null;
+
                     break;
                 }
             }
@@ -377,9 +380,8 @@ class Session
 
         if ($result) {
             $this->delete($name, $prefix);
+
             return $result;
-        } else {
-            return;
         }
     }
 
@@ -437,7 +439,7 @@ class Session
     {
         empty($this->init) && $this->boot();
 
-        $prefix = !is_null($prefix) ? $prefix : $this->prefix;
+        $prefix = null !== $prefix ? $prefix : $this->prefix;
 
         if (is_array($name)) {
             foreach ($name as $key) {
@@ -445,6 +447,7 @@ class Session
             }
         } elseif (strpos($name, '.')) {
             list($name1, $name2) = explode('.', $name);
+
             if ($prefix) {
                 unset($_SESSION[$prefix][$name1][$name2]);
             } else {
@@ -468,7 +471,7 @@ class Session
     public function clear($prefix = null)
     {
         empty($this->init) && $this->boot();
-        $prefix = !is_null($prefix) ? $prefix : $this->prefix;
+        $prefix = null !== $prefix ? $prefix : $this->prefix;
 
         if ($prefix) {
             unset($_SESSION[$prefix]);
@@ -488,7 +491,7 @@ class Session
     {
         empty($this->init) && $this->boot();
 
-        $prefix = !is_null($prefix) ? $prefix : $this->prefix;
+        $prefix = null !== $prefix ? $prefix : $this->prefix;
         $value  = $prefix ? (!empty($_SESSION[$prefix]) ? $_SESSION[$prefix] : []) : $_SESSION;
 
         $name = explode('.', $name);
@@ -496,9 +499,8 @@ class Session
         foreach ($name as $val) {
             if (!isset($value[$val])) {
                 return false;
-            } else {
-                $value = $value[$val];
             }
+            $value = $value[$val];
         }
 
         return true;
@@ -515,7 +517,7 @@ class Session
     {
         $array = $this->get($key);
 
-        if (is_null($array)) {
+        if (null === $array) {
             $array = [];
         }
 

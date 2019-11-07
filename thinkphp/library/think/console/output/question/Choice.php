@@ -1,4 +1,5 @@
 <?php
+
 // +----------------------------------------------------------------------
 // | ThinkPHP [ WE CAN DO IT JUST THINK ]
 // +----------------------------------------------------------------------
@@ -15,7 +16,6 @@ use think\console\output\Question;
 
 class Choice extends Question
 {
-
     private $choices;
     private $multiselect  = false;
     private $prompt       = ' > ';
@@ -123,8 +123,10 @@ class Choice extends Question
             }
 
             $multiselectChoices = [];
+
             foreach ($selectedChoices as $value) {
                 $results = [];
+
                 foreach ($choices as $key => $choice) {
                     if ($choice === $value) {
                         $results[] = $key;

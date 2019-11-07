@@ -29,7 +29,6 @@ use think\facade\Request;
  */
 class NodeService
 {
-
     /**
      * 获取标准访问节点
      * @param string $node
@@ -37,11 +36,15 @@ class NodeService
      */
     public static function full($node = null)
     {
-        if (empty($node)) return self::current();
+        if (empty($node)) {
+            return self::current();
+        }
+
         if (count(explode('/', $node)) === 1) {
             $node = Request::module() . '/' . Request::controller() . '/' . $node;
         }
-        return self::parseString(trim($node, " /"));
+
+        return self::parseString(trim($node, ' /'));
     }
 
     /**
@@ -70,14 +73,16 @@ class NodeService
     public static function checkpwd($password)
     {
         $password = trim($password);
+
         if (!strlen($password) >= 6) {
             return ['code' => 0, 'msg' => '密码必须大于6字符！'];
         }
+
         if (!preg_match("/^(?![\d]+$)(?![a-zA-Z]+$)(?![^\da-zA-Z]+$).{6,32}$/", $password)) {
             return ['code' => 0, 'msg' => '密码必需包含大小写字母、数字、符号任意两者组合！'];
-        } else {
-            return ['code' => 1, 'msg' => '密码复杂度通过验证！'];
         }
+
+        return ['code' => 1, 'msg' => '密码复杂度通过验证！'];
     }
 
     /**
@@ -88,10 +93,17 @@ class NodeService
     public static function getMenuNodeList()
     {
         static $nodes = [];
-        if (count($nodes) > 0) return $nodes;
-        foreach (self::getMethodList() as $node => $method) if ($method['menu']) {
-            $nodes[] = ['node' => $node, 'title' => $method['title']];
+
+        if (count($nodes) > 0) {
+            return $nodes;
         }
+
+        foreach (self::getMethodList() as $node => $method) {
+            if ($method['menu']) {
+                $nodes[] = ['node' => $node, 'title' => $method['title']];
+            }
+        }
+
         return $nodes;
     }
 
@@ -106,6 +118,7 @@ class NodeService
     public static function getMenuNodeTree()
     {
         $list = Db::name('SystemMenu')->where(['status' => '1'])->order('sort desc,id asc')->select();
+
         return self::buildMenuData(Data::arr2tree($list), self::getMethodList());
     }
 
@@ -119,16 +132,26 @@ class NodeService
     private static function buildMenuData($menus, $nodes)
     {
         foreach ($menus as $key => &$menu) {
-            if (!empty($menu['sub'])) $menu['sub'] = self::buildMenuData($menu['sub'], $nodes);
-            if (!empty($menu['sub'])) $menu['url'] = '#';
-            elseif (preg_match('/^https?\:/i', $menu['url'])) continue;
-            elseif ($menu['url'] === '#') unset($menus[$key]);
-            else {
-                $node = join('/', array_slice(explode('/', preg_replace('/[\W]/', '/', $menu['url'])), 0, 3));
+            if (!empty($menu['sub'])) {
+                $menu['sub'] = self::buildMenuData($menu['sub'], $nodes);
+            }
+
+            if (!empty($menu['sub'])) {
+                $menu['url'] = '#';
+            } elseif (preg_match('/^https?\:/i', $menu['url'])) {
+                continue;
+            } elseif ($menu['url'] === '#') {
+                unset($menus[$key]);
+            } else {
+                $node        = join('/', array_slice(explode('/', preg_replace('/[\W]/', '/', $menu['url'])), 0, 3));
                 $menu['url'] = url($menu['url']) . (empty($menu['params']) ? '' : "?{$menu['params']}");
-                if (!self::checkAuth($node)) unset($menus[$key]);
+
+                if (!self::checkAuth($node)) {
+                    unset($menus[$key]);
+                }
             }
         }
+
         return $menus;
     }
 
@@ -140,13 +163,25 @@ class NodeService
     public static function getAuthList()
     {
         static $nodes = [];
-        if (count($nodes) > 0) return $nodes;
-        $nodes = Cache::tag('system')->get('NodeAuthList', []);
-        if (count($nodes) > 0) return $nodes;
-        foreach (self::getMethodList() as $key => $node) {
-            if ($node['auth']) $nodes[$key] = $node['title'];
+
+        if (count($nodes) > 0) {
+            return $nodes;
         }
+
+        $nodes = Cache::tag('system')->get('NodeAuthList', []);
+
+        if (count($nodes) > 0) {
+            return $nodes;
+        }
+
+        foreach (self::getMethodList() as $key => $node) {
+            if ($node['auth']) {
+                $nodes[$key] = $node['title'];
+            }
+        }
+
         Cache::tag('system')->set('NodeAuthList', $nodes);
+
         return $nodes;
     }
 
@@ -159,20 +194,28 @@ class NodeService
      */
     public static function forceAuth($node = null)
     {
-        if (session('admin_user.username') === 'admin') return true;
-        $real = is_null($node) ? self::current() : self::full($node);
+        if (session('admin_user.username') === 'admin') {
+            return true;
+        }
+
+        $real = null === $node ? self::current() : self::full($node);
+
         list($module, $controller, $action) = explode('/', $real);
+
         if (class_exists($class = App::parseClass($module, 'controller', $controller))) {
             $reflection = new \ReflectionClass($class);
+
             if ($reflection->hasMethod($action)) {
                 $comment = preg_replace("/\s/", '', $reflection->getMethod($action)->getDocComment());
+
                 if (stripos($comment, '@authtrue') === false) {
                     return true;
-                } else {
-                    return in_array($real, (array)session('admin_user.nodes'));
                 }
+
+                return in_array($real, (array) session('admin_user.nodes'));
             }
         }
+
         return true;
     }
 
@@ -185,13 +228,17 @@ class NodeService
      */
     public static function checkAuth($node = null)
     {
-        if (session('admin_user.username') === 'admin') return true;
-        $real = is_null($node) ? self::current() : self::full($node);
-        if (isset(self::getAuthList()[$real])) {
-            return in_array($real, (array)session('admin_user.nodes'));
-        } else {
+        if (session('admin_user.username') === 'admin') {
             return true;
         }
+
+        $real = null === $node ? self::current() : self::full($node);
+
+        if (isset(self::getAuthList()[$real])) {
+            return in_array($real, (array) session('admin_user.nodes'));
+        }
+
+        return true;
     }
 
     /**
@@ -203,18 +250,42 @@ class NodeService
     public static function getAuthTree($checkeds = [])
     {
         static $nodes = [];
-        if (count($nodes) > 0) return $nodes;
-        foreach (self::getAuthList() as $node => $title) {
-            $pnode = substr($node, 0, strripos($node, '/'));
-            $nodes[$node] = ['node' => $node, 'title' => $title, 'pnode' => $pnode, 'checked' => in_array($node, $checkeds)];
+
+        if (count($nodes) > 0) {
+            return $nodes;
         }
-        foreach (self::getClassList() as $node => $title) foreach (array_keys($nodes) as $key) {
-            if (stripos($key, "{$node}/") !== false) {
-                $pnode = substr($node, 0, strripos($node, '/'));
-                $nodes[$node] = ['node' => $node, 'title' => $title, 'pnode' => $pnode, 'checked' => in_array($node, $checkeds)];
-                $nodes[$pnode] = ['node' => $pnode, 'title' => ucfirst($pnode), 'checked' => in_array($pnode, $checkeds)];
+
+        foreach (self::getAuthList() as $node => $title) {
+            $pnode        = substr($node, 0, strripos($node, '/'));
+            $nodes[$node] = [
+                'node' => $node,
+                'title' => $title,
+                'pnode' => $pnode,
+                'checked' => in_array($node, $checkeds)
+            ];
+        }
+
+        foreach (self::getClassList() as $node => $title) {
+            foreach (array_keys($nodes) as $key) {
+                if (stripos($key, "{$node}/") !== false) {
+
+                    $pnode         = substr($node, 0, strripos($node, '/'));
+                    $nodes[$node]  = [
+                        'node' => $node,
+                        'title' => $title,
+                        'pnode' => $pnode,
+                        'checked' => in_array($node, $checkeds)
+                    ];
+
+                    $nodes[$pnode] = [
+                        'node' => $pnode,
+                        'title' => ucfirst($pnode),
+                        'checked' => in_array($pnode, $checkeds)
+                    ];
+                }
             }
         }
+
         return $nodes = Data::arr2tree($nodes, 'node', 'pnode', '_sub_');
     }
 
@@ -232,11 +303,22 @@ class NodeService
             Cache::tag('system')->rm('NodeClassData');
             Cache::tag('system')->rm('NodeMethodData');
         }
+
         if (($uid = session('admin_user.id'))) {
             session('admin_user', Db::name('SystemUser')->where(['id' => $uid])->find());
         }
+
         if (($aids = session('admin_user.authorize'))) {
-            $where = [['status', 'eq', '1'], ['id', 'in', explode(',', $aids)]];
+
+            $where  = [
+                ['status', 'eq', '1'],
+                ['id', 'in', explode(',', $aids)]
+            ];
+
+            /**
+             * system-auth 系统-权限
+             * system_auth_node 系统-权限-授权
+             */
             $subsql = Db::name('SystemAuth')->field('id')->where($where)->buildSql();
             session('admin_user.nodes', array_unique(Db::name('SystemAuthNode')->whereRaw("auth in {$subsql}")->column('node')));
         } else {
@@ -252,15 +334,28 @@ class NodeService
     public static function getClassList()
     {
         static $nodes = [];
-        if (count($nodes) > 0) return $nodes;
+
+        if (count($nodes) > 0) {
+            return $nodes;
+        }
+
         $nodes = Cache::tag('system')->get('NodeClassData', []);
-        if (count($nodes) > 0) return $nodes;
+
+        if (count($nodes) > 0) {
+            return $nodes;
+        }
+
         self::eachController(function (\ReflectionClass $reflection, $prenode) use (&$nodes) {
             list($node, $comment) = [trim($prenode, ' / '), $reflection->getDocComment()];
             $nodes[$node] = preg_replace('/^\/\*\*\*(.*?)\*.*?$/', '$1', preg_replace("/\s/", '', $comment));
-            if (stripos($nodes[$node], '@') !== false) $nodes[$node] = '';
+
+            if (stripos($nodes[$node], '@') !== false) {
+                $nodes[$node] = '';
+            }
         });
+
         Cache::tag('system')->set('NodeClassData', $nodes);
+
         return $nodes;
     }
 
@@ -272,22 +367,37 @@ class NodeService
     public static function getMethodList()
     {
         static $nodes = [];
-        if (count($nodes) > 0) return $nodes;
+
+        if (count($nodes) > 0) {
+            return $nodes;
+        }
+
         $nodes = Cache::tag('system')->get('NodeMethodData', []);
-        if (count($nodes) > 0) return $nodes;
+
+        if (count($nodes) > 0) {
+            return $nodes;
+        }
+
         self::eachController(function (\ReflectionClass $reflection, $prenode) use (&$nodes) {
+            // 扫描控制器中函数
             foreach ($reflection->getMethods(\ReflectionMethod::IS_PUBLIC) as $method) {
                 $action = strtolower($method->getName());
                 list($node, $comment) = ["{$prenode}{$action}", preg_replace("/\s/", '', $method->getDocComment())];
                 $nodes[$node] = [
-                    'auth'  => stripos($comment, '@authtrue') !== false,
-                    'menu'  => stripos($comment, '@menutrue') !== false,
+                    'auth'  => stripos($comment, '@authtrue') !== false,  // true:需要认证, false:不需要认证
+                    'menu'  => stripos($comment, '@menutrue') !== false,  // true:菜单项, false:非菜单项
                     'title' => preg_replace('/^\/\*\*\*(.*?)\*.*?$/', '$1', $comment),
                 ];
-                if (stripos($nodes[$node]['title'], '@') !== false) $nodes[$node]['title'] = '';
+
+                if (stripos($nodes[$node]['title'], '@') !== false) {
+                    $nodes[$node]['title'] = '';
+                }
             }
         });
+
+        // 缓存数据打标签
         Cache::tag('system')->set('NodeMethodData', $nodes);
+
         return $nodes;
     }
 
@@ -298,9 +408,20 @@ class NodeService
      */
     public static function eachController($callable)
     {
-        foreach (self::scanPath(env('app_path') . "*/controller/") as $file) {
-            if (!preg_match("|/(\w+)/controller/(.+)\.php$|", $file, $matches)) continue;
+        foreach (self::scanPath(env('app_path') . '*/controller/') as $file) {
+
+            // 检测文件是否是controller目录下文件
+            if (!preg_match("|/(\w+)/controller/(.+)\.php$|", $file, $matches)) {
+                continue;
+            }
+
+            /**
+             * /(\w+)/controller/(.+)\.php$
+             * $matches[1] module
+             * $matches[2] child controller
+             */
             list($module, $controller) = [$matches[1], strtr($matches[2], '/', '.')];
+
             if (class_exists($class = substr(strtr(env('app_namespace') . $matches[0], '/', '\\'), 0, -4))) {
                 call_user_func($callable, new \ReflectionClass($class), Node::parseString("{$module}/{$controller}/"));
             }
@@ -316,11 +437,13 @@ class NodeService
     {
         if (count($nodes = explode('/', $node)) > 1) {
             $dots = [];
+
             foreach (explode('.', $nodes[1]) as $dot) {
-                $dots[] = trim(preg_replace("/[A-Z]/", "_\\0", $dot), "_");
+                $dots[] = trim(preg_replace('/[A-Z]/', '_\\0', $dot), '_');
             }
             $nodes[1] = join('.', $dots);
         }
+
         return strtolower(join('/', $nodes));
     }
 
@@ -334,13 +457,15 @@ class NodeService
     private static function scanPath($dirname, $data = [], $ext = 'php')
     {
         foreach (glob("{$dirname}*") as $file) {
+
             if (is_dir($file)) {
+                // 递归获取php文件
                 $data = array_merge($data, self::scanPath("{$file}/"));
-            } elseif (is_file($file) && pathinfo($file, 4) === $ext) {
+            } elseif (is_file($file) && pathinfo($file, PATHINFO_EXTENSION ) === $ext) {
                 $data[] = str_replace('\\', '/', $file);
             }
         }
+
         return $data;
     }
-
 }

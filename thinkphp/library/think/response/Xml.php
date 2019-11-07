@@ -1,4 +1,5 @@
 <?php
+
 // +----------------------------------------------------------------------
 // | ThinkPHP [ WE CAN DO IT JUST THINK ]
 // +----------------------------------------------------------------------
@@ -47,6 +48,7 @@ class Xml extends Response
                 $xml      = "<?xml version=\"1.0\" encoding=\"{$encoding}\"?>";
                 $data     = $xml . $data;
             }
+
             return $data;
         }
 
@@ -69,6 +71,7 @@ class Xml extends Response
     {
         if (is_array($attr)) {
             $array = [];
+
             foreach ($attr as $key => $value) {
                 $array[] = "{$key}=\"{$value}\"";
             }
