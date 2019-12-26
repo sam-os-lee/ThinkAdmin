@@ -2,6 +2,7 @@
 /.svn
 /.idea
 /runtime
+/vendor
 /safefile
 /nbproject
 /config/cert
